@@ -123,6 +123,14 @@
     @keyframes shimmer { 0%,100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(255,212,121,0)); } 50% { transform: scale(1.12); filter: drop-shadow(0 0 14px rgba(255,212,121,.6)); } }
     @media (prefers-reduced-motion: reduce) { .wave-track { animation: none; } .hero.deluxe .hero-badge { animation: none; } }
 
+    /* Drifting sea turtle (calm states) */
+    .turtle { position: absolute; left: 0; bottom: 44px; z-index: 1; pointer-events: none; animation: swim 19s linear infinite; }
+    .turtle-inner { width: 74px; height: 58px; color: var(--calm-2); opacity: .9; animation: bob 4.5s ease-in-out infinite; }
+    .turtle-inner svg { width: 100%; height: 100%; display: block; }
+    .hero.deluxe .turtle-inner { color: #ffd479; }
+    @keyframes swim { 0% { transform: translateX(560px); } 100% { transform: translateX(-200px); } }
+    @media (prefers-reduced-motion: reduce) { .turtle { animation: none; left: auto; right: 18px; } .turtle-inner { animation: none; } }
+
     /* Indicators (wave height + wind) */
     .indicators { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
     @media (max-width: 430px) { .indicators { grid-template-columns: 1fr; } }
@@ -148,6 +156,19 @@
     .ind.over .ind-bar > i { background: linear-gradient(90deg, #e8b06a, var(--warn)); }
     .ind-bar .thr { position: absolute; top: -3px; width: 2px; height: 14px; background: var(--text); opacity: .55; border-radius: 2px; }
     .ind-cap { margin-top: 7px; font-size: 11px; color: var(--muted); }
+
+    /* "Good for" activities (shown only when calm) */
+    .good-card.deluxe { border-color: rgba(255,212,121,.4); }
+    .activities { display: flex; gap: 10px; }
+    .act { flex: 1; background: var(--card-2); border: 1px solid var(--border); border-radius: 14px; padding: 14px 6px; text-align: center; }
+    .act .scene { width: 58px; height: 58px; margin: 0 auto 8px; color: var(--calm); animation: bob 3s ease-in-out infinite; }
+    .act .scene svg { width: 100%; height: 100%; display: block; }
+    .act:nth-child(2) .scene { animation-delay: -1s; color: var(--calm-2); }
+    .act:nth-child(3) .scene { animation-delay: -2s; }
+    .good-card.deluxe .act .scene { color: #ffd479; }
+    .act .name { font-weight: 700; font-size: 13px; }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+    @media (prefers-reduced-motion: reduce) { .act .scene { animation: none; } }
 
     /* Section card */
     .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; }
@@ -229,6 +250,8 @@
     <main id="app" class="hidden">
       <section class="hero" id="hero"></section>
 
+      <section id="goodFor"></section>
+
       <section class="indicators" id="indicators"></section>
 
       <div class="card">
@@ -284,6 +307,14 @@
 
     const WAVE_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c1.8 0 1.8 2 3.6 2S7.4 6 9.2 6 11 8 12.8 8 14.6 6 16.4 6 18.2 8 20 8s1.8-2 2-2"/><path d="M2 12c1.8 0 1.8 2 3.6 2S7.4 12 9.2 12 11 14 12.8 14 14.6 12 16.4 12 18.2 14 20 14s1.8-2 2-2"/><path d="M2 18c1.8 0 1.8 2 3.6 2S7.4 18 9.2 18 11 20 12.8 20 14.6 18 16.4 18 18.2 20 20 20s1.8-2 2-2"/></svg>`;
     const WIND_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h11a3 3 0 1 0-3-3"/><path d="M3 12h15.5a3 3 0 1 1-3 3"/><path d="M3 16h8.5a2.5 2.5 0 1 1-2.5 2.5"/></svg>`;
+
+    // Activity illustrations (shown when the sea is calm)
+    const SWIM_ART = `<svg viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="46" cy="22" r="6" fill="currentColor" stroke="none"/><path d="M12 40c7-5 13-5 19-2l7 4c4 2 9 2 13-1"/><path d="M38 42l7-11"/><path d="M5 54c4 0 4 3 8 3s4-3 8-3 4 3 8 3 4-3 8-3 4 3 8 3 4-3 8-3" opacity=".5"/></svg>`;
+    const SNORKEL_ART = `<svg viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><rect x="15" y="24" width="31" height="20" rx="7"/><path d="M30 44c0 4 2 7 6 7"/><path d="M46 28c6 0 9 4 9 10v15"/><path d="M50 53h9"/><path d="M15 31H8" opacity=".7"/><path d="M5 62c4 0 4 3 8 3s4-3 8-3 4 3 8 3 4-3 8-3 4 3 8 3 4-3 8-3" opacity=".45"/></svg>`;
+    const SUP_ART = `<svg viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="31" cy="13" r="5" fill="currentColor" stroke="none"/><path d="M31 18v15M31 33l-5 9M31 33l5 9"/><path d="M31 23l11-7"/><path d="M47 7L37 42"/><ellipse cx="34" cy="50" rx="23" ry="4.5"/><path d="M5 62c4 0 4 3 8 3s4-3 8-3 4 3 8 3 4-3 8-3 4 3 8 3 4-3 8-3" opacity=".45"/></svg>`;
+
+    // Decorative sea turtle that drifts across the hero when calm
+    const TURTLE_ART = `<svg viewBox="0 0 80 64" fill="none" stroke-linecap="round" stroke-linejoin="round"><g fill="currentColor" opacity=".82"><ellipse cx="58" cy="18" rx="8" ry="4.5" transform="rotate(35 58 18)"/><ellipse cx="58" cy="46" rx="8" ry="4.5" transform="rotate(-35 58 46)"/><ellipse cx="27" cy="14" rx="10" ry="5" transform="rotate(-32 27 14)"/><ellipse cx="27" cy="50" rx="10" ry="5" transform="rotate(32 27 50)"/><ellipse cx="11" cy="32" rx="7" ry="5.5"/></g><ellipse cx="42" cy="32" rx="22" ry="18" fill="currentColor"/><g stroke="#0e1420" stroke-width="2" opacity=".5" fill="none"><polygon points="42,24 50,28 50,36 42,40 34,36 34,28"/><path d="M42 24V18M50 28l5-3M50 36l5 3M42 40v6M34 36l-5 3M34 28l-5-3"/></g><circle cx="8" cy="30" r="1.5" fill="#0e1420"/></svg>`;
 
     const LS = {
       get loc() { return localStorage.getItem("yp-loc") || "telaviv"; },
@@ -461,6 +492,9 @@
         state = "rough"; icon = "🌊"; title = "ים לא פלטה"; sub = "כרגע מעל הסף שהגדרת";
       }
 
+      const turtle = (state === "calm" || state === "deluxe")
+        ? `<div class="turtle"><div class="turtle-inner">${TURTLE_ART}</div></div>` : "";
+
       hero.className = "hero " + state;
       hero.innerHTML = `
         <div class="hero-content">
@@ -468,7 +502,26 @@
           <h1>${title}</h1>
           <p class="sub">${sub}</p>
         </div>
+        ${turtle}
         ${waveScene(waveH)}`;
+    }
+
+    function renderGoodFor() {
+      const el = $("goodFor");
+      const now = israelNow();
+      const cur = currentHourData();
+      const calm = isDaytimeHour(now.hour) && cur && isCalmHour(cur);
+      if (!calm) { el.innerHTML = ""; return; }
+      const deluxe = cur.waveHeight != null && cur.waveHeight < DELUXE_WAVE;
+      const act = (art, name) => `<div class="act"><div class="scene">${art}</div><div class="name">${name}</div></div>`;
+      el.innerHTML = `<div class="card good-card${deluxe ? " deluxe" : ""}">
+        <h2>${deluxe ? "💎 מושלם עכשיו ל…" : "🐢 מצוין עכשיו ל…"}</h2>
+        <div class="activities">
+          ${act(SWIM_ART, "שחייה")}
+          ${act(SNORKEL_ART, "שנירקול")}
+          ${act(SUP_ART, "סאפ")}
+        </div>
+      </div>`;
     }
 
     // Animated layered wave illustration; amplitude scales with real wave height.
@@ -564,6 +617,7 @@
 
     function renderAll() {
       renderHero();
+      renderGoodFor();
       renderIndicators();
       renderNextWindow();
       renderMetrics();
