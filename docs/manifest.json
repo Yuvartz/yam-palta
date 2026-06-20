@@ -1,0 +1,18 @@
+{
+  "name": "ים פלאטה",
+  "short_name": "ים פלאטה",
+  "description": "האם הים רגוע מספיק לשחייה, סאפ וקיאק לאורך חופי ישראל וסיני",
+  "lang": "he",
+  "dir": "rtl",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0e16",
+  "theme_color": "#0a0e16",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "categories": ["weather", "lifestyle", "sports"]
+}

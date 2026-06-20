@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>ים פלאטה</title>
+  <meta name="description" content="האם הים רגוע מספיק לשחייה, סאפ וקיאק לאורך חופי ישראל וסיני" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0a0e16" />
+  <link rel="icon" href="favicon.ico" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="ים פלאטה" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #0a0e16;
+      --bg-2: #0e1420;
+      --card: #141b2a;
+      --card-2: #1b2436;
+      --border: #243049;
+      --text: #e6edf6;
+      --muted: #8a98ad;
+      --mono: 'JetBrains Mono', ui-monospace, monospace;
+      --sans: 'Heebo', system-ui, -apple-system, sans-serif;
+      --calm: #2dd4bf;
+      --calm-2: #34d399;
+      --calm-glow: rgba(45, 212, 191, 0.25);
+      --warn: #f0a55a;
+      --night: #6d7bd6;
+      --danger: #f06a6a;
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--sans);
+      background:
+        radial-gradient(1200px 600px at 50% -10%, #122 0%, transparent 60%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: max(16px, env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom));
+      line-height: 1.45;
+    }
+    .wrap { max-width: 560px; margin: 0 auto; }
+
+    .num { font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.5px; }
+
+    /* Topbar */
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+    .brand { font-weight: 900; font-size: 22px; display: flex; align-items: center; gap: 8px; }
+    .brand .dot { font-size: 22px; }
+    .streak { display: none; align-items: center; gap: 6px; background: var(--card); border: 1px solid var(--border);
+      padding: 7px 12px; border-radius: 999px; font-weight: 700; font-size: 14px; }
+    .streak.on { display: inline-flex; }
+    .streak .n { font-family: var(--mono); color: var(--calm); }
+
+    /* Locations */
+    .locations { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 18px; -ms-overflow-style: none; scrollbar-width: none; }
+    .locations::-webkit-scrollbar { display: none; }
+    .loc {
+      flex: 0 0 auto; background: var(--card); border: 1px solid var(--border); color: var(--muted);
+      padding: 8px 16px; border-radius: 999px; font-weight: 700; font-size: 14px; cursor: pointer; transition: .15s;
+    }
+    .loc:hover { color: var(--text); }
+    .loc.active { background: var(--card-2); color: var(--text); border-color: #3a4a6e; box-shadow: 0 0 0 1px #3a4a6e inset; }
+
+    /* Hero */
+    .hero {
+      position: relative; overflow: hidden;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 24px; padding: 30px 24px; text-align: center; margin-bottom: 16px;
+      min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: background .4s, border-color .4s;
+    }
+    .hero.calm {
+      background: linear-gradient(160deg, rgba(45,212,191,.16), rgba(52,211,153,.06) 60%, var(--card));
+      border-color: rgba(45,212,191,.5); box-shadow: 0 0 60px -20px var(--calm-glow);
+    }
+    .hero.night { background: linear-gradient(160deg, rgba(109,123,214,.14), var(--card)); border-color: rgba(109,123,214,.4); }
+    .hero .icon { font-size: 56px; line-height: 1; margin-bottom: 10px; }
+    .hero.calm .icon { animation: bounce 1.2s ease-in-out infinite; }
+    .hero h1 { font-size: 34px; font-weight: 900; margin: 0 0 8px; }
+    .hero.calm h1 { color: var(--calm); text-shadow: 0 0 28px var(--calm-glow); }
+    .hero.night h1 { color: var(--night); }
+    .hero .sub { color: var(--muted); font-size: 15px; margin: 0; }
+    .hero .verdict-meta { margin-top: 14px; display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+    .hero .verdict-meta b { color: var(--text); font-family: var(--mono); font-weight: 700; }
+
+    @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+    /* Confetti */
+    .confetti { position: fixed; top: -10px; width: 9px; height: 14px; z-index: 9999; pointer-events: none; border-radius: 2px; opacity: .9; animation: fall linear forwards; }
+    @keyframes fall { to { transform: translateY(105vh) rotate(540deg); opacity: 0; } }
+
+    /* Section card */
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; }
+    .card h2 { font-size: 13px; font-weight: 700; color: var(--muted); margin: 0 0 14px; text-transform: none; letter-spacing: .3px; }
+
+    /* Next window */
+    .next-line { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+    .next-line .when { font-weight: 800; font-size: 18px; }
+    .next-line .time { font-family: var(--mono); font-size: 18px; color: var(--calm); font-weight: 700; }
+    .next-empty { color: var(--muted); font-size: 15px; }
+
+    /* Metrics grid */
+    .metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .metric { background: var(--card-2); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
+    .metric .label { color: var(--muted); font-size: 12px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .metric .value { font-family: var(--mono); font-size: 22px; font-weight: 700; }
+    .metric .value small { font-size: 13px; color: var(--muted); font-weight: 500; }
+    .metric .compass { font-size: 15px; font-family: var(--sans); font-weight: 700; }
+
+    /* Forecast strip */
+    .day { display: grid; grid-template-columns: 96px 1fr 46px; align-items: center; gap: 12px; padding: 9px 0; }
+    .day + .day { border-top: 1px solid var(--border); }
+    .day .name { font-weight: 700; font-size: 14px; }
+    .day .name small { display: block; color: var(--muted); font-weight: 500; font-size: 11px; }
+    .bar { height: 9px; background: var(--bg-2); border-radius: 999px; overflow: hidden; }
+    .bar > i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--calm), var(--calm-2)); transition: width .5s; }
+    .day .pct { font-family: var(--mono); font-size: 14px; font-weight: 700; text-align: left; }
+
+    /* Settings */
+    .slider-row { margin-bottom: 18px; }
+    .slider-row:last-of-type { margin-bottom: 0; }
+    .slider-row .top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+    .slider-row .top .lbl { font-weight: 700; font-size: 14px; }
+    .slider-row .top .val { font-family: var(--mono); font-weight: 700; color: var(--calm); }
+    input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 999px;
+      background: var(--bg-2); outline: none; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%;
+      background: var(--calm); cursor: pointer; border: 3px solid var(--bg); box-shadow: 0 0 10px var(--calm-glow); }
+    input[type=range]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: var(--calm);
+      cursor: pointer; border: 3px solid var(--bg); }
+
+    .btn { width: 100%; margin-top: 16px; padding: 13px; border-radius: 12px; border: 1px solid var(--border);
+      background: var(--card-2); color: var(--text); font-family: var(--sans); font-weight: 700; font-size: 15px; cursor: pointer; transition: .15s; }
+    .btn:hover { border-color: #3a4a6e; }
+    .btn.ok { border-color: rgba(45,212,191,.5); color: var(--calm); }
+
+    .updated { text-align: center; color: var(--muted); font-size: 12px; margin-top: 4px; }
+    .updated .num { color: #6b7a90; }
+
+    /* States */
+    .state-msg { text-align: center; color: var(--muted); padding: 40px 0; }
+    .spinner { width: 34px; height: 34px; border: 3px solid var(--border); border-top-color: var(--calm);
+      border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 14px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error-box { background: rgba(240,106,106,.08); border: 1px solid rgba(240,106,106,.4); color: #ffb4b4;
+      border-radius: var(--radius); padding: 16px; text-align: center; margin-bottom: 16px; }
+    .error-box button { margin-top: 10px; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand"><span class="dot">🌊</span><span>ים פלאטה</span></div>
+      <div class="streak" id="streak"><span>🔥</span><span class="n" id="streakN">0</span><span>ימים רצופים</span></div>
+    </div>
+
+    <div class="locations" id="locations"></div>
+
+    <div id="errorBox" class="error-box hidden">
+      <div id="errorText">שגיאה בטעינת הנתונים.</div>
+      <button class="btn" onclick="App.refresh()">נסה שוב</button>
+    </div>
+
+    <div id="loading" class="card">
+      <div class="state-msg"><div class="spinner"></div>טוען נתוני ים...</div>
+    </div>
+
+    <main id="app" class="hidden">
+      <section class="hero" id="hero"></section>
+
+      <div class="card">
+        <h2>חלון הרגיעה הבא</h2>
+        <div id="nextWindow"></div>
+      </div>
+
+      <div class="card">
+        <h2>נתונים נוכחיים</h2>
+        <div class="metrics" id="metrics"></div>
+      </div>
+
+      <div class="card">
+        <h2>תחזית 6 ימים — אחוז שעות יום רגועות</h2>
+        <div id="forecast"></div>
+      </div>
+
+      <div class="card">
+        <h2>כיול אישי של סף הרגיעה</h2>
+        <div class="slider-row">
+          <div class="top"><span class="lbl">גובה גל מרבי</span><span class="val"><span id="waveVal" class="num">0.3</span> מ׳</span></div>
+          <input type="range" id="waveSlider" min="0.05" max="1.5" step="0.05" value="0.3" />
+        </div>
+        <div class="slider-row">
+          <div class="top"><span class="lbl">מהירות רוח מרבית</span><span class="val"><span id="windVal" class="num">10</span> קשר</span></div>
+          <input type="range" id="windSlider" min="1" max="30" step="1" value="10" />
+        </div>
+        <button class="btn" id="notifyBtn" onclick="App.enableNotifications()">🔔 הפעל התראות על ים רגוע</button>
+      </div>
+
+      <div class="updated" id="updated"></div>
+    </main>
+  </div>
+
+  <script>
+  const App = (() => {
+    "use strict";
+
+    // ---------- Config ----------
+    const LOCATIONS = {
+      telaviv: { name: "תל אביב", lat: 32.0809, lon: 34.7610 },
+      haifa:   { name: "חיפה",   lat: 32.8275, lon: 34.9897 },
+      ashdod:  { name: "אשדוד",  lat: 31.8044, lon: 34.6473 },
+      nuweiba: { name: "נוויבה", lat: 29.0267, lon: 34.6650 },
+    };
+    const DAY_START = 6, DAY_END = 19;          // active window 06:00–19:00
+    const KMH_PER_KNOT = 1.852;
+    const REFRESH_MS = 15 * 60 * 1000;          // 15 minutes
+    const COMPASS = ["צפונית", "צפונית-מזרחית", "מזרחית", "דרומית-מזרחית", "דרומית", "דרומית-מערבית", "מערבית", "צפונית-מערבית"];
+    const ARROWS  = ["↓", "↙", "←", "↖", "↑", "↗", "→", "↘"]; // direction wind blows TOWARD (from N -> arrow down)
+
+    const LS = {
+      get loc() { return localStorage.getItem("yp-loc") || "telaviv"; },
+      set loc(v) { localStorage.setItem("yp-loc", v); },
+      get wave() { return parseFloat(localStorage.getItem("yp-wave")) || 0.3; },
+      set wave(v) { localStorage.setItem("yp-wave", String(v)); },
+      get wind() { return parseFloat(localStorage.getItem("yp-wind")) || 10; },
+      set wind(v) { localStorage.setItem("yp-wind", String(v)); },
+    };
+
+    // ---------- State ----------
+    let hourly = [];        // merged: [{ time, dateStr, hour, waveHeight, seaTemp, airTemp, windKmh, windDir, uv }]
+    let waveMax = LS.wave;  // meters
+    let windMax = LS.wind;  // knots
+    let refreshTimer = null, minuteTimer = null;
+
+    // ---------- Helpers ----------
+    const $ = id => document.getElementById(id);
+    const pad = n => String(n).padStart(2, "0");
+    const round = (v, d = 1) => v == null ? null : Math.round(v * 10 ** d) / 10 ** d;
+    const toKnots = kmh => kmh / KMH_PER_KNOT;
+
+    function israelNow() {
+      // "YYYY-MM-DD HH:mm:ss" in Asia/Jerusalem
+      const s = new Intl.DateTimeFormat("sv-SE", {
+        timeZone: "Asia/Jerusalem", year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
+      }).format(new Date());
+      const [d, t] = s.split(" ");
+      return { dateStr: d, hour: parseInt(t.slice(0, 2), 10), minute: parseInt(t.slice(3, 5), 10) };
+    }
+    const isDaytimeHour = h => h >= DAY_START && h < DAY_END;
+    const isCalmHour = h => h.waveHeight != null && h.windKmh != null &&
+      h.waveHeight <= waveMax && toKnots(h.windKmh) <= windMax;
+
+    function hebrewDay(dateStr) {
+      const now = israelNow();
+      if (dateStr === now.dateStr) return "היום";
+      const tomorrow = new Date(now.dateStr + "T12:00");
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tStr = `${tomorrow.getFullYear()}-${pad(tomorrow.getMonth() + 1)}-${pad(tomorrow.getDate())}`;
+      if (dateStr === tStr) return "מחר";
+      return new Intl.DateTimeFormat("he-IL", { weekday: "long" }).format(new Date(dateStr + "T12:00"));
+    }
+    function shortDate(dateStr) {
+      const d = new Date(dateStr + "T12:00");
+      return `${d.getDate()}.${d.getMonth() + 1}`;
+    }
+
+    // ---------- Data ----------
+    async function fetchData() {
+      const loc = LOCATIONS[LS.loc];
+      const common = `latitude=${loc.lat}&longitude=${loc.lon}&timezone=Asia%2FJerusalem&forecast_days=7&past_days=7`;
+      const marineUrl = `https://marine-api.open-meteo.com/v1/marine?${common}&hourly=wave_height,sea_surface_temperature`;
+      const weatherUrl = `https://api.open-meteo.com/v1/forecast?${common}&hourly=temperature_2m,wind_speed_10m,wind_direction_10m,uv_index`;
+
+      const [mRes, wRes] = await Promise.all([fetch(marineUrl), fetch(weatherUrl)]);
+      if (!mRes.ok || !wRes.ok) throw new Error("API request failed");
+      const [marine, weather] = await Promise.all([mRes.json(), wRes.json()]);
+
+      // Merge by matching timestamp
+      const wIdx = {};
+      weather.hourly.time.forEach((t, i) => { wIdx[t] = i; });
+      const merged = [];
+      marine.hourly.time.forEach((t, i) => {
+        const j = wIdx[t];
+        merged.push({
+          time: t,
+          dateStr: t.slice(0, 10),
+          hour: parseInt(t.slice(11, 13), 10),
+          waveHeight: marine.hourly.wave_height?.[i] ?? null,
+          seaTemp: marine.hourly.sea_surface_temperature?.[i] ?? null,
+          airTemp: j != null ? weather.hourly.temperature_2m[j] : null,
+          windKmh: j != null ? weather.hourly.wind_speed_10m[j] : null,
+          windDir: j != null ? weather.hourly.wind_direction_10m[j] : null,
+          uv: j != null ? weather.hourly.uv_index[j] : null,
+        });
+      });
+      return merged;
+    }
+
+    // ---------- Derived logic ----------
+    function currentHourData() {
+      const now = israelNow();
+      const key = `${now.dateStr}T${pad(now.hour)}`;
+      return hourly.find(h => h.time.slice(0, 13) === key) || null;
+    }
+
+    function nextCalmWindow() {
+      const now = israelNow();
+      const nowKey = `${now.dateStr}T${pad(now.hour)}`;
+      let start = null, prev = null;
+      for (const h of hourly) {
+        if (h.time.slice(0, 13) <= nowKey) continue;       // only the future
+        const ok = isDaytimeHour(h.hour) && isCalmHour(h);
+        if (ok) { if (!start) start = h; prev = h; }
+        else if (start) return { start, end: prev };
+      }
+      return start ? { start, end: prev } : null;
+    }
+
+    function dayGroups() {
+      const map = new Map();
+      for (const h of hourly) {
+        if (!map.has(h.dateStr)) map.set(h.dateStr, []);
+        map.get(h.dateStr).push(h);
+      }
+      return map;
+    }
+
+    function streakCount() {
+      const groups = dayGroups();
+      const now = israelNow();
+      let cursor = new Date(now.dateStr + "T12:00");
+      let streak = 0;
+      for (let guard = 0; guard < 30; guard++) {
+        const ds = `${cursor.getFullYear()}-${pad(cursor.getMonth() + 1)}-${pad(cursor.getDate())}`;
+        const day = groups.get(ds);
+        if (!day) break;
+        const daytime = day.filter(h => isDaytimeHour(h.hour));
+        if (daytime.length === 0) break;
+        const allCalm = daytime.every(isCalmHour);
+        if (!allCalm) break;
+        streak++;
+        cursor.setDate(cursor.getDate() - 1);
+      }
+      return streak;
+    }
+
+    function forecastDays(count = 6) {
+      const now = israelNow();
+      const groups = dayGroups();
+      const days = [...groups.keys()].filter(d => d >= now.dateStr).sort().slice(0, count);
+      return days.map(ds => {
+        const daytime = groups.get(ds).filter(h => isDaytimeHour(h.hour));
+        const calm = daytime.filter(isCalmHour).length;
+        const pct = daytime.length ? Math.round((calm / daytime.length) * 100) : 0;
+        return { dateStr: ds, pct };
+      });
+    }
+
+    // ---------- Rendering ----------
+    function renderLocations() {
+      const cur = LS.loc;
+      $("locations").innerHTML = Object.entries(LOCATIONS).map(([k, v]) =>
+        `<button class="loc ${k === cur ? "active" : ""}" onclick="App.setLocation('${k}')">${v.name}</button>`
+      ).join("");
+    }
+
+    function renderHero() {
+      const hero = $("hero");
+      const now = israelNow();
+      const inWindow = isDaytimeHour(now.hour);
+      const cur = currentHourData();
+
+      hero.classList.remove("calm", "night");
+
+      if (!inWindow) {
+        hero.classList.add("night");
+        hero.innerHTML = `
+          <div class="icon">🌙</div>
+          <h1>שעות לילה</h1>
+          <p class="sub">המעקב פעיל בין 06:00 ל-19:00. נתראה מחר בבוקר 🌅</p>`;
+        return;
+      }
+
+      if (!cur) {
+        hero.innerHTML = `<div class="icon">🌊</div><h1>אין נתונים לשעה זו</h1><p class="sub">נסה לרענן</p>`;
+        return;
+      }
+
+      const calm = isCalmHour(cur);
+      const meta = `
+        <div class="verdict-meta">
+          <span>גובה גל <b class="num">${round(cur.waveHeight, 2)}</b> מ׳</span>
+          <span>רוח <b class="num">${round(toKnots(cur.windKmh))}</b> קשר</span>
+        </div>`;
+
+      if (calm) {
+        hero.classList.add("calm");
+        hero.innerHTML = `<div class="icon">🌊</div><h1>ים פלאטה!</h1>
+          <p class="sub">הים רגוע — תנאים מצוינים למים</p>${meta}`;
+      } else {
+        hero.innerHTML = `<div class="icon">🌊</div><h1>הים גלי</h1>
+          <p class="sub">כרגע מעל הסף שהגדרת</p>${meta}`;
+      }
+    }
+
+    function renderNextWindow() {
+      const el = $("nextWindow");
+      const w = nextCalmWindow();
+      if (!w) { el.innerHTML = `<div class="next-empty">לא נצפה חלון רגיעה ב-7 הימים הקרובים בתנאים הנוכחיים.</div>`; return; }
+      const endHour = w.end.hour + 1; // window covers full ending hour
+      el.innerHTML = `<div class="next-line">
+        <span class="when">${hebrewDay(w.start.dateStr)} <small style="color:var(--muted)">${shortDate(w.start.dateStr)}</small></span>
+        <span class="time">${pad(w.start.hour)}:00–${pad(endHour)}:00</span>
+      </div>`;
+    }
+
+    function renderMetrics() {
+      const el = $("metrics");
+      const cur = currentHourData() || hourly.find(h => h.time.slice(0, 13) >= `${israelNow().dateStr}T${pad(israelNow().hour)}`);
+      if (!cur) { el.innerHTML = `<div class="next-empty">אין נתונים זמינים.</div>`; return; }
+      const dirIdx = cur.windDir != null ? Math.round(cur.windDir / 45) % 8 : null;
+      el.innerHTML = `
+        <div class="metric"><div class="label">🌡️ טמפ׳ מים</div><div class="value">${fmt(cur.seaTemp)}<small> °C</small></div></div>
+        <div class="metric"><div class="label">☀️ טמפ׳ אוויר</div><div class="value">${fmt(cur.airTemp)}<small> °C</small></div></div>
+        <div class="metric"><div class="label">🧭 כיוון רוח</div><div class="value compass">${dirIdx != null ? ARROWS[dirIdx] + " " + COMPASS[dirIdx] : "—"}</div></div>
+        <div class="metric"><div class="label">😎 קרינת UV</div><div class="value">${cur.uv != null ? round(cur.uv) : "—"}</div></div>`;
+    }
+    const fmt = v => v == null ? "—" : round(v).toFixed(1);
+
+    function renderForecast() {
+      const el = $("forecast");
+      el.innerHTML = forecastDays(6).map(d => `
+        <div class="day">
+          <div class="name">${hebrewDay(d.dateStr)}<small>${shortDate(d.dateStr)}</small></div>
+          <div class="bar"><i style="width:${d.pct}%"></i></div>
+          <div class="pct">${d.pct}%</div>
+        </div>`).join("");
+    }
+
+    function renderStreak() {
+      const s = streakCount();
+      const badge = $("streak");
+      if (s >= 1) { badge.classList.add("on"); $("streakN").textContent = s; }
+      else badge.classList.remove("on");
+    }
+
+    function renderUpdated() {
+      const now = israelNow();
+      $("updated").innerHTML = `עודכן לאחרונה <span class="num">${pad(now.hour)}:${pad(now.minute)}</span> · מקור: Open-Meteo`;
+    }
+
+    function renderAll() {
+      renderHero();
+      renderNextWindow();
+      renderMetrics();
+      renderForecast();
+      renderStreak();
+      renderUpdated();
+    }
+
+    // ---------- Notifications ----------
+    function refreshNotifyBtn() {
+      const btn = $("notifyBtn");
+      if (!("Notification" in window)) { btn.textContent = "🔕 הדפדפן לא תומך בהתראות"; btn.disabled = true; return; }
+      if (Notification.permission === "granted") { btn.textContent = "✅ התראות פעילות"; btn.classList.add("ok"); }
+      else if (Notification.permission === "denied") { btn.textContent = "🔕 התראות חסומות בדפדפן"; }
+      else { btn.textContent = "🔔 הפעל התראות על ים רגוע"; }
+    }
+
+    async function enableNotifications() {
+      if (!("Notification" in window)) return;
+      try { await Notification.requestPermission(); } catch (e) {}
+      refreshNotifyBtn();
+    }
+
+    function maybeNotify() {
+      if (!("Notification" in window) || Notification.permission !== "granted") return;
+      const now = israelNow();
+      if (!isDaytimeHour(now.hour)) { sessionStorage.setItem("yp-was-calm", "0"); return; } // no notifications at night
+      const cur = currentHourData();
+      const calmNow = cur ? isCalmHour(cur) : false;
+      const wasCalm = sessionStorage.getItem("yp-was-calm") === "1";
+      if (calmNow && !wasCalm) {
+        try {
+          new Notification("🌊 ים פלאטה!", {
+            body: `${LOCATIONS[LS.loc].name}: הים נרגע — תנאים מצוינים למים עכשיו.`,
+            icon: "icon-192.png", tag: "yam-plata", lang: "he", dir: "rtl",
+          });
+        } catch (e) {}
+      }
+      sessionStorage.setItem("yp-was-calm", calmNow ? "1" : "0");
+    }
+
+    // ---------- Flow ----------
+    function showError(msg) {
+      $("loading").classList.add("hidden");
+      $("app").classList.add("hidden");
+      $("errorText").textContent = msg || "שגיאה בטעינת הנתונים.";
+      $("errorBox").classList.remove("hidden");
+    }
+
+    async function load() {
+      $("errorBox").classList.add("hidden");
+      if (hourly.length === 0) { $("loading").classList.remove("hidden"); $("app").classList.add("hidden"); }
+      try {
+        hourly = await fetchData();
+        $("loading").classList.add("hidden");
+        $("app").classList.remove("hidden");
+        renderAll();
+        maybeNotify();
+      } catch (e) {
+        console.error(e);
+        if (hourly.length === 0) showError("לא ניתן לטעון נתונים. בדוק חיבור לאינטרנט ונסה שוב. (פעולת ה-fetch עובדת רק מכתובת אמיתית, לא מתוך תצוגה מוטמעת)");
+      }
+    }
+
+    // ---------- Public API ----------
+    function setLocation(key) {
+      if (!LOCATIONS[key] || key === LS.loc) return;
+      LS.loc = key;
+      sessionStorage.setItem("yp-was-calm", "0");
+      renderLocations();
+      hourly = [];
+      load();
+    }
+
+    function init() {
+      renderLocations();
+      refreshNotifyBtn();
+
+      // Sliders
+      const ws = $("waveSlider"), wd = $("windSlider");
+      ws.value = waveMax; wd.value = windMax;
+      $("waveVal").textContent = Number(waveMax).toFixed(2);
+      $("windVal").textContent = Math.round(windMax);
+      ws.addEventListener("input", () => {
+        waveMax = parseFloat(ws.value); LS.wave = waveMax;
+        $("waveVal").textContent = waveMax.toFixed(2);
+        if (hourly.length) renderAll();
+      });
+      wd.addEventListener("input", () => {
+        windMax = parseFloat(wd.value); LS.wind = windMax;
+        $("windVal").textContent = Math.round(windMax);
+        if (hourly.length) renderAll();
+      });
+
+      load();
+      refreshTimer = setInterval(load, REFRESH_MS);            // refetch every 15 min
+      minuteTimer = setInterval(() => { if (hourly.length) renderAll(); }, 60 * 1000); // keep clock/window fresh
+    }
+
+    return { init, setLocation, refresh: load, enableNotifications };
+  })();
+
+  document.addEventListener("DOMContentLoaded", App.init);
+  </script>
+</body>
+</html>

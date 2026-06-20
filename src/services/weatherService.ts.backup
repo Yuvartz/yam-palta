@@ -1,0 +1,100 @@
+import axios from 'axios';
+import { WeatherData, BeachCondition } from '../types/weather';
+
+const OPEN_METEO_BASE_URL = 'https://marine-api.open-meteo.com/v1';
+
+export class WeatherService {
+  private static telAvivCoords = {
+    latitude: 32.0853,
+    longitude: 34.7818
+  };
+
+  static async getBeachWeather(): Promise<WeatherData> {
+    try {
+      const response = await axios.get(`${OPEN_METEO_BASE_URL}/marine`, {
+        params: {
+          latitude: this.telAvivCoords.latitude,
+          longitude: this.telAvivCoords.longitude,
+          hourly: 'temperature_2m,windspeed_10m,winddirection_10m,wave_height,water_temperature',
+          timezone: 'Asia/Jerusalem',
+          forecast_days: 7
+        }
+      });
+      
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching weather data:', error);
+      throw error;
+    }
+  }
+
+  static analyzeBeachConditions(weatherData: WeatherData): BeachCondition[] {
+    const conditions: BeachCondition[] = [];
+    
+    for (let i = 0; i < weatherData.hourly.time.length; i++) {
+      const time = weatherData.hourly.time[i];
+      const temperature = weatherData.hourly.temperature_2m[i];
+      const windSpeed = weatherData.hourly.windspeed_10m?.[i] || 0;
+      const windDirection = weatherData.hourly.winddirection_10m?.[i] || 0;
+      const waveHeight = weatherData.hourly.wave_height?.[i] || 0;
+      const waterTemperature = weatherData.hourly.water_temperature?.[i] || 22;
+
+      const score = this.calculateBeachScore(windSpeed, waveHeight, temperature);
+      const condition = this.getBeachCondition(score);
+
+      conditions.push({
+        time,
+        temperature,
+        windSpeed,
+        windDirection,
+        waveHeight,
+        waterTemperature,
+        condition,
+        score
+      });
+    }
+
+    return conditions;
+  }
+
+  private static calculateBeachScore(windSpeed: number, waveHeight: number, temperature: number): number {
+    let score = 100;
+
+    // Wind penalty (stronger wind = lower score)
+    if (windSpeed > 20) score -= 40;
+    else if (windSpeed > 15) score -= 25;
+    else if (windSpeed > 10) score -= 15;
+    else if (windSpeed > 5) score -= 5;
+
+    // Wave penalty (higher waves = lower score)
+    if (waveHeight > 1.5) score -= 50;
+    else if (waveHeight > 1.0) score -= 30;
+    else if (waveHeight > 0.5) score -= 15;
+    else if (waveHeight > 0.2) score -= 5;
+
+    // Temperature bonus/penalty
+    if (temperature >= 25 && temperature <= 30) score += 10;
+    else if (temperature < 15 || temperature > 35) score -= 20;
+
+    return Math.max(0, Math.min(100, score));
+  }
+
+  private static getBeachCondition(score: number): 'yam-plata' | 'almost-plata' | 'not-nice' {
+    if (score >= 80) return 'yam-plata';
+    if (score >= 60) return 'almost-plata';
+    return 'not-nice';
+  }
+
+  static getSunsetTime(date: Date): string {
+    // Tel Aviv sunset times (approximate)
+    const month = date.getMonth() + 1;
+    let sunsetHour = 18; // Default 6 PM
+    
+    if (month >= 6 && month <= 8) sunsetHour = 19; // Summer
+    else if (month >= 3 && month <= 5) sunsetHour = 18; // Spring
+    else if (month >= 9 && month <= 11) sunsetHour = 17; // Fall
+    else sunsetHour = 16; // Winter
+    
+    return `${sunsetHour.toString().padStart(2, '0')}:00`;
+  }
+} 
