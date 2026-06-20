@@ -56,7 +56,7 @@
     .alert-banner b { color: #ffd479; }
 
     /* Hero */
-    .hero { position: relative; overflow: hidden; background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 30px 24px 0; text-align: center; margin-bottom: 14px; min-height: 280px; display: flex; flex-direction: column; align-items: center; transition: background .5s, border-color .5s, box-shadow .5s; }
+    .hero { position: relative; overflow: hidden; background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 30px 24px 18px; text-align: center; margin-bottom: 14px; min-height: 330px; display: flex; flex-direction: column; align-items: center; transition: background .5s, border-color .5s, box-shadow .5s; }
     .hero-content { position: relative; z-index: 3; }
     .hero-score { line-height: 1; margin-bottom: 10px; }
     .hero-score .sc-num { font-family: var(--mono); font-size: 58px; font-weight: 800; }
@@ -116,30 +116,34 @@
     .next-empty { color: var(--muted); font-size: 14px; padding: 7px 0; }
     .next-empty + .next-empty { border-top: 1px solid var(--border); }
 
-    /* Indicators */
-    .indicators { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-    @media (max-width: 430px) { .indicators { grid-template-columns: 1fr; } }
-    .ind { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; display: flex; gap: 14px; align-items: flex-start; transition: border-color .3s; }
+    /* Today timeline inside the hero */
+    .timeline { display: flex; justify-content: space-between; gap: 4px; margin-top: 16px; background: rgba(10,14,22,.45); border: 1px solid var(--border); border-radius: 12px; padding: 9px 6px; backdrop-filter: blur(4px); }
+    .tl-cell { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 2px 0; }
+    .tl-h { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+    .tl-dot { width: 11px; height: 11px; border-radius: 50%; box-shadow: 0 0 6px -1px rgba(255,255,255,.3); }
+    .tl-now { background: rgba(255,255,255,.07); border-radius: 8px; }
+    .tl-now .tl-h { color: var(--text); font-weight: 700; }
+
+    /* Indicators — three across */
+    .indicators { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+    .ind { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 14px 9px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: border-color .3s; }
     .ind.ok { border-color: rgba(45,212,191,.45); }
     .ind.over { border-color: rgba(240,165,90,.45); }
-    .ind-icon { flex: 0 0 auto; width: 46px; height: 46px; border-radius: 13px; display: flex; align-items: center; justify-content: center; background: var(--card-2); }
-    .ind-icon svg { width: 27px; height: 27px; }
+    .ind-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: var(--card-2); }
+    .ind-icon svg { width: 23px; height: 23px; }
     .ind.ok .ind-icon { color: var(--calm); background: rgba(45,212,191,.12); }
     .ind.over .ind-icon { color: var(--warn); background: rgba(240,165,90,.12); }
-    .ind-body { flex: 1 1 auto; min-width: 0; }
-    .ind-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
-    .ind-label { font-weight: 700; font-size: 14px; }
-    .ind-status { font-size: 11px; font-weight: 700; white-space: nowrap; }
-    .ind.ok .ind-status { color: var(--calm); }
-    .ind.over .ind-status { color: var(--warn); }
-    .ind-value { font-family: var(--mono); font-size: 26px; font-weight: 800; margin: 3px 0 10px; }
-    .ind-value small { font-size: 13px; color: var(--muted); font-weight: 500; }
-    .ind-bar { position: relative; height: 8px; background: var(--bg-2); border-radius: 999px; direction: ltr; }
+    .ind-label { font-weight: 700; font-size: 12px; }
+    .ind.ok .ind-label { color: var(--calm); }
+    .ind.over .ind-label { color: var(--warn); }
+    .ind-value { font-family: var(--mono); font-size: 20px; font-weight: 800; color: var(--text); }
+    .ind-value small { font-size: 11px; color: var(--muted); font-weight: 500; }
+    .ind-bar { position: relative; width: 100%; height: 7px; background: var(--bg-2); border-radius: 999px; direction: ltr; }
     .ind-bar > i { position: absolute; left: 0; top: 0; height: 100%; border-radius: 999px; transition: width .5s; }
     .ind.ok .ind-bar > i { background: linear-gradient(90deg, var(--calm), var(--calm-2)); }
     .ind.over .ind-bar > i { background: linear-gradient(90deg, #e8b06a, var(--warn)); }
-    .ind-bar .thr { position: absolute; top: -3px; width: 2px; height: 14px; background: var(--text); opacity: .55; border-radius: 2px; }
-    .ind-cap { margin-top: 7px; font-size: 11px; color: var(--muted); }
+    .ind-bar .thr { position: absolute; top: -3px; width: 2px; height: 13px; background: var(--text); opacity: .5; border-radius: 2px; }
+    .ind-cap { font-size: 10px; color: var(--muted); font-family: var(--mono); }
 
     /* Metrics */
     .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -234,14 +238,14 @@
       <section class="indicators" id="indicators"></section>
 
       <div class="card">
-        <h2>פירוט גלים</h2>
-        <div class="metrics" id="waveDetail"></div>
-        <p class="wave-note">גלי רוח (קוצים) = גלים קצרים מהרוח המקומית — הם שהופכים את הים לקופצני. סוול = גלים ארוכים שהגיעו ממרחק, חלקים בהרבה.</p>
+        <h2>נתונים נוכחיים</h2>
+        <div class="metrics" id="metrics"></div>
       </div>
 
       <div class="card">
-        <h2>נתונים נוכחיים</h2>
-        <div class="metrics" id="metrics"></div>
+        <h2>פירוט גלים</h2>
+        <div class="metrics" id="waveDetail"></div>
+        <p class="wave-note">גלי רוח (קוצים) = גלים קצרים מהרוח המקומית — הם שהופכים את הים לקופצני. סוול = גלים ארוכים שהגיעו ממרחק, חלקים בהרבה.</p>
       </div>
 
       <div class="card">
@@ -368,14 +372,14 @@
       return Math.round((chopS * 0.34 + windS * 0.28 + heightS * 0.16 + tempS * 0.22) * 100) / 10;
     }
     function scoreColor(s) { return s >= 8 ? "#34d399" : s >= 6.5 ? "#2dd4bf" : s >= 5 ? "#e9c46a" : s >= 3.5 ? "#f0a55a" : "#f06a6a"; }
-    function scoreDesc(s, h) {
+    function scoreDesc(state, s, h) {
       const w = h && h.seaTemp != null ? ` · מים ${round(h.seaTemp)}°` : "";
-      if (s >= 8.5) return "תנאים מושלמים — קפצו למים!" + w;
-      if (s >= 7) return "תנאים מצוינים לשחייה" + w;
-      if (s >= 5.5) return "תנאים טובים, אפשר להיכנס" + w;
-      if (s >= 4) return "סביר — הים מעט גלי או קריר" + w;
-      if (s >= 2.5) return "פחות מתאים כרגע" + w;
-      return "לא מומלץ להיכנס עכשיו" + w;
+      if (state === "neutral" || s == null) return "—";
+      if (state === "rough") return "הים מעל הסף שהגדרת — פחות מתאים לשחייה כרגע" + w;
+      if (state === "deluxe") return "תנאים מושלמים — שטוח כמו זכוכית!" + w;
+      if (s >= 8) return "תנאים מצוינים לשחייה" + w;
+      if (s >= 6.5) return "תנאים טובים לשחייה" + w;
+      return "הים רגוע, אך פחות מושלם (מים קרירים או גל קל)" + w;
     }
 
     async function fetchLocation(loc) {
@@ -497,7 +501,9 @@
       else if (isDeluxeHour(ref)) { state = "deluxe"; title = "פלטה דלוקס"; }
       else if (isCalmHour(ref)) { state = "calm"; title = "ים פלטה"; }
       else { state = "rough"; title = "ים לא פלטה"; }
-      const sc = swimScore(ref), scCol = sc != null ? scoreColor(sc) : "var(--muted)", desc = sc != null ? scoreDesc(sc, ref) : "—";
+      let sc = swimScore(ref);
+      if (sc != null && state === "rough") sc = Math.min(sc, 4.5);   // not פלטה => not a great swim match
+      const scCol = sc != null ? scoreColor(sc) : "var(--muted)", desc = scoreDesc(state, sc, ref);
       const calm = state === "calm" || state === "deluxe";
       const turtle = calm ? `<div class="turtle"><div class="turtle-inner">${TURTLE_ART}</div></div>` : "";
       const sparks = calm ? sparkles(7) : "";
@@ -506,7 +512,17 @@
         <div class="hero-content">
           <div class="hero-score" style="color:${scCol}"><span class="sc-num">${sc != null ? sc.toFixed(1) : "—"}</span><span class="sc-max">/10</span><div class="sc-label">התאמה לשחייה</div></div>
           <h1>${title}</h1><p class="sub">${desc}</p>
+          ${todayTimeline()}
         </div>${turtle}${sparks}${waveScene(waveH, period)}`;
+    }
+    function todayTimeline() {
+      const now = israelNow(); const slots = [5, 8, 11, 14, 17, 20];
+      const nowSlot = slots.reduce((a, b) => Math.abs(b - now.hour) < Math.abs(a - now.hour) ? b : a, slots[0]);
+      return `<div class="timeline">` + slots.map(hr => {
+        const h = hourly.find(x => x.dateStr === now.dateStr && x.hour === hr);
+        const col = h ? hourLabel(h)[1] : "var(--border)";
+        return `<div class="tl-cell ${hr === nowSlot ? "tl-now" : ""}"><span class="tl-h">${pad(hr)}</span><span class="tl-dot" style="background:${col}"></span></div>`;
+      }).join("") + `</div>`;
     }
     function renderGoodFor() {
       const el = $("goodFor"); const ref = nearestHourData();
@@ -515,24 +531,24 @@
       const act = (art, name) => `<div class="act"><div class="scene">${art}</div><div class="name">${name}</div></div>`;
       el.innerHTML = `<div class="card good-card${deluxe ? " deluxe" : ""}"><h2>${deluxe ? "💎 מושלם עכשיו ל…" : "🐢 מצוין עכשיו ל…"}</h2><div class="activities">${act(SWIM_ART, "שחייה")}${act(SNORKEL_ART, "שנירקול")}${act(SUP_ART, "סאפ")}</div></div>`;
     }
-    function indicatorCard(icon, label, value, dec, unit, threshold, scaleMax, thrText, extra) {
+    function indicatorCard(icon, label, value, dec, unit, threshold, scaleMax, thrText) {
       const ok = value <= threshold;
       const fill = Math.max(3, Math.min(100, value / scaleMax * 100));
       const thrPos = Math.max(0, Math.min(100, threshold / scaleMax * 100));
-      return `<div class="ind ${ok ? "ok" : "over"}"><div class="ind-icon">${icon}</div><div class="ind-body">
-        <div class="ind-top"><span class="ind-label">${label}</span><span class="ind-status">${ok ? "✓ בתוך הסף" : "מעל הסף"}</span></div>
-        <div class="ind-value"><span class="num">${value.toFixed(dec)}</span> <small>${unit}</small></div>
+      return `<div class="ind ${ok ? "ok" : "over"}">
+        <div class="ind-icon">${icon}</div>
+        <div class="ind-label">${label} ${ok ? "✓" : "⚠︎"}</div>
+        <div class="ind-value"><span class="num">${value.toFixed(dec)}</span><small> ${unit}</small></div>
         <div class="ind-bar"><i style="width:${fill}%"></i><span class="thr" style="left:${thrPos}%"></span></div>
-        <div class="ind-cap">הסף שלך: ≤ ${thrText} ${unit}${extra ? " · " + extra : ""}</div></div></div>`;
+        <div class="ind-cap">≤ ${thrText} ${unit}</div></div>`;
     }
     function renderIndicators() {
       const el = $("indicators"); const cur = nearestHourData();
       if (!cur || cur.windKmh == null) { el.innerHTML = ""; return; }
       const chop = chopHeight(cur);
-      const periodTxt = cur.wavePeriod != null ? `מחזור ${round(cur.wavePeriod)}ש׳` : "";
       el.innerHTML =
-        indicatorCard(HEIGHT_ICON, "גובה גל כולל", cur.waveHeight != null ? cur.waveHeight : 0, 2, "מ׳", heightMax, 2.0, heightMax.toFixed(2), periodTxt) +
-        indicatorCard(CHOP_ICON, "גלי רוח (קוצים)", chop != null ? chop : 0, 2, "מ׳", chopMax, 0.6, chopMax.toFixed(2), "הגורם לקופצניות") +
+        indicatorCard(HEIGHT_ICON, "גובה גל", cur.waveHeight != null ? cur.waveHeight : 0, 2, "מ׳", heightMax, 2.0, heightMax.toFixed(2)) +
+        indicatorCard(CHOP_ICON, "גלי רוח", chop != null ? chop : 0, 2, "מ׳", chopMax, 0.6, chopMax.toFixed(2)) +
         indicatorCard(WIND_ICON, "עוצמת רוח", toKnots(cur.windKmh), 1, "קשר", windMax, 30, Math.round(windMax));
     }
     function renderWaveDetails() {
@@ -557,7 +573,7 @@
     }
     function hourLabel(h) { return isDeluxeHour(h) ? ["דלוקס", "#ffd479"] : isCalmHour(h) ? ["פלטה", "var(--calm)"] : ["גלי", "#5aa0e0"]; }
     function dayHoursHTML(ds) {
-      const rows = hourly.filter(h => h.dateStr === ds && isDaytimeHour(h.hour));
+      const rows = hourly.filter(h => h.dateStr === ds && h.hour >= 5 && h.hour <= 20 && (h.hour - 5) % 3 === 0);
       if (!rows.length) return `<div class="next-empty" style="padding:8px 0">אין נתונים ליום זה</div>`;
       return rows.map(h => {
         const [lbl, col] = hourLabel(h); const chop = chopHeight(h);
