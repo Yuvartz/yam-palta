@@ -95,10 +95,15 @@
       border-color: rgba(45,212,191,.5); box-shadow: 0 0 60px -20px var(--calm-glow);
     }
     .hero.night { background: linear-gradient(160deg, rgba(109,123,214,.14), var(--card)); border-color: rgba(109,123,214,.4); }
+    .hero.deluxe {
+      background: linear-gradient(160deg, rgba(255,212,121,.18), rgba(45,212,191,.08) 60%, var(--card));
+      border-color: rgba(255,212,121,.55); box-shadow: 0 0 70px -18px rgba(255,212,121,.35);
+    }
     .hero .icon { font-size: 56px; line-height: 1; margin-bottom: 10px; }
     .hero.calm .icon { animation: bounce 1.2s ease-in-out infinite; }
     .hero h1 { font-size: 36px; font-weight: 900; margin: 0 0 8px; }
     .hero.calm h1 { color: var(--calm); text-shadow: 0 0 28px var(--calm-glow); }
+    .hero.deluxe h1 { color: #ffd479; text-shadow: 0 0 30px rgba(255,212,121,.45); }
     .hero.night h1 { color: var(--night); }
     .hero .sub { color: var(--muted); font-size: 15px; margin: 0; }
 
@@ -259,6 +264,7 @@
     const KMH_PER_KNOT = 1.852;
     const REFRESH_MS = 15 * 60 * 1000;          // 15 minutes
     const WAVE_SCALE = 1.5, WIND_SCALE = 30;    // indicator bar max scale (matches sliders)
+    const DELUXE_WAVE = 0.1;                     // wave height below this (while calm) = "פלטה דלוקס"
     const COMPASS = ["צפונית", "צפונית-מזרחית", "מזרחית", "דרומית-מזרחית", "דרומית", "דרומית-מערבית", "מערבית", "צפונית-מערבית"];
     const ARROWS  = ["↓", "↙", "←", "↖", "↑", "↗", "→", "↘"]; // direction wind blows TOWARD (from N -> arrow down)
 
@@ -423,7 +429,7 @@
       const inWindow = isDaytimeHour(now.hour);
       const cur = currentHourData();
 
-      hero.classList.remove("calm", "night");
+      hero.classList.remove("calm", "night", "deluxe");
 
       if (!inWindow) {
         hero.classList.add("night");
@@ -440,8 +446,14 @@
 
       if (isCalmHour(cur)) {
         hero.classList.add("calm");
-        hero.innerHTML = `<div class="icon">🌊</div><h1>ים פלטה</h1>
-          <p class="sub">הים רגוע — תנאים מצוינים למים</p>`;
+        if (cur.waveHeight != null && cur.waveHeight < DELUXE_WAVE) {
+          hero.classList.add("deluxe");
+          hero.innerHTML = `<div class="icon">💎</div><h1>פלטה דלוקס</h1>
+            <p class="sub">הים שטוח כמו זכוכית — מושלם!</p>`;
+        } else {
+          hero.innerHTML = `<div class="icon">🌊</div><h1>ים פלטה</h1>
+            <p class="sub">הים רגוע — תנאים מצוינים למים</p>`;
+        }
       } else {
         hero.innerHTML = `<div class="icon">🌊</div><h1>ים לא פלטה</h1>
           <p class="sub">כרגע מעל הסף שהגדרת</p>`;
@@ -552,9 +564,10 @@
       const calmNow = cur ? isCalmHour(cur) : false;
       const wasCalm = sessionStorage.getItem("yp-was-calm") === "1";
       if (calmNow && !wasCalm) {
+        const deluxe = cur.waveHeight != null && cur.waveHeight < DELUXE_WAVE;
         try {
-          new Notification("🌊 ים פלטה!", {
-            body: `${LOCATIONS[LS.loc].name}: הים נרגע — תנאים מצוינים למים עכשיו.`,
+          new Notification(deluxe ? "💎 פלטה דלוקס!" : "🌊 ים פלטה!", {
+            body: `${LOCATIONS[LS.loc].name}: ${deluxe ? "הים שטוח כמו זכוכית" : "הים נרגע"} — תנאים מצוינים למים עכשיו.`,
             icon: "icon-192.png", tag: "yam-palata", lang: "he", dir: "rtl",
           });
         } catch (e) {}
