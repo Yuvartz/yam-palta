@@ -296,6 +296,11 @@
       </div>
 
       <div class="card">
+        <h2>פירוט גלים</h2>
+        <div class="metrics" id="waveDetail"></div>
+      </div>
+
+      <div class="card">
         <h2>תחזית 6 ימים — אחוז שעות יום רגועות</h2>
         <div id="forecast"></div>
       </div>
@@ -416,8 +421,10 @@
       return { dateStr: d, hour: parseInt(t.slice(0, 2), 10), minute: parseInt(t.slice(3, 5), 10) };
     }
     const isDaytimeHour = h => h >= DAY_START && h < DAY_END;
-    const isCalmHour = h => h.waveHeight != null && h.windKmh != null && h.waveHeight <= waveMax && toKnots(h.windKmh) <= windMax;
-    const isDeluxeHour = h => isCalmHour(h) && h.waveHeight != null && h.waveHeight < DELUXE_WAVE;
+    // Local wind-chop (not long groundswell) is what makes the sea feel flat; fall back to total height.
+    const chopHeight = h => h.windWave != null ? h.windWave : h.waveHeight;
+    const isCalmHour = h => { const c = chopHeight(h); return c != null && h.windKmh != null && c <= waveMax && toKnots(h.windKmh) <= windMax; };
+    const isDeluxeHour = h => { const c = chopHeight(h); return isCalmHour(h) && c != null && c < DELUXE_WAVE && (h.wavePeriod == null || h.wavePeriod >= 6); };
 
     function hebrewDay(dateStr) {
       const now = israelNow();
@@ -432,7 +439,7 @@
     // ---------- Data ----------
     async function fetchLocation(loc) {
       const common = `latitude=${loc.lat}&longitude=${loc.lon}&timezone=Asia%2FJerusalem&forecast_days=7&past_days=7`;
-      const marineUrl = `https://marine-api.open-meteo.com/v1/marine?${common}&hourly=wave_height,sea_surface_temperature`;
+      const marineUrl = `https://marine-api.open-meteo.com/v1/marine?${common}&hourly=wave_height,wave_period,wave_direction,wind_wave_height,swell_wave_height,swell_wave_period,sea_surface_temperature`;
       const weatherUrl = `https://api.open-meteo.com/v1/forecast?${common}&hourly=temperature_2m,wind_speed_10m,wind_direction_10m,uv_index`;
       const [mRes, wRes] = await Promise.all([fetch(marineUrl), fetch(weatherUrl)]);
       if (!mRes.ok || !wRes.ok) throw new Error("API request failed");
@@ -444,6 +451,11 @@
         return {
           time: t, dateStr: t.slice(0, 10), hour: parseInt(t.slice(11, 13), 10),
           waveHeight: marine.hourly.wave_height?.[i] ?? null,
+          wavePeriod: marine.hourly.wave_period?.[i] ?? null,
+          waveDir: marine.hourly.wave_direction?.[i] ?? null,
+          windWave: marine.hourly.wind_wave_height?.[i] ?? null,
+          swell: marine.hourly.swell_wave_height?.[i] ?? null,
+          swellPeriod: marine.hourly.swell_wave_period?.[i] ?? null,
           seaTemp: marine.hourly.sea_surface_temperature?.[i] ?? null,
           airTemp: j != null ? weather.hourly.temperature_2m[j] : null,
           windKmh: j != null ? weather.hourly.wind_speed_10m[j] : null,
@@ -536,17 +548,19 @@
       const foamPath = foam ? `<path d="${top}" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2" stroke-linecap="round"/>` : "";
       return `<svg class="wtile" viewBox="0 0 600 132" preserveAspectRatio="none"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity="0.95"/><stop offset="1" stop-color="currentColor" stop-opacity="0.45"/></linearGradient></defs><path d="${fill}" fill="url(#${id})"/>${foamPath}</svg>`;
     }
-    function waveScene(waveH) {
+    function waveScene(waveH, period = 6) {
       const aF = ampFromHeight(waveH);
       const durMul = Math.max(0.55, Math.min(1.6, 1.6 - waveH));
       const sy = (3 + waveH * 6).toFixed(1) + "px";
+      // Longer period -> fewer, longer (smoother) rolls; shorter -> choppier. Cycles must divide 600 for seamless tiling.
+      const cyF = period >= 9 ? 2 : period >= 6.5 ? 3 : period >= 4.5 ? 4 : 5;
       const layers = [
-        { cls: "back",  amp: aF * 0.50, mid: 60, L: 300, scroll: 16,  swell: 8 },
-        { cls: "mid",   amp: aF * 0.72, mid: 74, L: 200, scroll: 11,  swell: 6.5 },
-        { cls: "front", amp: aF * 1.00, mid: 90, L: 150, scroll: 7.5, swell: 5, foam: true },
+        { cls: "back",  amp: aF * 0.50, mid: 60, cyc: Math.max(1, cyF - 2), scroll: 16,  swell: 8 },
+        { cls: "mid",   amp: aF * 0.72, mid: 74, cyc: Math.max(2, cyF - 1), scroll: 11,  swell: 6.5 },
+        { cls: "front", amp: aF * 1.00, mid: 90, cyc: cyF,                  scroll: 7.5, swell: 5, foam: true },
       ];
       return `<div class="wave-scene">` + layers.map((l, i) => {
-        const t = waveTile(l.amp, l.mid, l.L, l.foam);
+        const t = waveTile(l.amp, l.mid, 600 / l.cyc, l.foam);
         return `<div class="wave-layer ${l.cls}" style="--sy:${sy};animation-duration:${l.swell}s;animation-delay:${(-i * 1.3).toFixed(1)}s"><div class="wave-track" style="animation-duration:${(l.scroll * durMul).toFixed(1)}s">${t}${t}</div></div>`;
       }).join("") + `</div>`;
     }
@@ -572,6 +586,7 @@
       const inWindow = isDaytimeHour(now.hour);
       const cur = currentHourData(); const ref = nearestHourData();
       const waveH = ref && ref.waveHeight != null ? ref.waveHeight : 0.2;
+      const period = ref && ref.wavePeriod != null ? ref.wavePeriod : 6;
 
       let state, icon, title, sub;
       if (!inWindow) { state = "night"; icon = "🌙"; title = "שעות לילה"; sub = "המעקב פעיל בין 06:00 ל-19:00 · נתראה בבוקר 🌅"; }
@@ -589,7 +604,7 @@
       hero.className = "hero " + state;
       hero.innerHTML = `
         <div class="hero-content"><div class="hero-badge">${badge}</div><h1>${title}</h1><p class="sub">${sub}</p></div>
-        ${turtle}${sparks}${waveScene(waveH)}`;
+        ${turtle}${sparks}${waveScene(waveH, period)}`;
     }
 
     function renderGoodFor() {
@@ -604,7 +619,7 @@
       </div>`;
     }
 
-    function indicatorCard(icon, label, value, dec, unit, threshold, scaleMax, thrText) {
+    function indicatorCard(icon, label, value, dec, unit, threshold, scaleMax, thrText, extra) {
       const ok = value <= threshold;
       const fill = Math.max(3, Math.min(100, (value / scaleMax) * 100));
       const thrPos = Math.max(0, Math.min(100, (threshold / scaleMax) * 100));
@@ -612,13 +627,15 @@
         <div class="ind-top"><span class="ind-label">${label}</span><span class="ind-status">${ok ? "✓ בתוך הסף" : "מעל הסף"}</span></div>
         <div class="ind-value"><span class="num">${value.toFixed(dec)}</span> <small>${unit}</small></div>
         <div class="ind-bar"><i style="width:${fill}%"></i><span class="thr" style="left:${thrPos}%"></span></div>
-        <div class="ind-cap">הסף שלך: ≤ ${thrText} ${unit}</div></div></div>`;
+        <div class="ind-cap">הסף שלך: ≤ ${thrText} ${unit}${extra ? " · " + extra : ""}</div></div></div>`;
     }
     function renderIndicators() {
       const el = $("indicators"); const cur = nearestHourData();
       if (!cur || cur.waveHeight == null || cur.windKmh == null) { el.innerHTML = ""; return; }
+      const chop = chopHeight(cur);
+      const waveExtra = `סה״כ ${fmt(cur.waveHeight)}מ׳${cur.wavePeriod != null ? ` · מחזור ${round(cur.wavePeriod)}ש׳` : ""}`;
       el.innerHTML =
-        indicatorCard(WAVE_ICON, "גובה גל", cur.waveHeight, 2, "מ׳", waveMax, 1.5, waveMax.toFixed(2)) +
+        indicatorCard(WAVE_ICON, "גלי רוח (קוצים)", chop != null ? chop : 0, 2, "מ׳", waveMax, 1.5, waveMax.toFixed(2), waveExtra) +
         indicatorCard(WIND_ICON, "עוצמת רוח", toKnots(cur.windKmh), 1, "קשר", windMax, 30, Math.round(windMax));
     }
 
@@ -646,6 +663,17 @@
         </div>`;
     }
 
+    function renderWaveDetails() {
+      const el = $("waveDetail"); const cur = nearestHourData();
+      if (!cur) { el.innerHTML = ""; return; }
+      const dirIdx = cur.waveDir != null ? Math.round(cur.waveDir / 45) % 8 : null;
+      el.innerHTML = `
+        <div class="metric"><div class="label">⏱️ מחזור (אינטרוול)</div><div class="value">${cur.wavePeriod != null ? round(cur.wavePeriod) : "—"}<small> ש׳</small></div></div>
+        <div class="metric"><div class="label">📏 גובה גל כולל</div><div class="value">${fmt(cur.waveHeight)}<small> מ׳</small></div></div>
+        <div class="metric"><div class="label">🌊 סוול (גל רחוק)</div><div class="value">${fmt(cur.swell)}<small> מ׳</small></div>${cur.swellPeriod != null ? `<div class="opt" style="color:var(--muted)">מחזור ${round(cur.swellPeriod)} ש׳</div>` : ""}</div>
+        <div class="metric"><div class="label">🧭 כיוון גל</div><div class="value compass" style="font-family:var(--sans);font-size:15px">${dirIdx != null ? ARROWS[dirIdx] + " " + COMPASS[dirIdx] : "—"}</div></div>`;
+    }
+
     function renderForecast() {
       $("forecast").innerHTML = forecastDays(6).map(d => `<div class="day"><div class="name">${hebrewDay(d.dateStr)}<small>${shortDate(d.dateStr)}</small></div><div class="bar"><i style="width:${d.pct}%"></i></div><div class="pct">${d.pct}%</div></div>`).join("");
     }
@@ -660,7 +688,7 @@
     }
     function renderAll() {
       renderHero(); renderGoodFor(); renderIndicators(); renderNextWindow();
-      renderMetrics(); renderForecast(); renderStreak(); renderUpdated();
+      renderMetrics(); renderWaveDetails(); renderForecast(); renderStreak(); renderUpdated();
     }
 
     // ---------- Weekly alert ----------
