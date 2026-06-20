@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ים פלאטה</title>
+  <title>YAM PALATA</title>
   <meta name="description" content="האם הים רגוע מספיק לשחייה, סאפ וקיאק לאורך חופי ישראל וסיני" />
 
   <!-- PWA -->
@@ -14,12 +14,12 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="ים פלאטה" />
+  <meta name="apple-mobile-web-app-title" content="YAM PALATA" />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet" />
 
   <style>
     :root {
@@ -60,8 +60,13 @@
 
     /* Topbar */
     .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
-    .brand { font-weight: 900; font-size: 22px; display: flex; align-items: center; gap: 8px; }
-    .brand .dot { font-size: 22px; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand .dot { font-size: 24px; line-height: 1; }
+    .brand .wordmark {
+      font-family: var(--mono); font-weight: 800; font-size: 21px; letter-spacing: 3px;
+      background: linear-gradient(90deg, var(--calm), var(--calm-2));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
     .streak { display: none; align-items: center; gap: 6px; background: var(--card); border: 1px solid var(--border);
       padding: 7px 12px; border-radius: 999px; font-weight: 700; font-size: 14px; }
     .streak.on { display: inline-flex; }
@@ -81,8 +86,8 @@
     .hero {
       position: relative; overflow: hidden;
       background: var(--card); border: 1px solid var(--border);
-      border-radius: 24px; padding: 30px 24px; text-align: center; margin-bottom: 16px;
-      min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      border-radius: 24px; padding: 30px 24px; text-align: center; margin-bottom: 14px;
+      min-height: 190px; display: flex; flex-direction: column; align-items: center; justify-content: center;
       transition: background .4s, border-color .4s;
     }
     .hero.calm {
@@ -92,22 +97,42 @@
     .hero.night { background: linear-gradient(160deg, rgba(109,123,214,.14), var(--card)); border-color: rgba(109,123,214,.4); }
     .hero .icon { font-size: 56px; line-height: 1; margin-bottom: 10px; }
     .hero.calm .icon { animation: bounce 1.2s ease-in-out infinite; }
-    .hero h1 { font-size: 34px; font-weight: 900; margin: 0 0 8px; }
+    .hero h1 { font-size: 36px; font-weight: 900; margin: 0 0 8px; }
     .hero.calm h1 { color: var(--calm); text-shadow: 0 0 28px var(--calm-glow); }
     .hero.night h1 { color: var(--night); }
     .hero .sub { color: var(--muted); font-size: 15px; margin: 0; }
-    .hero .verdict-meta { margin-top: 14px; display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
-    .hero .verdict-meta b { color: var(--text); font-family: var(--mono); font-weight: 700; }
 
     @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
 
-    /* Confetti */
-    .confetti { position: fixed; top: -10px; width: 9px; height: 14px; z-index: 9999; pointer-events: none; border-radius: 2px; opacity: .9; animation: fall linear forwards; }
-    @keyframes fall { to { transform: translateY(105vh) rotate(540deg); opacity: 0; } }
+    /* Indicators (wave height + wind) */
+    .indicators { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    @media (max-width: 430px) { .indicators { grid-template-columns: 1fr; } }
+    .ind { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 16px; display: flex; gap: 14px; align-items: flex-start; transition: border-color .3s; }
+    .ind.ok { border-color: rgba(45,212,191,.45); }
+    .ind.over { border-color: rgba(240,165,90,.45); }
+    .ind-icon { flex: 0 0 auto; width: 46px; height: 46px; border-radius: 13px; display: flex; align-items: center; justify-content: center; background: var(--card-2); }
+    .ind-icon svg { width: 27px; height: 27px; }
+    .ind.ok .ind-icon { color: var(--calm); background: rgba(45,212,191,.12); }
+    .ind.over .ind-icon { color: var(--warn); background: rgba(240,165,90,.12); }
+    .ind-body { flex: 1 1 auto; min-width: 0; }
+    .ind-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .ind-label { font-weight: 700; font-size: 14px; }
+    .ind-status { font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .ind.ok .ind-status { color: var(--calm); }
+    .ind.over .ind-status { color: var(--warn); }
+    .ind-value { font-family: var(--mono); font-size: 27px; font-weight: 800; margin: 3px 0 10px; }
+    .ind-value small { font-size: 13px; color: var(--muted); font-weight: 500; }
+    .ind-bar { position: relative; height: 8px; background: var(--bg-2); border-radius: 999px; direction: ltr; }
+    .ind-bar > i { position: absolute; left: 0; top: 0; height: 100%; border-radius: 999px; transition: width .5s; }
+    .ind.ok .ind-bar > i { background: linear-gradient(90deg, var(--calm), var(--calm-2)); }
+    .ind.over .ind-bar > i { background: linear-gradient(90deg, #e8b06a, var(--warn)); }
+    .ind-bar .thr { position: absolute; top: -3px; width: 2px; height: 14px; background: var(--text); opacity: .55; border-radius: 2px; }
+    .ind-cap { margin-top: 7px; font-size: 11px; color: var(--muted); }
 
     /* Section card */
     .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; }
-    .card h2 { font-size: 13px; font-weight: 700; color: var(--muted); margin: 0 0 14px; text-transform: none; letter-spacing: .3px; }
+    .card h2 { font-size: 13px; font-weight: 700; color: var(--muted); margin: 0 0 14px; letter-spacing: .3px; }
 
     /* Next window */
     .next-line { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
@@ -167,7 +192,7 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="brand"><span class="dot">🌊</span><span>ים פלאטה</span></div>
+      <div class="brand"><span class="dot">🌊</span><span class="wordmark">YAM PALATA</span></div>
       <div class="streak" id="streak"><span>🔥</span><span class="n" id="streakN">0</span><span>ימים רצופים</span></div>
     </div>
 
@@ -185,8 +210,10 @@
     <main id="app" class="hidden">
       <section class="hero" id="hero"></section>
 
+      <section class="indicators" id="indicators"></section>
+
       <div class="card">
-        <h2>חלון הרגיעה הבא</h2>
+        <h2>צפי לים פלטה הקרוב</h2>
         <div id="nextWindow"></div>
       </div>
 
@@ -210,7 +237,7 @@
           <div class="top"><span class="lbl">מהירות רוח מרבית</span><span class="val"><span id="windVal" class="num">10</span> קשר</span></div>
           <input type="range" id="windSlider" min="1" max="30" step="1" value="10" />
         </div>
-        <button class="btn" id="notifyBtn" onclick="App.enableNotifications()">🔔 הפעל התראות על ים רגוע</button>
+        <button class="btn" id="notifyBtn" onclick="App.enableNotifications()">🔔 הפעל התראות על ים פלטה</button>
       </div>
 
       <div class="updated" id="updated"></div>
@@ -231,8 +258,12 @@
     const DAY_START = 6, DAY_END = 19;          // active window 06:00–19:00
     const KMH_PER_KNOT = 1.852;
     const REFRESH_MS = 15 * 60 * 1000;          // 15 minutes
+    const WAVE_SCALE = 1.5, WIND_SCALE = 30;    // indicator bar max scale (matches sliders)
     const COMPASS = ["צפונית", "צפונית-מזרחית", "מזרחית", "דרומית-מזרחית", "דרומית", "דרומית-מערבית", "מערבית", "צפונית-מערבית"];
     const ARROWS  = ["↓", "↙", "←", "↖", "↑", "↗", "→", "↘"]; // direction wind blows TOWARD (from N -> arrow down)
+
+    const WAVE_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c1.8 0 1.8 2 3.6 2S7.4 6 9.2 6 11 8 12.8 8 14.6 6 16.4 6 18.2 8 20 8s1.8-2 2-2"/><path d="M2 12c1.8 0 1.8 2 3.6 2S7.4 12 9.2 12 11 14 12.8 14 14.6 12 16.4 12 18.2 14 20 14s1.8-2 2-2"/><path d="M2 18c1.8 0 1.8 2 3.6 2S7.4 18 9.2 18 11 20 12.8 20 14.6 18 16.4 18 18.2 20 20 20s1.8-2 2-2"/></svg>`;
+    const WIND_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h11a3 3 0 1 0-3-3"/><path d="M3 12h15.5a3 3 0 1 1-3 3"/><path d="M3 16h8.5a2.5 2.5 0 1 1-2.5 2.5"/></svg>`;
 
     const LS = {
       get loc() { return localStorage.getItem("yp-loc") || "telaviv"; },
@@ -320,6 +351,11 @@
       const key = `${now.dateStr}T${pad(now.hour)}`;
       return hourly.find(h => h.time.slice(0, 13) === key) || null;
     }
+    function nearestHourData() {
+      const now = israelNow();
+      const key = `${now.dateStr}T${pad(now.hour)}`;
+      return currentHourData() || hourly.find(h => h.time.slice(0, 13) >= key) || null;
+    }
 
     function nextCalmWindow() {
       const now = israelNow();
@@ -354,8 +390,7 @@
         if (!day) break;
         const daytime = day.filter(h => isDaytimeHour(h.hour));
         if (daytime.length === 0) break;
-        const allCalm = daytime.every(isCalmHour);
-        if (!allCalm) break;
+        if (!daytime.every(isCalmHour)) break;
         streak++;
         cursor.setDate(cursor.getDate() - 1);
       }
@@ -398,33 +433,50 @@
           <p class="sub">המעקב פעיל בין 06:00 ל-19:00. נתראה מחר בבוקר 🌅</p>`;
         return;
       }
-
       if (!cur) {
         hero.innerHTML = `<div class="icon">🌊</div><h1>אין נתונים לשעה זו</h1><p class="sub">נסה לרענן</p>`;
         return;
       }
 
-      const calm = isCalmHour(cur);
-      const meta = `
-        <div class="verdict-meta">
-          <span>גובה גל <b class="num">${round(cur.waveHeight, 2)}</b> מ׳</span>
-          <span>רוח <b class="num">${round(toKnots(cur.windKmh))}</b> קשר</span>
-        </div>`;
-
-      if (calm) {
+      if (isCalmHour(cur)) {
         hero.classList.add("calm");
-        hero.innerHTML = `<div class="icon">🌊</div><h1>ים פלאטה!</h1>
-          <p class="sub">הים רגוע — תנאים מצוינים למים</p>${meta}`;
+        hero.innerHTML = `<div class="icon">🌊</div><h1>ים פלטה</h1>
+          <p class="sub">הים רגוע — תנאים מצוינים למים</p>`;
       } else {
-        hero.innerHTML = `<div class="icon">🌊</div><h1>הים גלי</h1>
-          <p class="sub">כרגע מעל הסף שהגדרת</p>${meta}`;
+        hero.innerHTML = `<div class="icon">🌊</div><h1>ים לא פלטה</h1>
+          <p class="sub">כרגע מעל הסף שהגדרת</p>`;
       }
+    }
+
+    function indicatorCard(icon, label, value, dec, unit, threshold, scaleMax, thrText) {
+      const ok = value <= threshold;
+      const fill = Math.max(3, Math.min(100, (value / scaleMax) * 100));
+      const thrPos = Math.max(0, Math.min(100, (threshold / scaleMax) * 100));
+      return `<div class="ind ${ok ? "ok" : "over"}">
+        <div class="ind-icon">${icon}</div>
+        <div class="ind-body">
+          <div class="ind-top"><span class="ind-label">${label}</span><span class="ind-status">${ok ? "✓ בתוך הסף" : "מעל הסף"}</span></div>
+          <div class="ind-value"><span class="num">${value.toFixed(dec)}</span> <small>${unit}</small></div>
+          <div class="ind-bar"><i style="width:${fill}%"></i><span class="thr" style="left:${thrPos}%"></span></div>
+          <div class="ind-cap">הסף שלך: ≤ ${thrText} ${unit}</div>
+        </div>
+      </div>`;
+    }
+
+    function renderIndicators() {
+      const el = $("indicators");
+      const cur = nearestHourData();
+      if (!cur || cur.waveHeight == null || cur.windKmh == null) { el.innerHTML = ""; return; }
+      const knots = toKnots(cur.windKmh);
+      el.innerHTML =
+        indicatorCard(WAVE_ICON, "גובה גל", cur.waveHeight, 2, "מ׳", waveMax, WAVE_SCALE, waveMax.toFixed(2)) +
+        indicatorCard(WIND_ICON, "עוצמת רוח", knots, 1, "קשר", windMax, WIND_SCALE, Math.round(windMax));
     }
 
     function renderNextWindow() {
       const el = $("nextWindow");
       const w = nextCalmWindow();
-      if (!w) { el.innerHTML = `<div class="next-empty">לא נצפה חלון רגיעה ב-7 הימים הקרובים בתנאים הנוכחיים.</div>`; return; }
+      if (!w) { el.innerHTML = `<div class="next-empty">לא נצפה ים פלטה ב-7 הימים הקרובים בתנאים שהגדרת.</div>`; return; }
       const endHour = w.end.hour + 1; // window covers full ending hour
       el.innerHTML = `<div class="next-line">
         <span class="when">${hebrewDay(w.start.dateStr)} <small style="color:var(--muted)">${shortDate(w.start.dateStr)}</small></span>
@@ -434,7 +486,7 @@
 
     function renderMetrics() {
       const el = $("metrics");
-      const cur = currentHourData() || hourly.find(h => h.time.slice(0, 13) >= `${israelNow().dateStr}T${pad(israelNow().hour)}`);
+      const cur = nearestHourData();
       if (!cur) { el.innerHTML = `<div class="next-empty">אין נתונים זמינים.</div>`; return; }
       const dirIdx = cur.windDir != null ? Math.round(cur.windDir / 45) % 8 : null;
       el.innerHTML = `
@@ -469,6 +521,7 @@
 
     function renderAll() {
       renderHero();
+      renderIndicators();
       renderNextWindow();
       renderMetrics();
       renderForecast();
@@ -482,7 +535,7 @@
       if (!("Notification" in window)) { btn.textContent = "🔕 הדפדפן לא תומך בהתראות"; btn.disabled = true; return; }
       if (Notification.permission === "granted") { btn.textContent = "✅ התראות פעילות"; btn.classList.add("ok"); }
       else if (Notification.permission === "denied") { btn.textContent = "🔕 התראות חסומות בדפדפן"; }
-      else { btn.textContent = "🔔 הפעל התראות על ים רגוע"; }
+      else { btn.textContent = "🔔 הפעל התראות על ים פלטה"; }
     }
 
     async function enableNotifications() {
@@ -500,9 +553,9 @@
       const wasCalm = sessionStorage.getItem("yp-was-calm") === "1";
       if (calmNow && !wasCalm) {
         try {
-          new Notification("🌊 ים פלאטה!", {
+          new Notification("🌊 ים פלטה!", {
             body: `${LOCATIONS[LS.loc].name}: הים נרגע — תנאים מצוינים למים עכשיו.`,
-            icon: "icon-192.png", tag: "yam-plata", lang: "he", dir: "rtl",
+            icon: "icon-192.png", tag: "yam-palata", lang: "he", dir: "rtl",
           });
         } catch (e) {}
       }
