@@ -76,15 +76,6 @@
     .hero-score .sc-label { font-size: 12px; color: var(--muted); margin-top: 5px; font-weight: 700; letter-spacing: .5px; }
     .hero h1 { font-size: 30px; font-weight: 900; margin: 0 0 6px; transition: color .4s; }
     .hero .sub { color: var(--muted); font-size: 15px; margin: 0; max-width: 330px; }
-    .conf { font-size: 11px; font-weight: 700; margin-top: 8px; opacity: .92; }
-    .sci { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 0 18px; margin-bottom: 16px; }
-    .sci summary { cursor: pointer; padding: 16px 0; font-size: 13px; font-weight: 700; color: var(--muted); list-style: none; }
-    .sci summary::-webkit-details-marker { display: none; }
-    .sci[open] summary { color: var(--text); }
-    .sci-body { padding: 0 0 18px; font-size: 12.5px; color: var(--muted); line-height: 1.7; }
-    .sci-body b { color: var(--text); }
-    .sci-body h4 { color: var(--calm); font-size: 12px; margin: 13px 0 3px; }
-    .sci-body a { color: var(--calm); }
     .hero.calm { background: linear-gradient(160deg, rgba(45,212,191,.14), var(--card) 72%); border-color: rgba(45,212,191,.45); box-shadow: 0 0 60px -22px var(--calm-glow); }
     .hero.calm h1 { color: var(--calm); }
     .hero.deluxe { background: linear-gradient(160deg, rgba(255,212,121,.16), rgba(45,212,191,.06) 55%, var(--card)); border-color: rgba(255,212,121,.5); box-shadow: 0 0 70px -20px rgba(255,212,121,.3); }
@@ -316,29 +307,6 @@
         <button class="btn" id="notifyBtn" onclick="App.enableNotifications()">🔔 הפעל התראות על ים פלטה</button>
       </div>
 
-      <details class="sci">
-        <summary>📖 דיוק הנתונים והמדע מאחוריהם</summary>
-        <div class="sci-body">
-          <h4>איך אנחנו מחשבים</h4>
-          שואבים בכל רענון מ-<b>4 מודלי גלים</b> (MFWAM של Météo-France ~8 ק״מ, ECMWF-WAM ~9 ק״מ, ו-EWAM/GWAM של DWD)
-          ומ-<b>3 מודלי מזג אוויר</b> (ECMWF-IFS, ICON, GFS). הערך המוצג הוא ה<b>חציון של המודלים האמינים ביותר לים התיכון</b>
-          (MFWAM + ECMWF), והפיזור בין כל המודלים משמש כ<b>מדד ביטחון</b>: כשהם מסכימים — ביטחון גבוה; כשחלוקים — התחזית פחות ודאית.
-
-          <h4>גובה גל מובהק (Hs)</h4>
-          המודלים מדווחים <b>גובה גל מובהק</b> — ממוצע הגובה של שליש הגלים הגבוהים. גלים בודדים יכולים להיות גבוהים פי ~1.5,
-          וגל יחיד קיצוני אף פי ~2.
-
-          <h4>גלי רוח מול סוול</h4>
-          <b>גלי רוח (קוצים)</b> נוצרים מהרוח המקומית — קצרים, תלולים ו״דוקרים״. <b>סוול</b> הוא גל ארוך שהגיע מסערה רחוקה — חלק ומתגלגל.
-          גל <b>נשבר</b> כשהתלילות (גובה חלקי אורך) חורגת מ-~1/7. במים עמוקים אורך הגל ≈ 1.56×(מחזור בשניות)² מטר — לכן מחזור ארוך = גל ארוך ומהיר.
-
-          <h4>למה זה משנה</h4>
-          ECMWF-IFS נחשב המדויק במודלים הגלובליים, ו-ICON (DWD) מצוין לאירופה. המודל הייעודי המדויק ביותר לים התיכון
-          (<a href="https://data.marine.copernicus.eu/product/MEDSEA_ANALYSISFORECAST_WAV_006_017/description" target="_blank" rel="noopener">Copernicus MedWAM3</a>, ~4 ק״מ)
-          דורש הרשמה ולכן לא משולב — MFWAM ו-ECMWF הם הקרובים ביותר אליו ללא מפתח. נתונים: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>.
-        </div>
-      </details>
-
       <div class="updated" id="updated"></div>
     </main>
   </div>
@@ -527,15 +495,6 @@
         windKmh: j != null ? weather.hourly.wind_speed_10m[j] : null }; });
     }
 
-    function confidence(h) {
-      if (!h) return null;
-      let lvl = 2;
-      const ws = (h.waveHi != null && h.waveLo != null) ? h.waveHi - h.waveLo : null;
-      const wd = (h.windHi != null && h.windLo != null) ? h.windHi - h.windLo : null;
-      if (ws != null) { if (ws > 0.3) lvl = Math.min(lvl, 0); else if (ws > 0.15) lvl = Math.min(lvl, 1); }
-      if (wd != null) { if (wd > 9) lvl = Math.min(lvl, 0); else if (wd > 4) lvl = Math.min(lvl, 1); }
-      return { lvl, ws, wd };
-    }
 
     function currentHourData() { const now = israelNow(); const k = `${now.dateStr}T${pad(now.hour)}`; return hourly.find(h => h.time.slice(0, 13) === k) || null; }
     function nearestHourData() { const now = israelNow(); const k = `${now.dateStr}T${pad(now.hour)}`; return currentHourData() || hourly.find(h => h.time.slice(0, 13) >= k) || null; }
@@ -646,15 +605,8 @@
         <div class="hero-content">
           <div class="hero-score" style="color:${scCol}"><span class="sc-num">${sc != null ? sc.toFixed(1) : "—"}</span><span class="sc-max">/10</span><div class="sc-label">התאמה לשחייה</div></div>
           <h1>${title}</h1><p class="sub">${desc}</p>
-          ${confChip(ref)}
           ${todayTimeline()}
         </div>${turtle}${sparks}${seajelly}${waveScene(waveH, period)}`;
-    }
-    function confChip(h) {
-      const c = confidence(h); if (!c) return "";
-      const [txt, col] = c.lvl === 2 ? ["ביטחון גבוה", "var(--calm)"] : c.lvl === 1 ? ["ביטחון בינוני", "#e9c46a"] : ["ביטחון נמוך", "#f0a55a"];
-      const range = (h.waveLo != null && h.waveHi != null && h.waveHi - h.waveLo >= 0.01) ? ` · גל ${h.waveLo.toFixed(2)}–${h.waveHi.toFixed(2)}מ׳` : "";
-      return `<div class="conf" style="color:${col}">🎯 ${txt} · ${WAVE_TRUST.length + 2} מודלים${range}</div>`;
     }
     function miniWave(height, color) {
       const h = height == null ? 0.15 : height;
