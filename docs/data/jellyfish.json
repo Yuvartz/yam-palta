@@ -1,8 +1,24 @@
 {
-  "updated": "2026-06-21T17:18:19.278Z",
+  "updated": "2026-06-21T19:14:19.426Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25262",
+      "reporter": "Dor Edelist",
+      "location": "הרצליה",
+      "lat": 32.166,
+      "lon": 34.796,
+      "date": "2026-06-21T20:36",
+      "dateText": "21.06.2026",
+      "time": "20:36",
+      "activity": "יאכטה",
+      "distance": "200- 1 ק\"מ",
+      "quantity": "50",
+      "species": "חוטית נודדת",
+      "diameter": "31-60",
+      "url": "https://www.meduzot.co.il/observation/25262"
+    },
     {
       "id": "25261",
       "reporter": "נעמה פרידמן",
@@ -1266,22 +1282,6 @@
       "species": "חוטית נודדת",
       "diameter": "11-30",
       "url": "https://www.meduzot.co.il/observation/25158"
-    },
-    {
-      "id": "25156",
-      "reporter": "Ariela Leco",
-      "location": "פלמחים",
-      "lat": 31.93,
-      "lon": 34.697,
-      "date": "2026-06-18T10:00",
-      "dateText": "18.06.2026",
-      "time": "10:00",
-      "activity": "צלילה חופשית שנירקול",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25156"
     }
   ]
 }
