@@ -138,12 +138,15 @@
     .next-empty + .next-empty { border-top: 1px solid var(--border); }
 
     /* Today timeline inside the hero */
-    .timeline { display: flex; justify-content: space-between; gap: 4px; margin-top: 16px; background: rgba(10,14,22,.45); border: 1px solid var(--border); border-radius: 12px; padding: 9px 6px; backdrop-filter: blur(4px); }
-    .tl-cell { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 2px 0; }
-    .tl-h { font-family: var(--mono); font-size: 10px; color: var(--muted); }
-    .tl-dot { width: 11px; height: 11px; border-radius: 50%; box-shadow: 0 0 6px -1px rgba(255,255,255,.3); }
-    .tl-now { background: rgba(255,255,255,.07); border-radius: 8px; }
-    .tl-now .tl-h { color: var(--text); font-weight: 700; }
+    .timeline { display: flex; flex-direction: column; gap: 2px; margin-top: 14px; background: rgba(10,14,22,.55); border: 1px solid var(--border); border-radius: 14px; padding: 7px 10px; backdrop-filter: blur(5px); width: 100%; max-width: 380px; }
+    .tl-row { display: grid; grid-template-columns: 46px 1fr 52px 66px; align-items: center; gap: 8px; padding: 6px 3px; border-radius: 9px; }
+    .tl-row.tl-now { background: rgba(255,255,255,.08); }
+    .tl-h { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+    .tl-row.tl-now .tl-h { color: var(--text); font-weight: 700; }
+    .tl-wave { display: flex; align-items: center; }
+    .tl-wave svg { width: 100%; height: 20px; display: block; }
+    .tl-height { font-size: 12px; color: var(--text); white-space: nowrap; }
+    .tl-status { font-size: 11.5px; font-weight: 700; text-align: left; white-space: nowrap; }
 
     /* Indicators — three across */
     .indicators { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
@@ -555,14 +558,28 @@
           ${todayTimeline()}
         </div>${turtle}${sparks}${seajelly}${waveScene(waveH, period)}`;
     }
+    function miniWave(height, color) {
+      const h = height == null ? 0.15 : height;
+      const amp = Math.max(2, Math.min(9, h * 9 + 2));
+      const mid = 12; let d = `M0 ${mid}`;
+      for (let x = 4; x <= 60; x += 4) d += ` L${x} ${(mid - amp * Math.sin((2 * Math.PI * x) / 26)).toFixed(1)}`;
+      return `<svg viewBox="0 0 60 24" preserveAspectRatio="none"><path d="${d}" fill="none" stroke="${color}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    }
     function todayTimeline() {
       const now = israelNow(); const slots = [5, 8, 11, 14, 17, 20];
       const nowSlot = slots.reduce((a, b) => Math.abs(b - now.hour) < Math.abs(a - now.hour) ? b : a, slots[0]);
-      return `<div class="timeline">` + slots.map(hr => {
+      const rows = slots.map(hr => {
         const h = hourly.find(x => x.dateStr === now.dateStr && x.hour === hr);
-        const col = h ? hourLabel(h)[1] : "var(--border)";
-        return `<div class="tl-cell ${hr === nowSlot ? "tl-now" : ""}"><span class="tl-h">${pad(hr)}</span><span class="tl-dot" style="background:${col}"></span></div>`;
-      }).join("") + `</div>`;
+        const [lbl, col] = h ? hourLabel(h) : ["—", "var(--border)"];
+        const height = h && h.waveHeight != null ? h.waveHeight : null;
+        return `<div class="tl-row ${hr === nowSlot ? "tl-now" : ""}">
+          <span class="tl-h">${pad(hr)}:00</span>
+          <span class="tl-wave">${miniWave(height, col)}</span>
+          <span class="tl-height num">${height != null ? height.toFixed(2) + " מ׳" : "—"}</span>
+          <span class="tl-status" style="color:${col}">${lbl}</span>
+        </div>`;
+      }).join("");
+      return `<div class="timeline">${rows}</div>`;
     }
     function renderGoodFor() {
       const el = $("goodFor"); const ref = nearestHourData();
