@@ -296,7 +296,7 @@
       </div>
 
       <div class="card">
-        <h2>תחזית 6 ימים · % זמן מתאים לשחייה · לחצו ליום</h2>
+        <h2>תחזית 6 ימים · % זמן ים פלטה · לחצו ליום</h2>
         <div id="forecast"></div>
       </div>
 
@@ -556,7 +556,7 @@
       const days = [...g.keys()].filter(d => d >= now.dateStr).sort().slice(0, count);
       return days.map(ds => {
         const dt = g.get(ds).filter(h => isDaytimeHour(h.hour));   // percentages ignore night
-        return { dateStr: ds, pct: dt.length ? Math.round(dt.filter(isSwimHour).length / dt.length * 100) : 0 };
+        return { dateStr: ds, pct: dt.length ? Math.round(dt.filter(isCalmHour).length / dt.length * 100) : 0 };   // sea-state forecast (ים פלטה), not swim-readiness
       });
     }
     function weekCalmPct(data) {
