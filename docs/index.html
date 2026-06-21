@@ -249,12 +249,12 @@
       </div>
 
       <div class="card">
-        <h2>תחזית 6 ימים · לחצו על יום לפירוט שעתי</h2>
+        <h2>תחזית 6 ימים · % זמן מתאים לשחייה · לחצו ליום</h2>
         <div id="forecast"></div>
       </div>
 
       <div class="card">
-        <h2>צפי לים פלטה הקרוב</h2>
+        <h2>צפי לשחייה הקרוב</h2>
         <div id="nextWindow"></div>
       </div>
 
@@ -270,8 +270,8 @@
           <input type="range" id="windSlider" min="1" max="30" step="1" value="10" />
         </div>
         <div class="slider-row">
-          <div class="top"><span class="lbl">טמפ׳ מים מועדפת (מינ׳)</span><span class="val"><span id="waterVal" class="num">24</span>°C</span></div>
-          <input type="range" id="waterSlider" min="18" max="30" step="1" value="24" />
+          <div class="top"><span class="lbl">טמפ׳ מים מינימלית לשחייה</span><span class="val"><span id="waterVal" class="num">27.7</span>°C</span></div>
+          <input type="range" id="waterSlider" min="18" max="31" step="0.1" value="27.7" />
         </div>
         <button class="btn" id="notifyBtn" onclick="App.enableNotifications()">🔔 הפעל התראות על ים פלטה</button>
       </div>
@@ -333,7 +333,7 @@
       get loc() { return localStorage.getItem("yp-loc") || "telaviv"; }, set loc(v) { localStorage.setItem("yp-loc", v); },
       get height() { return parseFloat(localStorage.getItem("yp-height")) || 0.8; }, set height(v) { localStorage.setItem("yp-height", String(v)); },
       get wind() { return parseFloat(localStorage.getItem("yp-wind")) || 10; }, set wind(v) { localStorage.setItem("yp-wind", String(v)); },
-      get water() { return parseFloat(localStorage.getItem("yp-water")) || 24; }, set water(v) { localStorage.setItem("yp-water", String(v)); },
+      get water() { const v = parseFloat(localStorage.getItem("yp-water")); return isNaN(v) ? 27.7 : v; }, set water(v) { localStorage.setItem("yp-water", String(v)); },
       get customs() { try { return JSON.parse(localStorage.getItem("yp-locs")) || {}; } catch (e) { return {}; } }, set customs(o) { localStorage.setItem("yp-locs", JSON.stringify(o)); },
     };
     const allLocations = () => ({ ...BUILTIN, ...LS.customs });
@@ -360,6 +360,9 @@
     const chopHeight = h => h.windWave != null ? h.windWave : h.waveHeight;
     const isCalmHour = h => { const c = chopHeight(h); return c != null && h.windKmh != null && c <= chopMax && (h.waveHeight == null || h.waveHeight <= heightMax) && toKnots(h.windKmh) <= windMax; };
     const isDeluxeHour = h => { const c = chopHeight(h); return isCalmHour(h) && c != null && c < DELUXE_CHOP && (h.wavePeriod == null || h.wavePeriod >= 6); };
+    const isWarmEnough = h => h.seaTemp != null && h.seaTemp >= waterMin;   // personal min water temp
+    const isSwimHour = h => isCalmHour(h) && isWarmEnough(h);               // calm AND warm = good to swim
+    const fmtT = v => Number.isInteger(v) ? String(v) : v.toFixed(1);
 
     function swimScore(h) {
       if (!h) return null;
@@ -373,13 +376,13 @@
     }
     function scoreColor(s) { return s >= 8 ? "#34d399" : s >= 6.5 ? "#2dd4bf" : s >= 5 ? "#e9c46a" : s >= 3.5 ? "#f0a55a" : "#f06a6a"; }
     function scoreDesc(state, s, h) {
-      const w = h && h.seaTemp != null ? ` · מים ${round(h.seaTemp)}°` : "";
+      const temp = h && h.seaTemp != null ? round(h.seaTemp) : null;
+      const w = temp != null ? ` · מים ${temp}°` : "";
       if (state === "neutral" || s == null) return "—";
-      if (state === "rough") return "הים מעל הסף שהגדרת — פחות מתאים לשחייה כרגע" + w;
-      if (state === "deluxe") return "תנאים מושלמים — שטוח כמו זכוכית!" + w;
-      if (s >= 8) return "תנאים מצוינים לשחייה" + w;
-      if (s >= 6.5) return "תנאים טובים לשחייה" + w;
-      return "הים רגוע, אך פחות מושלם (מים קרירים או גל קל)" + w;
+      if (state === "rough") return "הים לא פלטה כרגע — לא מתאים לשחייה" + w;
+      if (!isWarmEnough(h)) return `הים פלטה, אך המים ${temp != null ? temp + "° " : ""}מתחת ל-${fmtT(waterMin)}° שהעדפת`;
+      if (state === "deluxe") return "פלטה דלוקס ומים חמימים — מושלם לשחייה!" + w;
+      return "מתאים לשחייה — ים פלטה ומים חמימים!" + w;
     }
 
     async function fetchLocation(loc) {
@@ -429,7 +432,7 @@
         const ds = `${cur.getFullYear()}-${pad(cur.getMonth() + 1)}-${pad(cur.getDate())}`;
         const day = g.get(ds); if (!day) break;
         const dt = day.filter(h => isDaytimeHour(h.hour));
-        if (dt.length === 0 || !dt.every(isCalmHour)) break;
+        if (dt.length === 0 || !dt.every(isSwimHour)) break;
         s++; cur.setDate(cur.getDate() - 1);
       }
       return s;
@@ -439,20 +442,23 @@
       const days = [...g.keys()].filter(d => d >= now.dateStr).sort().slice(0, count);
       return days.map(ds => {
         const dt = g.get(ds).filter(h => isDaytimeHour(h.hour));   // percentages ignore night
-        return { dateStr: ds, pct: dt.length ? Math.round(dt.filter(isCalmHour).length / dt.length * 100) : 0 };
+        return { dateStr: ds, pct: dt.length ? Math.round(dt.filter(isSwimHour).length / dt.length * 100) : 0 };
       });
     }
     function weekCalmPct(data) {
       const now = israelNow();
       const fut = data.filter(h => h.dateStr >= now.dateStr && isDaytimeHour(h.hour));   // ignore night
-      return fut.length ? Math.round(fut.filter(isCalmHour).length / fut.length * 100) : 0;
+      return fut.length ? Math.round(fut.filter(isSwimHour).length / fut.length * 100) : 0;
     }
     function tempInfo(t, isWater) {
       if (t == null) return { color: "var(--muted)", note: "" };
+      if (isWater) {
+        if (t >= WONDERFUL_SEA) return { color: "#f6a96b", note: "✨ נפלא לשחייה!" };
+        if (t >= waterMin) return { color: "#34d399", note: "✓ חם מספיק לשחייה" };
+        return { color: "#5aa0e0", note: `קר מ-${fmtT(waterMin)}° שהעדפת` };
+      }
       let color = t >= 28 ? "#f6a96b" : t >= 24 ? "#34d399" : t >= 20 ? "#2dd4bf" : t >= 16 ? "#5aa0e0" : "#7e93da";
-      let note = "";
-      if (isWater) note = t >= WONDERFUL_SEA ? "✨ נפלא במים!" : t >= waterMin ? "✓ נעים לשחייה" : "קריר מההעדפה שלך";
-      return { color, note };
+      return { color, note: "" };
     }
 
     // Waves
@@ -502,7 +508,10 @@
       else if (isCalmHour(ref)) { state = "calm"; title = "ים פלטה"; }
       else { state = "rough"; title = "ים לא פלטה"; }
       let sc = swimScore(ref);
-      if (sc != null && state === "rough") sc = Math.min(sc, 4.5);   // not פלטה => not a great swim match
+      if (sc != null) {
+        if (state === "rough") sc = Math.min(sc, 4.5);                       // not פלטה
+        else if (ref && !isWarmEnough(ref)) sc = Math.min(sc, 5.5);          // calm but colder than you like
+      }
       const scCol = sc != null ? scoreColor(sc) : "var(--muted)", desc = scoreDesc(state, sc, ref);
       const calm = state === "calm" || state === "deluxe";
       const turtle = calm ? `<div class="turtle"><div class="turtle-inner">${TURTLE_ART}</div></div>` : "";
@@ -526,8 +535,8 @@
     }
     function renderGoodFor() {
       const el = $("goodFor"); const ref = nearestHourData();
-      if (!ref || !isCalmHour(ref)) { el.innerHTML = ""; return; }
-      const deluxe = isDeluxeHour(ref);
+      if (!ref || !isSwimHour(ref)) { el.innerHTML = ""; return; }
+      const deluxe = isDeluxeHour(ref) && isWarmEnough(ref);
       const act = (art, name) => `<div class="act"><div class="scene">${art}</div><div class="name">${name}</div></div>`;
       el.innerHTML = `<div class="card good-card${deluxe ? " deluxe" : ""}"><h2>${deluxe ? "💎 מושלם עכשיו ל…" : "🐢 מצוין עכשיו ל…"}</h2><div class="activities">${act(SWIM_ART, "שחייה")}${act(SNORKEL_ART, "שנירקול")}${act(SUP_ART, "סאפ")}</div></div>`;
     }
@@ -571,13 +580,19 @@
         <div class="metric"><div class="label">☀️ טמפ׳ אוויר</div><div class="value" style="color:${air.color}">${fmt(cur.airTemp)}<small> °C</small></div></div>
         <div class="metric combo"><div class="sub"><div class="label">🧭 כיוון רוח</div><div class="value compass">${dirIdx != null ? ARROWS[dirIdx] + " " + COMPASS[dirIdx] : "—"}</div></div><div class="sub"><div class="label">😎 קרינת UV</div><div class="value">${cur.uv != null ? round(cur.uv) : "—"}</div></div></div>`;
     }
-    function hourLabel(h) { return isDeluxeHour(h) ? ["דלוקס", "#ffd479"] : isCalmHour(h) ? ["פלטה", "var(--calm)"] : ["גלי", "#5aa0e0"]; }
+    function hourLabel(h) {
+      const warm = isWarmEnough(h);
+      if (isDeluxeHour(h) && warm) return ["דלוקס", "#ffd479"];
+      if (isCalmHour(h) && warm) return ["לשחייה", "#34d399"];
+      if (isCalmHour(h)) return ["פלטה·קר", "#7bb8d6"];
+      return ["גלי", "#4a86c5"];
+    }
     function dayHoursHTML(ds) {
       const rows = hourly.filter(h => h.dateStr === ds && h.hour >= 5 && h.hour <= 20 && (h.hour - 5) % 3 === 0);
       if (!rows.length) return `<div class="next-empty" style="padding:8px 0">אין נתונים ליום זה</div>`;
       return rows.map(h => {
         const [lbl, col] = hourLabel(h); const chop = chopHeight(h);
-        return `<div class="hr"><span class="t num">${pad(h.hour)}:00</span><span class="hr-dot" style="background:${col}"></span><span class="hr-data">קוץ ${chop != null ? chop.toFixed(2) : "—"} · גל ${fmt(h.waveHeight)} · רוח ${h.windKmh != null ? Math.round(toKnots(h.windKmh)) : "—"}ק׳</span><span class="hr-v" style="color:${col}">${lbl}</span></div>`;
+        return `<div class="hr"><span class="t num">${pad(h.hour)}:00</span><span class="hr-dot" style="background:${col}"></span><span class="hr-data">קוץ ${chop != null ? chop.toFixed(2) : "—"} · רוח ${h.windKmh != null ? Math.round(toKnots(h.windKmh)) : "—"}ק׳ · מים ${h.seaTemp != null ? round(h.seaTemp) + "°" : "—"}</span><span class="hr-v" style="color:${col}">${lbl}</span></div>`;
       }).join("");
     }
     function renderForecast() {
@@ -593,11 +608,11 @@
     }
     function renderNextWindow() {
       const el = $("nextWindow");
-      const c = nextWindowBy(isCalmHour), d = nextWindowBy(isDeluxeHour);
+      const c = nextWindowBy(isSwimHour), d = nextWindowBy(h => isDeluxeHour(h) && isWarmEnough(h));
       const line = (label, w, cls) => w
         ? `<div class="next-line ${cls}"><span class="when">${label} · ${hebrewDay(w.start.dateStr)} <small style="color:var(--muted)">${shortDate(w.start.dateStr)}</small></span><span class="time">${pad(w.start.hour)}:00–${pad(w.end.hour + 1)}:00</span></div>`
         : `<div class="next-empty">${label} · לא צפוי ב-7 הימים הקרובים</div>`;
-      el.innerHTML = line("ים פלטה", c, "calm") + line("💎 פלטה דלוקס", d, "deluxe");
+      el.innerHTML = line("מתאים לשחייה", c, "calm") + line("💎 פלטה דלוקס", d, "deluxe");
     }
     function renderStreak() { const s = streakCount(), b = $("streak"); if (s >= 1) { b.classList.add("on"); $("streakN").textContent = s; } else b.classList.remove("on"); }
     function renderUpdated() { const now = israelNow(); $("updated").innerHTML = `עודכן לאחרונה <span class="num">${pad(now.hour)}:${pad(now.minute)}</span> · מקור: Open-Meteo`; }
@@ -617,7 +632,7 @@
       let best = null;
       for (const [k, v] of Object.entries(allLocations())) { const data = dataCache[k]; if (!data) continue; const pct = weekCalmPct(data); if (!best || pct > best.pct) best = { name: v.name, pct }; }
       const el = $("alertBanner");
-      el.innerHTML = (best && best.pct >= ALERT_PCT) ? `<span class="ic">🔥</span><span>שים לב — בשבוע הקרוב צפוי כ-<b>${best.pct}%</b> מהזמן ים פלטה ב<b>${best.name}</b>!</span>` : "";
+      el.innerHTML = (best && best.pct >= ALERT_PCT) ? `<span class="ic">🔥</span><span>שים לב — בשבוע הקרוב צפוי כ-<b>${best.pct}%</b> מהזמן מתאים לשחייה ב<b>${best.name}</b>!</span>` : "";
     }
     async function scanAlerts() {
       await Promise.all(Object.entries(allLocations()).map(async ([k, v]) => { if (dataCache[k]) return; try { dataCache[k] = await fetchLocation(v); } catch (e) {} }));
@@ -635,13 +650,13 @@
     async function enableNotifications() { if (!("Notification" in window)) return; try { await Notification.requestPermission(); } catch (e) {} refreshNotifyBtn(); }
     function maybeNotify() {
       if (!("Notification" in window) || Notification.permission !== "granted") return;
-      const cur = currentHourData(); const calmNow = cur ? isCalmHour(cur) : false;
-      const wasCalm = sessionStorage.getItem("yp-was-calm") === "1";
-      if (calmNow && !wasCalm) {
+      const cur = currentHourData(); const swimNow = cur ? isSwimHour(cur) : false;
+      const wasSwim = sessionStorage.getItem("yp-was-swim") === "1";
+      if (swimNow && !wasSwim) {
         const deluxe = isDeluxeHour(cur);
-        try { new Notification(deluxe ? "💎 פלטה דלוקס!" : "🌊 ים פלטה!", { body: `${allLocations()[LS.loc].name}: ${deluxe ? "הים שטוח כמו זכוכית" : "הים נרגע"} — תנאים מצוינים למים עכשיו.`, icon: "icon-192.png", tag: "yam-palata", lang: "he", dir: "rtl" }); } catch (e) {}
+        try { new Notification(deluxe ? "💎 פלטה דלוקס!" : "🏊 מתאים לשחייה!", { body: `${allLocations()[LS.loc].name}: ים פלטה ומים ${round(cur.seaTemp)}° — מושלם לשחייה עכשיו!`, icon: "icon-192.png", tag: "yam-palata", lang: "he", dir: "rtl" }); } catch (e) {}
       }
-      sessionStorage.setItem("yp-was-calm", calmNow ? "1" : "0");
+      sessionStorage.setItem("yp-was-swim", swimNow ? "1" : "0");
     }
 
     function showError(msg) { $("loading").classList.add("hidden"); $("app").classList.add("hidden"); $("errorText").textContent = msg; $("errorBox").classList.remove("hidden"); }
@@ -673,16 +688,16 @@
     }
     function finishAdd(key) { closeAdd(); LS.loc = key; renderLocations(); hourly = []; load(); }
 
-    function setLocation(key) { if (!allLocations()[key] || key === LS.loc) return; LS.loc = key; sessionStorage.setItem("yp-was-calm", "0"); renderLocations(); hourly = []; load(); }
+    function setLocation(key) { if (!allLocations()[key] || key === LS.loc) return; LS.loc = key; sessionStorage.setItem("yp-was-swim", "0"); renderLocations(); hourly = []; load(); }
     function updateCalmLabels() { $("calmVal").textContent = heightMax.toFixed(2); $("calmDerived").textContent = `סף קוצים (גלי רוח) נגזר אוטומטית: ≤ ${chopMax.toFixed(2)}מ׳`; }
     function init() {
       renderLocations(); refreshNotifyBtn();
       const cs = $("calmSlider"), wd = $("windSlider"), wt = $("waterSlider");
       cs.value = heightMax; wd.value = windMax; wt.value = waterMin;
-      updateCalmLabels(); $("windVal").textContent = Math.round(windMax); $("waterVal").textContent = Math.round(waterMin);
+      updateCalmLabels(); $("windVal").textContent = Math.round(windMax); $("waterVal").textContent = fmtT(waterMin);
       cs.addEventListener("input", () => { heightMax = parseFloat(cs.value); chopMax = chopMaxOf(heightMax); LS.height = heightMax; updateCalmLabels(); if (hourly.length) { renderAll(); recomputeAlert(); } });
       wd.addEventListener("input", () => { windMax = parseFloat(wd.value); LS.wind = windMax; $("windVal").textContent = Math.round(windMax); if (hourly.length) { renderAll(); recomputeAlert(); } });
-      wt.addEventListener("input", () => { waterMin = parseFloat(wt.value); LS.water = waterMin; $("waterVal").textContent = Math.round(waterMin); if (hourly.length) { renderHero(); renderMetrics(); } });
+      wt.addEventListener("input", () => { waterMin = parseFloat(wt.value); LS.water = waterMin; $("waterVal").textContent = fmtT(waterMin); if (hourly.length) { renderAll(); recomputeAlert(); } });
       $("addModal").addEventListener("click", e => { if (e.target.id === "addModal") closeAdd(); });
       load(); setInterval(load, REFRESH_MS); setInterval(() => { if (hourly.length) renderAll(); }, 60 * 1000);
     }
