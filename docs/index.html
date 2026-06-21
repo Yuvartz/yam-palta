@@ -319,8 +319,8 @@
           <input type="range" id="windSlider" min="1" max="30" step="1" value="10" />
         </div>
         <div class="slider-row">
-          <div class="top"><span class="lbl">טמפ׳ מים מינימלית לשחייה</span><span class="val"><span id="waterVal" class="num">27.7</span>°C</span></div>
-          <input type="range" id="waterSlider" min="18" max="31" step="0.1" value="27.7" />
+          <div class="top"><span class="lbl">טמפ׳ מים מינימלית לשחייה</span><span class="val"><span id="waterVal" class="num">26</span>°C</span></div>
+          <input type="range" id="waterSlider" min="18" max="31" step="0.1" value="26" />
         </div>
         <button class="btn" id="notifyBtn" onclick="App.enableNotifications()">🔔 הפעל התראות על ים פלטה</button>
       </div>
@@ -365,7 +365,7 @@
     const KMH_PER_KNOT = 1.852;
     const REFRESH_MS = 15 * 60 * 1000;
     const DELUXE_CHOP = 0.1;
-    const WONDERFUL_SEA = 28;
+    const WONDERFUL_SEA = 29;
     const ALERT_PCT = 80;
     const COMPASS = ["צפונית", "צפונית-מזרחית", "מזרחית", "דרומית-מזרחית", "דרומית", "דרומית-מערבית", "מערבית", "צפונית-מערבית"];
     const ARROWS = ["↓", "↙", "←", "↖", "↑", "↗", "→", "↘"];
@@ -383,7 +383,7 @@
       get loc() { return localStorage.getItem("yp-loc") || "telaviv"; }, set loc(v) { localStorage.setItem("yp-loc", v); },
       get height() { return parseFloat(localStorage.getItem("yp-height")) || 0.3; }, set height(v) { localStorage.setItem("yp-height", String(v)); },
       get wind() { return parseFloat(localStorage.getItem("yp-wind")) || 10; }, set wind(v) { localStorage.setItem("yp-wind", String(v)); },
-      get water() { const v = parseFloat(localStorage.getItem("yp-water")); return isNaN(v) ? 27.7 : v; }, set water(v) { localStorage.setItem("yp-water", String(v)); },
+      get water() { const v = parseFloat(localStorage.getItem("yp-water")); return isNaN(v) ? 26 : v; }, set water(v) { localStorage.setItem("yp-water", String(v)); },
       get customs() { try { return JSON.parse(localStorage.getItem("yp-locs")) || {}; } catch (e) { return {}; } }, set customs(o) { localStorage.setItem("yp-locs", JSON.stringify(o)); },
     };
     const allLocations = () => ({ ...BUILTIN, ...LS.customs });
@@ -415,6 +415,13 @@
     const isSwimHour = h => isCalmHour(h) && isWarmEnough(h);               // calm AND warm = good to swim
     const fmtT = v => Number.isInteger(v) ? String(v) : v.toFixed(1);
 
+    // 26°C = swimmable but cool (0.75), gradually improving to 29°C = wonderful (1.0, capped).
+    function tempScore(water) {
+      if (water == null) return .5;
+      if (water >= 29) return 1;
+      if (water >= 26) return 0.75 + 0.25 * (water - 26) / 3;
+      return clamp01(0.75 * (water - 18) / 8);
+    }
     function swimScore(h) {
       if (!h) return null;
       const chop = chopHeight(h), height = h.waveHeight;
@@ -422,7 +429,7 @@
       const chopS = chop == null ? .5 : clamp01(1 - (chop - 0.05) / 0.55);
       const heightS = height == null ? .5 : clamp01(1 - (height - 0.3) / 1.5);
       const windS = wind == null ? .5 : clamp01(1 - (wind - 5) / 18);
-      const tempS = water == null ? .5 : clamp01((water - 18) / 8);
+      const tempS = tempScore(water);
       return Math.round((chopS * 0.34 + windS * 0.28 + heightS * 0.16 + tempS * 0.22) * 100) / 10;
     }
     function scoreBreakdown(h) {
@@ -432,7 +439,7 @@
       const chopS = chop == null ? .5 : clamp01(1 - (chop - 0.05) / 0.55);
       const heightS = height == null ? .5 : clamp01(1 - (height - 0.3) / 1.5);
       const windS = wind == null ? .5 : clamp01(1 - (wind - 5) / 18);
-      const tempS = water == null ? .5 : clamp01((water - 18) / 8);
+      const tempS = tempScore(water);
       return [
         { label: "גלי רוח (קוצים)", icon: CHOP_ICON, value: chop, unit: "מ׳", dec: 2, sub: chopS, weight: 34 },
         { label: "עוצמת רוח", icon: WIND_ICON, value: wind, unit: "קשר", dec: 1, sub: windS, weight: 28 },
