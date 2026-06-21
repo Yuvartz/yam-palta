@@ -58,6 +58,11 @@
     .jelly-warn:empty { display: none; }
     .jelly-warn .jw-ic { font-size: 18px; line-height: 1; }
     .jelly-warn b { color: #ff9db0; }
+    .jelly-warn.clickable { cursor: pointer; }
+    .jelly-warn .jw-text { flex: 1; }
+    .jelly-warn .jw-chev { font-size: 11px; opacity: .85; align-self: center; white-space: nowrap; }
+    .jelly-collapse { display: none; }
+    .jelly-collapse.open { display: block; margin: 0 0 14px; animation: fadeUp .25s ease both; }
     .jelly-item { display: flex; align-items: center; gap: 10px; padding: 9px 0; text-decoration: none; color: inherit; }
     .jelly-item + .jelly-item { border-top: 1px solid var(--border); }
     .jelly-emoji { font-size: 20px; line-height: 1; }
@@ -266,6 +271,7 @@
       <div class="card">
         <h2>נתונים נוכחיים</h2>
         <div id="jellyAlert" class="jelly-warn"></div>
+        <div id="jellyList" class="jelly-collapse"></div>
         <div class="metrics" id="metrics"></div>
       </div>
 
@@ -273,12 +279,6 @@
         <h2>פירוט גלים</h2>
         <div class="metrics" id="waveDetail"></div>
         <p class="wave-note">גלי רוח (קוצים) = גלים קצרים מהרוח המקומית — הם שהופכים את הים לקופצני. סוול = גלים ארוכים שהגיעו ממרחק, חלקים בהרבה.</p>
-      </div>
-
-      <div class="card" id="jellyCard" style="display:none">
-        <h2>🪼 דיווחי מדוזות אחרונים</h2>
-        <div id="jellyList"></div>
-        <div class="credit">מקור: דיווחי גולשים ב-<a href="https://www.meduzot.co.il/list" target="_blank" rel="noopener">מדוזות בים</a> · מתעדכן כל שעה</div>
       </div>
 
       <div class="card">
@@ -373,7 +373,7 @@
     const allLocations = () => ({ ...BUILTIN, ...LS.customs });
 
     let hourly = [];
-    let jelly = [], jellyUpdated = null;
+    let jelly = [], jellyUpdated = null, jellyOpen = false;
     let heightMax = LS.height, windMax = LS.wind, waterMin = LS.water;
     const chopMaxOf = h => Math.round(h * 0.4 * 100) / 100;   // chop cap derived from the (primary) total-height cap, stricter
     let chopMax = chopMaxOf(heightMax);
@@ -726,21 +726,26 @@
       const el = $("jellyAlert"); if (!el) return; const near = nearbyJelly();
       if (near.length) {
         const n = allLocations()[LS.loc].name;
-        el.innerHTML = `<span class="jw-ic">🪼</span><span>זהירות — <b>${near.length}</b> דיווחי מדוזות ליד <b>${n}</b> ב-48 השעות האחרונות (${near[0].location}, ${timeAgo(near[0].date)})</span>`;
-      } else el.innerHTML = "";
+        el.className = "jelly-warn clickable";
+        el.onclick = () => App.toggleJelly();
+        el.innerHTML = `<span class="jw-ic">🪼</span><span class="jw-text">זהירות — <b>${near.length}</b> דיווחי מדוזות ליד <b>${n}</b> ב-48 השעות האחרונות (${near[0].location}, ${timeAgo(near[0].date)})</span><span class="jw-chev">${jellyOpen ? "▴ סגור" : "▾ פרטים"}</span>`;
+      } else { el.className = "jelly-warn"; el.onclick = null; el.innerHTML = ""; jellyOpen = false; }
     }
     function renderJellyReports() {
-      const card = $("jellyCard"), list = $("jellyList");
-      if (!jelly.length) { card.style.display = "none"; return; }
-      card.style.display = "";
+      const list = $("jellyList"); if (!list) return;
+      list.classList.toggle("open", jellyOpen && jelly.length > 0);
+      if (!jellyOpen || !jelly.length) return;
       const loc = allLocations()[LS.loc];
-      list.innerHTML = jelly.slice(0, 7).map(r => {
+      const items = jelly.slice(0, 7).map(r => {
         const near = r.lat != null && loc && haversine(loc.lat, loc.lon, r.lat, r.lon) <= 25 && hoursSince(r.date) <= 48;
-        const meta = [r.species, r.quantity ? "כמות " + r.quantity : null, r.distance ? "מרחק " + r.distance + "מ׳" : null].filter(Boolean).join(" · ");
+        const distTxt = r.distance ? (/[א-ת]/.test(r.distance) ? r.distance : r.distance + "מ׳") : null;
+        const meta = [r.species, r.quantity ? "כמות " + r.quantity : null, distTxt ? "מרחק " + distTxt : null].filter(Boolean).join(" · ");
         return `<a class="jelly-item" href="${r.url}" target="_blank" rel="noopener"><span class="jelly-emoji">🪼</span><span class="jelly-main"><div class="jelly-loc ${near ? "jelly-near" : ""}">${r.location || "—"}${near ? " · קרוב אליך" : ""}</div><div class="jelly-meta">${meta || "דיווח"}</div></span><span class="jelly-when">${timeAgo(r.date)}</span></a>`;
       }).join("");
+      list.innerHTML = items + `<div class="credit">מקור: דיווחי גולשים ב-<a href="https://www.meduzot.co.il/list" target="_blank" rel="noopener">מדוזות בים</a> · מתעדכן כל שעה</div>`;
     }
     function renderJelly() { renderJellyAlert(); renderJellyReports(); }
+    function toggleJelly() { jellyOpen = !jellyOpen; renderJellyAlert(); renderJellyReports(); }
     async function loadJelly() {
       try {
         const res = await fetch("data/jellyfish.json?v=" + Math.floor(Date.now() / 3600000));
@@ -837,7 +842,7 @@
       load(); setInterval(load, REFRESH_MS); setInterval(() => { if (hourly.length) renderAll(); }, 60 * 1000);
     }
 
-    return { init, setLocation, refresh: load, enableNotifications, openAdd, closeAdd, confirmAdd, toggleDay };
+    return { init, setLocation, refresh: load, enableNotifications, openAdd, closeAdd, confirmAdd, toggleDay, toggleJelly };
   })();
 
   document.addEventListener("DOMContentLoaded", App.init);
