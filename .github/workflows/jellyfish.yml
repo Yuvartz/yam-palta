@@ -1,0 +1,35 @@
+name: Update jellyfish reports
+
+on:
+  schedule:
+    - cron: "0 * * * *"   # hourly
+  workflow_dispatch:        # allow manual run
+
+permissions:
+  contents: write
+
+concurrency:
+  group: jellyfish
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Fetch & parse jellyfish reports
+        run: node scripts/fetch-jellyfish.mjs
+      - name: Commit if changed
+        run: |
+          if [[ -n "$(git status --porcelain docs/data/jellyfish.json)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add docs/data/jellyfish.json
+            git commit -m "data: refresh jellyfish reports [skip ci]"
+            git push
+          else
+            echo "No changes."
+          fi

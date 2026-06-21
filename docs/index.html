@@ -54,6 +54,18 @@
     .alert-banner .ic { font-size: 22px; line-height: 1; }
     .alert-banner:empty { display: none; }
     .alert-banner b { color: #ffd479; }
+    .alert-banner.jelly { background: linear-gradient(135deg, rgba(240,106,106,.16), rgba(200,90,170,.10)); border-color: rgba(240,106,106,.5); }
+    .alert-banner.jelly b { color: #ff9db0; }
+    .jelly-item { display: flex; align-items: center; gap: 10px; padding: 9px 0; text-decoration: none; color: inherit; }
+    .jelly-item + .jelly-item { border-top: 1px solid var(--border); }
+    .jelly-emoji { font-size: 20px; line-height: 1; }
+    .jelly-main { flex: 1; min-width: 0; }
+    .jelly-loc { font-weight: 700; font-size: 14px; }
+    .jelly-loc.jelly-near { color: #ff9db0; }
+    .jelly-meta { color: var(--muted); font-size: 12px; }
+    .jelly-when { color: var(--muted); font-size: 11px; font-family: var(--mono); white-space: nowrap; }
+    .credit { font-size: 11px; color: var(--muted); margin-top: 12px; }
+    .credit a { color: var(--calm); }
 
     /* Hero */
     .hero { position: relative; overflow: hidden; background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 30px 24px 18px; text-align: center; margin-bottom: 14px; min-height: 330px; display: flex; flex-direction: column; align-items: center; transition: background .5s, border-color .5s, box-shadow .5s; }
@@ -224,6 +236,7 @@
 
     <div class="locations" id="locations"></div>
     <div class="alert-banner" id="alertBanner"></div>
+    <div class="alert-banner jelly" id="jellyAlert"></div>
 
     <div id="errorBox" class="error-box hidden">
       <div id="errorText">שגיאה בטעינת הנתונים.</div>
@@ -246,6 +259,12 @@
         <h2>פירוט גלים</h2>
         <div class="metrics" id="waveDetail"></div>
         <p class="wave-note">גלי רוח (קוצים) = גלים קצרים מהרוח המקומית — הם שהופכים את הים לקופצני. סוול = גלים ארוכים שהגיעו ממרחק, חלקים בהרבה.</p>
+      </div>
+
+      <div class="card" id="jellyCard" style="display:none">
+        <h2>🪼 דיווחי מדוזות אחרונים</h2>
+        <div id="jellyList"></div>
+        <div class="credit">מקור: דיווחי גולשים ב-<a href="https://www.meduzot.co.il/list" target="_blank" rel="noopener">מדוזות בים</a> · מתעדכן כל שעה</div>
       </div>
 
       <div class="card">
@@ -339,6 +358,7 @@
     const allLocations = () => ({ ...BUILTIN, ...LS.customs });
 
     let hourly = [];
+    let jelly = [], jellyUpdated = null;
     let heightMax = LS.height, windMax = LS.wind, waterMin = LS.water;
     const chopMaxOf = h => Math.round(h * 0.4 * 100) / 100;   // chop cap derived from the (primary) total-height cap, stricter
     let chopMax = chopMaxOf(heightMax);
@@ -614,9 +634,45 @@
         : `<div class="next-empty">${label} · לא צפוי ב-7 הימים הקרובים</div>`;
       el.innerHTML = line("מתאים לשחייה", c, "calm") + line("💎 פלטה דלוקס", d, "deluxe");
     }
+    // Jellyfish reports (scraped hourly from meduzot.co.il into data/jellyfish.json)
+    function haversine(la1, lo1, la2, lo2) { const R = 6371, r = x => x * Math.PI / 180; const dLa = r(la2 - la1), dLo = r(lo2 - lo1); const x = Math.sin(dLa / 2) ** 2 + Math.cos(r(la1)) * Math.cos(r(la2)) * Math.sin(dLo / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(x)); }
+    function hoursSince(iso) { const t = new Date(iso).getTime(); return isNaN(t) ? Infinity : (Date.now() - t) / 3600000; }
+    function timeAgo(iso) { const h = hoursSince(iso); if (!isFinite(h)) return ""; const m = Math.round(h * 60); if (m < 60) return `לפני ${m} ד׳`; if (h < 24) return `לפני ${Math.round(h)} שע׳`; return `לפני ${Math.round(h / 24)} ימים`; }
+    function nearbyJelly() {
+      const loc = allLocations()[LS.loc]; if (!loc) return [];
+      return jelly.filter(r => r.lat != null && hoursSince(r.date) <= 48 && haversine(loc.lat, loc.lon, r.lat, r.lon) <= 25).sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+    function renderJellyAlert() {
+      const el = $("jellyAlert"); const near = nearbyJelly();
+      if (near.length) {
+        const n = allLocations()[LS.loc].name;
+        el.className = "alert-banner jelly";
+        el.innerHTML = `<span class="ic">🪼</span><span>זהירות — <b>${near.length}</b> דיווחי מדוזות ליד <b>${n}</b> ב-48 השעות האחרונות (${near[0].location}, ${timeAgo(near[0].date)})</span>`;
+      } else el.innerHTML = "";
+    }
+    function renderJellyReports() {
+      const card = $("jellyCard"), list = $("jellyList");
+      if (!jelly.length) { card.style.display = "none"; return; }
+      card.style.display = "";
+      const loc = allLocations()[LS.loc];
+      list.innerHTML = jelly.slice(0, 7).map(r => {
+        const near = r.lat != null && loc && haversine(loc.lat, loc.lon, r.lat, r.lon) <= 25 && hoursSince(r.date) <= 48;
+        const meta = [r.species, r.quantity ? "כמות " + r.quantity : null, r.distance ? "מרחק " + r.distance + "מ׳" : null].filter(Boolean).join(" · ");
+        return `<a class="jelly-item" href="${r.url}" target="_blank" rel="noopener"><span class="jelly-emoji">🪼</span><span class="jelly-main"><div class="jelly-loc ${near ? "jelly-near" : ""}">${r.location || "—"}${near ? " · קרוב אליך" : ""}</div><div class="jelly-meta">${meta || "דיווח"}</div></span><span class="jelly-when">${timeAgo(r.date)}</span></a>`;
+      }).join("");
+    }
+    function renderJelly() { renderJellyAlert(); renderJellyReports(); }
+    async function loadJelly() {
+      try {
+        const res = await fetch("data/jellyfish.json?v=" + Math.floor(Date.now() / 3600000));
+        if (!res.ok) return;
+        const j = await res.json(); jelly = j.reports || []; jellyUpdated = j.updated; renderJelly();
+      } catch (e) {}
+    }
+
     function renderStreak() { const s = streakCount(), b = $("streak"); if (s >= 1) { b.classList.add("on"); $("streakN").textContent = s; } else b.classList.remove("on"); }
     function renderUpdated() { const now = israelNow(); $("updated").innerHTML = `עודכן לאחרונה <span class="num">${pad(now.hour)}:${pad(now.minute)}</span> · מקור: Open-Meteo`; }
-    function renderAll() { renderHero(); renderGoodFor(); renderIndicators(); renderWaveDetails(); renderMetrics(); renderForecast(); renderNextWindow(); renderStreak(); renderUpdated(); }
+    function renderAll() { renderHero(); renderGoodFor(); renderIndicators(); renderWaveDetails(); renderMetrics(); renderForecast(); renderNextWindow(); renderStreak(); renderUpdated(); renderJelly(); }
 
     function hebrewDay(ds) {
       const now = israelNow();
@@ -668,7 +724,7 @@
         const data = await fetchLocation(loc);
         hourly = data; dataCache[LS.loc] = data;
         $("loading").classList.add("hidden"); $("app").classList.remove("hidden");
-        renderAll(); maybeNotify(); scanAlerts();
+        renderAll(); maybeNotify(); scanAlerts(); loadJelly();
       } catch (e) { console.error(e); if (hourly.length === 0) showError("לא ניתן לטעון נתונים. בדוק חיבור לאינטרנט ונסה שוב."); }
     }
 
