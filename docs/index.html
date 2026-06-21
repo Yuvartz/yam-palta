@@ -77,10 +77,23 @@
     /* Hero */
     .hero { position: relative; overflow: hidden; background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 30px 24px 18px; text-align: center; margin-bottom: 14px; min-height: 330px; display: flex; flex-direction: column; align-items: center; transition: background .5s, border-color .5s, box-shadow .5s; }
     .hero-content { position: relative; z-index: 3; }
-    .hero-score { line-height: 1; margin-bottom: 10px; }
+    .hero-score { line-height: 1; margin-bottom: 10px; cursor: pointer; }
     .hero-score .sc-num { font-family: var(--mono); font-size: 58px; font-weight: 800; }
     .hero-score .sc-max { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--muted); }
     .hero-score .sc-label { font-size: 12px; color: var(--muted); margin-top: 5px; font-weight: 700; letter-spacing: .5px; }
+    .hero-score .sc-chev { font-size: 10px; opacity: .8; }
+    .score-detail { text-align: right; width: 100%; max-width: 340px; margin: 4px auto 14px; background: rgba(10,14,22,.55);
+      border: 1px solid var(--border); border-radius: 14px; padding: 6px 12px; backdrop-filter: blur(5px); cursor: default;
+      animation: fadeUp .25s ease both; }
+    .sd-row { display: grid; grid-template-columns: 24px 1fr 56px 36px; align-items: center; gap: 8px; padding: 8px 2px; }
+    .sd-row + .sd-row { border-top: 1px solid var(--border); }
+    .sd-icon { display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 13px; }
+    .sd-icon svg { width: 16px; height: 16px; }
+    .sd-label { font-size: 12.5px; font-weight: 700; color: var(--text); }
+    .sd-label small { display: block; color: var(--muted); font-weight: 500; font-size: 10.5px; }
+    .sd-value { font-size: 12px; color: var(--muted); text-align: left; white-space: nowrap; }
+    .sd-sub { font-size: 13px; font-weight: 800; text-align: left; }
+    .sd-note { font-size: 11px; color: var(--warn); padding: 8px 2px 4px; border-top: 1px solid var(--border); margin-top: 2px; line-height: 1.5; }
     .hero h1 { font-size: 30px; font-weight: 900; margin: 0 0 6px; transition: color .4s; }
     .hero .sub { color: var(--muted); font-size: 15px; margin: 0; max-width: 330px; }
     .hero.calm { background: linear-gradient(160deg, rgba(45,212,191,.14), var(--card) 72%); border-color: rgba(45,212,191,.45); box-shadow: 0 0 60px -22px var(--calm-glow); }
@@ -373,7 +386,7 @@
     const allLocations = () => ({ ...BUILTIN, ...LS.customs });
 
     let hourly = [];
-    let jelly = [], jellyUpdated = null, jellyOpen = false;
+    let jelly = [], jellyUpdated = null, jellyOpen = false, scoreOpen = false;
     let heightMax = LS.height, windMax = LS.wind, waterMin = LS.water;
     const chopMaxOf = h => Math.round(h * 0.4 * 100) / 100;   // chop cap derived from the (primary) total-height cap, stricter
     let chopMax = chopMaxOf(heightMax);
@@ -409,12 +422,27 @@
       const tempS = water == null ? .5 : clamp01((water - 18) / 8);
       return Math.round((chopS * 0.34 + windS * 0.28 + heightS * 0.16 + tempS * 0.22) * 100) / 10;
     }
+    function scoreBreakdown(h) {
+      if (!h) return null;
+      const chop = chopHeight(h), height = h.waveHeight;
+      const wind = h.windKmh != null ? toKnots(h.windKmh) : null, water = h.seaTemp;
+      const chopS = chop == null ? .5 : clamp01(1 - (chop - 0.05) / 0.55);
+      const heightS = height == null ? .5 : clamp01(1 - (height - 0.3) / 1.5);
+      const windS = wind == null ? .5 : clamp01(1 - (wind - 5) / 18);
+      const tempS = water == null ? .5 : clamp01((water - 18) / 8);
+      return [
+        { label: "גלי רוח (קוצים)", icon: CHOP_ICON, value: chop, unit: "מ׳", dec: 2, sub: chopS, weight: 34 },
+        { label: "עוצמת רוח", icon: WIND_ICON, value: wind, unit: "קשר", dec: 1, sub: windS, weight: 28 },
+        { label: "טמפ׳ מים", icon: null, emoji: "🌊", value: water, unit: "°C", dec: 1, sub: tempS, weight: 22 },
+        { label: "גובה גל", icon: HEIGHT_ICON, value: height, unit: "מ׳", dec: 2, sub: heightS, weight: 16 },
+      ];
+    }
     function scoreColor(s) { return s >= 8 ? "#34d399" : s >= 6.5 ? "#2dd4bf" : s >= 5 ? "#e9c46a" : s >= 3.5 ? "#f0a55a" : "#f06a6a"; }
     function scoreDesc(state, s, h) {
       const temp = h && h.seaTemp != null ? round(h.seaTemp) : null;
       const w = temp != null ? ` · מים ${temp}°` : "";
       if (state === "neutral" || s == null) return "—";
-      if (state === "rough") return "הים לא פלטה כרגע — לא מתאים לשחייה" + w;
+      if (state === "rough") return "לא מתאים לשחייה כרגע" + w;
       if (!isWarmEnough(h)) return `הים פלטה, אך המים ${temp != null ? temp + "° " : ""}מתחת ל-${fmtT(waterMin)}° שהעדפת`;
       if (state === "deluxe") return "פלטה דלוקס ומים חמימים — מושלם לשחייה!" + w;
       return "מתאים לשחייה — ים פלטה ומים חמימים!" + w;
@@ -592,10 +620,10 @@
       else if (isDeluxeHour(ref)) { state = "deluxe"; title = "פלטה דלוקס"; }
       else if (isCalmHour(ref)) { state = "calm"; title = "ים פלטה"; }
       else { state = "rough"; title = "ים לא פלטה"; }
-      let sc = swimScore(ref);
+      let sc = swimScore(ref); let capNote = null;
       if (sc != null) {
-        if (state === "rough") sc = Math.min(sc, 4.5);                       // not פלטה
-        else if (ref && !isWarmEnough(ref)) sc = Math.min(sc, 5.5);          // calm but colder than you like
+        if (state === "rough") { sc = Math.min(sc, 4.5); capNote = "⚠️ הציון מוגבל ל-4.5 לכל היותר כי הים לא פלטה כרגע."; }
+        else if (ref && !isWarmEnough(ref)) { sc = Math.min(sc, 5.5); capNote = `⚠️ הציון מוגבל ל-5.5 לכל היותר כי המים מתחת ל-${fmtT(waterMin)}° שהעדפת.`; }
       }
       const scCol = sc != null ? scoreColor(sc) : "var(--muted)", desc = scoreDesc(state, sc, ref);
       const calm = state === "calm" || state === "deluxe";
@@ -605,11 +633,27 @@
       hero.className = "hero " + state;
       hero.innerHTML = `
         <div class="hero-content">
-          <div class="hero-score" style="color:${scCol}"><span class="sc-num">${sc != null ? sc.toFixed(1) : "—"}</span><span class="sc-max">/10</span><div class="sc-label">התאמה לשחייה</div></div>
+          <div class="hero-score${scoreOpen ? " open" : ""}" style="color:${scCol}" onclick="App.toggleScore()">
+            <span class="sc-num">${sc != null ? sc.toFixed(1) : "—"}</span><span class="sc-max">/10</span>
+            <div class="sc-label">התאמה לשחייה <span class="sc-chev">${scoreOpen ? "▴" : "▾"}</span></div>
+          </div>
+          ${scoreOpen ? scoreDetailHTML(ref, capNote) : ""}
           <h1>${title}</h1><p class="sub">${desc}</p>
           ${todayTimeline()}
         </div>${turtle}${sparks}${seajelly}${waveScene(waveH, period)}`;
     }
+    function scoreDetailHTML(h, capNote) {
+      const rows = scoreBreakdown(h); if (!rows) return "";
+      const body = rows.map(r => `
+        <div class="sd-row">
+          <span class="sd-icon">${r.icon || `<span>${r.emoji}</span>`}</span>
+          <span class="sd-label">${r.label}<small>משקל ${r.weight}%</small></span>
+          <span class="sd-value num">${r.value != null ? r.value.toFixed(r.dec) + " " + r.unit : "—"}</span>
+          <span class="sd-sub num" style="color:${scoreColor(r.sub * 10)}">${(r.sub * 10).toFixed(1)}</span>
+        </div>`).join("");
+      return `<div class="score-detail" onclick="event.stopPropagation()">${body}${capNote ? `<div class="sd-note">${capNote}</div>` : ""}</div>`;
+    }
+    function toggleScore() { scoreOpen = !scoreOpen; renderHero(); }
     function miniWave(height, color) {
       const h = height == null ? 0.15 : height;
       const amp = Math.max(2, Math.min(9, h * 9 + 2));
@@ -842,7 +886,7 @@
       load(); setInterval(load, REFRESH_MS); setInterval(() => { if (hourly.length) renderAll(); }, 60 * 1000);
     }
 
-    return { init, setLocation, refresh: load, enableNotifications, openAdd, closeAdd, confirmAdd, toggleDay, toggleJelly };
+    return { init, setLocation, refresh: load, enableNotifications, openAdd, closeAdd, confirmAdd, toggleDay, toggleJelly, toggleScore };
   })();
 
   document.addEventListener("DOMContentLoaded", App.init);
