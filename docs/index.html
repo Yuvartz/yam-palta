@@ -602,8 +602,10 @@
       }).join("") + `</div>`;
     }
     function sparkles(n) {
+      // Anchored to the bottom in px (matching the fixed-height wave-scene), not a % of the
+      // whole hero — otherwise they drift off the water whenever the hero grows taller.
       let s = "";
-      for (let i = 0; i < n; i++) s += `<span class="sparkle" style="left:${(8 + Math.random() * 84).toFixed(0)}%;top:${(52 + Math.random() * 38).toFixed(0)}%;animation-delay:${(Math.random() * 3).toFixed(1)}s;animation-duration:${(2.4 + Math.random() * 2).toFixed(1)}s"></span>`;
+      for (let i = 0; i < n; i++) s += `<span class="sparkle" style="left:${(8 + Math.random() * 84).toFixed(0)}%;bottom:${(10 + Math.random() * 95).toFixed(0)}px;animation-delay:${(Math.random() * 3).toFixed(1)}s;animation-duration:${(2.4 + Math.random() * 2).toFixed(1)}s"></span>`;
       return s;
     }
 
