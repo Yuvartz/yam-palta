@@ -54,8 +54,10 @@
     .alert-banner .ic { font-size: 22px; line-height: 1; }
     .alert-banner:empty { display: none; }
     .alert-banner b { color: #ffd479; }
-    .alert-banner.jelly { background: linear-gradient(135deg, rgba(240,106,106,.16), rgba(200,90,170,.10)); border-color: rgba(240,106,106,.5); }
-    .alert-banner.jelly b { color: #ff9db0; }
+    .jelly-warn { display: flex; gap: 9px; align-items: flex-start; margin: 0 0 14px; padding: 11px 13px; border-radius: 12px; background: linear-gradient(135deg, rgba(240,106,106,.16), rgba(200,90,170,.10)); border: 1px solid rgba(240,106,106,.45); font-size: 13px; font-weight: 700; line-height: 1.45; }
+    .jelly-warn:empty { display: none; }
+    .jelly-warn .jw-ic { font-size: 18px; line-height: 1; }
+    .jelly-warn b { color: #ff9db0; }
     .jelly-item { display: flex; align-items: center; gap: 10px; padding: 9px 0; text-decoration: none; color: inherit; }
     .jelly-item + .jelly-item { border-top: 1px solid var(--border); }
     .jelly-emoji { font-size: 20px; line-height: 1; }
@@ -248,7 +250,6 @@
 
     <div class="locations" id="locations"></div>
     <div class="alert-banner" id="alertBanner"></div>
-    <div class="alert-banner jelly" id="jellyAlert"></div>
 
     <div id="errorBox" class="error-box hidden">
       <div id="errorText">שגיאה בטעינת הנתונים.</div>
@@ -264,6 +265,7 @@
 
       <div class="card">
         <h2>נתונים נוכחיים</h2>
+        <div id="jellyAlert" class="jelly-warn"></div>
         <div class="metrics" id="metrics"></div>
       </div>
 
@@ -721,11 +723,10 @@
       return jelly.filter(r => r.lat != null && hoursSince(r.date) <= 48 && haversine(loc.lat, loc.lon, r.lat, r.lon) <= 25).sort((a, b) => new Date(b.date) - new Date(a.date));
     }
     function renderJellyAlert() {
-      const el = $("jellyAlert"); const near = nearbyJelly();
+      const el = $("jellyAlert"); if (!el) return; const near = nearbyJelly();
       if (near.length) {
         const n = allLocations()[LS.loc].name;
-        el.className = "alert-banner jelly";
-        el.innerHTML = `<span class="ic">🪼</span><span>זהירות — <b>${near.length}</b> דיווחי מדוזות ליד <b>${n}</b> ב-48 השעות האחרונות (${near[0].location}, ${timeAgo(near[0].date)})</span>`;
+        el.innerHTML = `<span class="jw-ic">🪼</span><span>זהירות — <b>${near.length}</b> דיווחי מדוזות ליד <b>${n}</b> ב-48 השעות האחרונות (${near[0].location}, ${timeAgo(near[0].date)})</span>`;
       } else el.innerHTML = "";
     }
     function renderJellyReports() {
