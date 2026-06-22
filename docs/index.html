@@ -133,7 +133,22 @@
     @keyframes jbob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
     @keyframes jpulse { 0%,100% { transform: scale(1,1); } 50% { transform: scale(1.08,.85); } }
     @media (prefers-reduced-motion: reduce) { .seajelly, .seajelly-in, .seajelly-in svg { animation: none; } }
-    @media (prefers-reduced-motion: reduce) { .wave-track, .wave-layer, .sparkle, .star, .turtle, .turtle-inner, .act .scene { animation: none; } .turtle { left: auto; right: 18px; } }
+
+    /* Drifting swim/snorkel/SUP figures (shown when conditions are swim-ready) */
+    .surfer { position: absolute; left: 0; z-index: 2; pointer-events: none; color: var(--calm-2); }
+    .surfer .surfer-inner { width: 38px; height: 38px; opacity: .92; animation: bob 3.2s ease-in-out infinite; }
+    .surfer .surfer-inner svg { width: 100%; height: 100%; display: block; }
+    .surfer.sup { bottom: 68px; animation: swim 24s linear infinite; }
+    .surfer.snorkel { bottom: 36px; color: #7bdcd0; animation: swim 29s linear infinite; animation-delay: -10s; }
+    .surfer.swim { bottom: 18px; color: #5ad1c9; animation: swim 33s linear infinite; animation-delay: -20s; }
+    .hero.deluxe .surfer { color: #ffd479; }
+
+    /* Moon (night sky, shape reflects today's real phase) */
+    .moon { position: absolute; top: 12px; right: 16px; z-index: 1; pointer-events: none; animation: moonBob 7s ease-in-out infinite; }
+    .moon svg { display: block; border-radius: 50%; filter: drop-shadow(0 0 9px rgba(243,236,214,.45)); }
+    @keyframes moonBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+    @media (prefers-reduced-motion: reduce) { .wave-track, .wave-layer, .sparkle, .star, .turtle, .turtle-inner, .act .scene, .surfer, .surfer .surfer-inner, .moon { animation: none; } .turtle { left: auto; right: 18px; } }
 
     /* Activities */
     .good-card.deluxe { border-color: rgba(255,212,121,.4); }
@@ -206,6 +221,8 @@
     .metric.combo .value { font-size: 15px; font-weight: 700; }
     .metric.combo .compass { font-family: var(--sans); }
     .wave-note { font-size: 11px; color: var(--muted); margin: 12px 0 0; line-height: 1.5; }
+    .metrics-date { font-size: 12px; color: var(--muted); font-weight: 700; margin-bottom: 10px; }
+    .metrics-date:empty { display: none; }
 
     /* Forecast + day breakdown */
     .day { display: grid; grid-template-columns: 88px 1fr 44px 16px; align-items: center; gap: 10px; padding: 9px 0; cursor: pointer; }
@@ -288,6 +305,7 @@
         <h2>נתונים נוכחיים</h2>
         <div id="jellyAlert" class="jelly-warn"></div>
         <div id="jellyList" class="jelly-collapse"></div>
+        <div id="metricsDate" class="metrics-date"></div>
         <div class="metrics" id="metrics"></div>
       </div>
 
@@ -389,7 +407,7 @@
     const allLocations = () => ({ ...BUILTIN, ...LS.customs });
 
     let hourly = [];
-    let jelly = [], jellyUpdated = null, jellyOpen = false, scoreOpen = false;
+    let jelly = [], jellyUpdated = null, jellyOpen = false, scoreOpen = false, dailySun = {};
     let heightMax = LS.height, windMax = LS.wind, waterMin = LS.water;
     const chopMaxOf = h => Math.round(h * 0.4 * 100) / 100;   // chop cap derived from the (primary) total-height cap, stricter
     let chopMax = chopMaxOf(heightMax);
@@ -488,9 +506,12 @@
       const common = `latitude=${loc.lat}&longitude=${loc.lon}&timezone=Asia%2FJerusalem&forecast_days=7&past_days=7`;
       const marineUrl = `https://marine-api.open-meteo.com/v1/marine?${common}&hourly=wave_height,wave_period,wave_direction,wind_wave_height,swell_wave_height,swell_wave_period,sea_surface_temperature&models=best_match,${MARINE_MODELS.join(",")}`;
       const weatherUrl = `https://api.open-meteo.com/v1/forecast?${common}&hourly=temperature_2m,wind_speed_10m,wind_direction_10m,uv_index&models=${WX_MODELS.join(",")}`;
-      const [mRes, wRes] = await Promise.all([fetch(marineUrl), fetch(weatherUrl)]);
-      if (!mRes.ok || !wRes.ok) throw new Error("API request failed");
-      const [marine, weather] = await Promise.all([mRes.json(), wRes.json()]);
+      // Sunrise/sunset is purely geometric (model-independent) — fetched separately because the
+      // `models=` param above would otherwise suffix the daily fields per model (sunrise_ecmwf_ifs025...).
+      const sunUrl = `https://api.open-meteo.com/v1/forecast?${common}&daily=sunrise,sunset`;
+      const [mRes, wRes, sRes] = await Promise.all([fetch(marineUrl), fetch(weatherUrl), fetch(sunUrl)]);
+      if (!mRes.ok || !wRes.ok || !sRes.ok) throw new Error("API request failed");
+      const [marine, weather, sunData] = await Promise.all([mRes.json(), wRes.json(), sRes.json()]);
       const mh = marine.hourly, wh = weather.hourly;
       const wave = ensemble(mh, "wave_height", MARINE_MODELS, WAVE_TRUST);
       const period = ensemble(mh, "wave_period", MARINE_MODELS, WAVE_TRUST);
@@ -504,7 +525,11 @@
       const wdir = ensemble(wh, "wind_direction_10m", WX_MODELS, WX_TRUST);
       const uv = ensemble(wh, "uv_index", WX_MODELS, WX_TRUST);
       const wIdx = {}; wh.time.forEach((t, i) => { wIdx[t] = i; });
-      return mh.time.map((t, i) => {
+      const sun = {};
+      (sunData.daily?.time || []).forEach((d, i) => {
+        sun[d] = { sunrise: sunData.daily.sunrise?.[i]?.slice(11, 16) ?? null, sunset: sunData.daily.sunset?.[i]?.slice(11, 16) ?? null };
+      });
+      const hourlyOut = mh.time.map((t, i) => {
         const j = wIdx[t];
         return {
           time: t, dateStr: t.slice(0, 10), hour: parseInt(t.slice(11, 13), 10),
@@ -518,6 +543,7 @@
           uv: j != null ? uv.med[j] : null,
         };
       });
+      return { hourly: hourlyOut, sun };
     }
 
     // Light single-model fetch (best_match) for the all-locations weekly alert scan.
@@ -639,13 +665,20 @@
       }
       const scCol = sc != null ? scoreColor(sc) : "var(--muted)", desc = scoreDesc(state, sc, ref);
       const calm = state === "calm" || state === "deluxe";
+      const swimReady = ref ? isSwimHour(ref) : false;
       const turtle = calm ? `<div class="turtle"><div class="turtle-inner">${TURTLE_ART}</div></div>` : "";
       const sparks = calm ? sparkles(7) : "";
       const seajelly = nearbyJelly().length ? `<div class="seajelly"><div class="seajelly-in">${JELLY_ART}</div></div>` : "";
-      const skyStars = isNightNow() ? stars(14) : "";
+      const night = isNightNow();
+      const skyStars = night ? stars(14) : "";
+      const moon = night ? (() => { const ph = moonPhaseNow(); return `<div class="moon">${moonGlyph(ph.illum, ph.waxing, 42)}</div>`; })() : "";
+      const surfers = swimReady ? `
+        <div class="surfer sup"><div class="surfer-inner">${SUP_ART}</div></div>
+        <div class="surfer snorkel"><div class="surfer-inner">${SNORKEL_ART}</div></div>
+        <div class="surfer swim"><div class="surfer-inner">${SWIM_ART}</div></div>` : "";
       hero.className = "hero " + state;
       hero.innerHTML = `
-        ${skyStars}
+        ${skyStars}${moon}
         <div class="hero-content">
           <div class="hero-score${scoreOpen ? " open" : ""}" style="color:${scCol}" onclick="App.toggleScore()">
             <span class="sc-num">${sc != null ? sc.toFixed(1) : "—"}</span><span class="sc-max">/10</span>
@@ -654,7 +687,7 @@
           ${scoreOpen ? scoreDetailHTML(ref, capNote) : ""}
           <h1>${title}</h1><p class="sub">${desc}</p>
           ${todayTimeline()}
-        </div>${turtle}${sparks}${seajelly}${waveScene(waveH, period)}`;
+        </div>${turtle}${sparks}${seajelly}${surfers}${waveScene(waveH, period)}`;
     }
     function isNightNow() {
       const now = israelNow();
@@ -688,6 +721,92 @@
     }
     function sunsetHourFor(month) { if (month >= 6 && month <= 8) return 19; if (month >= 3 && month <= 5) return 18; if (month >= 9 && month <= 11) return 17; return 16; }
     function addDays(dateStr, n) { const d = new Date(dateStr + "T12:00"); d.setDate(d.getDate() + n); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; }
+
+    // ---------- Minimal moon astronomy (phase + rise/set) ----------
+    // Sun rise/set comes from Open-Meteo directly; the Moon doesn't, so this implements
+    // low-precision lunar position formulas (Schlyter-style orbital elements + a handful of the
+    // largest perturbation terms) — accurate to a few minutes, plenty for a decorative sky icon.
+    const ARAD = Math.PI / 180;
+    const norm360 = x => { x %= 360; return x < 0 ? x + 360 : x; };
+    function julianFromDate(date) { return date.getTime() / 86400000 + 2440587.5; }
+    function sunEclipticLongitude(d) {
+      const M = norm360(357.5291 + 0.98560028 * d);
+      const C = 1.9148 * Math.sin(M * ARAD) + 0.02 * Math.sin(2 * M * ARAD) + 0.0003 * Math.sin(3 * M * ARAD);
+      return { lon: norm360(M + C + 102.9372 + 180), M };
+    }
+    function moonPosition(d) {
+      const sun = sunEclipticLongitude(d);
+      const dm = d + 1.5; // Moon's classic orbital elements are referenced to 2000 Jan 0.0 (JD 2451543.5), 1.5 days before J2000.0
+      const N = norm360(125.1228 - 0.0529538083 * dm), inc = 5.1454, w = norm360(318.0634 + 0.1643573223 * dm);
+      const a = 60.2666, e = 0.0549, M = norm360(115.3654 + 13.0649929509 * dm);
+      let E = M + (180 / Math.PI) * e * Math.sin(M * ARAD) * (1 + e * Math.cos(M * ARAD));
+      for (let k = 0; k < 6; k++) E -= (E - (180 / Math.PI) * e * Math.sin(E * ARAD) - M) / (1 - e * Math.cos(E * ARAD));
+      const xv = a * (Math.cos(E * ARAD) - e), yv = a * (Math.sqrt(1 - e * e) * Math.sin(E * ARAD));
+      const v = norm360(Math.atan2(yv, xv) / ARAD), r = Math.sqrt(xv * xv + yv * yv), vw = v + w;
+      const xh = r * (Math.cos(N * ARAD) * Math.cos(vw * ARAD) - Math.sin(N * ARAD) * Math.sin(vw * ARAD) * Math.cos(inc * ARAD));
+      const yh = r * (Math.sin(N * ARAD) * Math.cos(vw * ARAD) + Math.cos(N * ARAD) * Math.sin(vw * ARAD) * Math.cos(inc * ARAD));
+      const zh = r * (Math.sin(vw * ARAD) * Math.sin(inc * ARAD));
+      let lon = norm360(Math.atan2(yh, xh) / ARAD);
+      const Lm = norm360(N + w + M), D = norm360(Lm - sun.lon), F = norm360(Lm - N);
+      lon = norm360(lon - 1.274 * Math.sin((M - 2 * D) * ARAD) + 0.658 * Math.sin(2 * D * ARAD) - 0.186 * Math.sin(sun.M * ARAD)
+        - 0.059 * Math.sin((2 * M - 2 * D) * ARAD) - 0.057 * Math.sin((M - 2 * D + sun.M) * ARAD) + 0.053 * Math.sin((M + 2 * D) * ARAD)
+        + 0.046 * Math.sin((2 * D - sun.M) * ARAD) + 0.041 * Math.sin((M - sun.M) * ARAD) - 0.035 * Math.sin(D * ARAD) - 0.031 * Math.sin((M + sun.M) * ARAD));
+      const lat = Math.atan2(zh, Math.sqrt(xh * xh + yh * yh)) / ARAD
+        - 0.173 * Math.sin((F - 2 * D) * ARAD) - 0.055 * Math.sin((M - F - 2 * D) * ARAD) - 0.046 * Math.sin((M + F - 2 * D) * ARAD)
+        + 0.033 * Math.sin((F + 2 * D) * ARAD) + 0.017 * Math.sin((2 * M + F) * ARAD);
+      const dist = r - 0.58 * Math.cos((M - 2 * D) * ARAD) - 0.46 * Math.cos(2 * D * ARAD);
+      return { lon, lat, dist, sunLon: sun.lon };
+    }
+    function eclToEq(lon, lat) {
+      const lonR = lon * ARAD, latR = lat * ARAD, e = 23.4397 * ARAD;
+      return {
+        ra: norm360(Math.atan2(Math.sin(lonR) * Math.cos(e) - Math.tan(latR) * Math.sin(e), Math.cos(lonR)) / ARAD),
+        dec: Math.asin(Math.sin(latR) * Math.cos(e) + Math.cos(latR) * Math.sin(e) * Math.sin(lonR)) / ARAD,
+      };
+    }
+    function moonAltitude(date, lat, lon) {
+      const d = julianFromDate(date) - 2451545.0;
+      const pos = moonPosition(d), eq = eclToEq(pos.lon, pos.lat);
+      const lst = norm360(norm360(280.16 + 360.9856235 * d) + lon);
+      const ha = lst - eq.ra;
+      const altGeo = Math.asin(Math.sin(lat * ARAD) * Math.sin(eq.dec * ARAD) + Math.cos(lat * ARAD) * Math.cos(eq.dec * ARAD) * Math.cos(ha * ARAD)) / ARAD;
+      const parallax = Math.asin(1 / pos.dist) / ARAD;
+      return altGeo - parallax * Math.cos(altGeo * ARAD);
+    }
+    function israelMidnightUTC(dateStr) {
+      const guess = new Date(dateStr + "T00:00:00Z");
+      const h = parseInt(new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Jerusalem", hour: "2-digit", hour12: false }).format(guess), 10) % 24;
+      return new Date(guess.getTime() - h * 3600000);
+    }
+    function moonRiseSet(dateStr, lat, lon) {
+      const base = israelMidnightUTC(dateStr).getTime(), threshold = -0.34, stepMin = 12;
+      let prevAlt = null, prevT = null, rise = null, set = null;
+      for (let m = 0; m <= 24 * 60; m += stepMin) {
+        const t = new Date(base + m * 60000), alt = moonAltitude(t, lat, lon);
+        if (prevAlt != null) {
+          if (prevAlt < threshold && alt >= threshold && !rise) rise = new Date(prevT.getTime() + (threshold - prevAlt) / (alt - prevAlt) * (t - prevT));
+          if (prevAlt >= threshold && alt < threshold && !set) set = new Date(prevT.getTime() + (prevAlt - threshold) / (prevAlt - alt) * (t - prevT));
+        }
+        prevAlt = alt; prevT = t;
+      }
+      return { rise, set };
+    }
+    function moonPhaseNow() {
+      const d = julianFromDate(new Date()) - 2451545.0;
+      const pos = moonPosition(d);
+      const phaseAngle = norm360(pos.lon - pos.sunLon);
+      return { illum: (1 - Math.cos(phaseAngle * ARAD)) / 2, waxing: phaseAngle < 180 };
+    }
+    function fmtIsraelHM(date) { return date ? new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Jerusalem", hour: "2-digit", minute: "2-digit", hour12: false }).format(date) : null; }
+    function moonGlyph(illum, waxing, size = 40) {
+      const R = size / 2, cx = R, cy = R;
+      const k = Math.max(0, Math.min(1, illum));
+      const darkX = cx + (waxing ? -1 : 1) * 2 * R * k;
+      return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
+        <circle cx="${cx}" cy="${cy}" r="${R - 1}" fill="#f3ecd6" stroke="rgba(255,255,255,.35)" stroke-width="1"/>
+        <circle cx="${darkX}" cy="${cy}" r="${R - 1}" fill="#1b2436"/>
+      </svg>`;
+    }
     function todayTimeline() {
       const now = israelNow();
       const month = parseInt(now.dateStr.slice(5, 7), 10);
@@ -748,12 +867,20 @@
     function renderMetrics() {
       const el = $("metrics"); const cur = nearestHourData();
       if (!cur) { el.innerHTML = `<div class="next-empty">אין נתונים זמינים.</div>`; return; }
+      const now = israelNow();
+      const weekday = new Intl.DateTimeFormat("he-IL", { weekday: "long", timeZone: "Asia/Jerusalem" }).format(new Date());
+      $("metricsDate").innerHTML = `📅 ${weekday} · ${shortDate(now.dateStr)}.${now.dateStr.slice(0, 4)}`;
       const sea = tempInfo(cur.seaTemp, true), air = tempInfo(cur.airTemp, false);
       const dirIdx = cur.windDir != null ? Math.round(cur.windDir / 45) % 8 : null;
+      const sun = dailySun[now.dateStr] || {};
+      const loc = allLocations()[LS.loc] || BUILTIN.telaviv;
+      const moonRS = moonRiseSet(now.dateStr, loc.lat, loc.lon);
       el.innerHTML = `
         <div class="metric"><div class="label">🌊 טמפ׳ מים</div><div class="value" style="color:${sea.color}">${fmt(cur.seaTemp)}<small> °C</small></div>${sea.note ? `<div class="opt" style="color:${sea.color}">${sea.note}</div>` : ""}</div>
         <div class="metric"><div class="label">☀️ טמפ׳ אוויר</div><div class="value" style="color:${air.color}">${fmt(cur.airTemp)}<small> °C</small></div></div>
-        <div class="metric combo"><div class="sub"><div class="label">🧭 כיוון רוח</div><div class="value compass">${dirIdx != null ? ARROWS[dirIdx] + " " + COMPASS[dirIdx] : "—"}</div></div><div class="sub"><div class="label">😎 קרינת UV</div><div class="value">${cur.uv != null ? round(cur.uv) : "—"}</div></div></div>`;
+        <div class="metric combo"><div class="sub"><div class="label">🧭 כיוון רוח</div><div class="value compass">${dirIdx != null ? ARROWS[dirIdx] + " " + COMPASS[dirIdx] : "—"}</div></div><div class="sub"><div class="label">😎 קרינת UV</div><div class="value">${cur.uv != null ? round(cur.uv) : "—"}</div></div></div>
+        <div class="metric combo"><div class="sub"><div class="label">🌅 זריחה</div><div class="value">${sun.sunrise || "—"}</div></div><div class="sub"><div class="label">🌇 שקיעה</div><div class="value">${sun.sunset || "—"}</div></div></div>
+        <div class="metric combo"><div class="sub"><div class="label">🌙 זריחת ירח</div><div class="value">${fmtIsraelHM(moonRS.rise) || "—"}</div></div><div class="sub"><div class="label">🌙 שקיעת ירח</div><div class="value">${fmtIsraelHM(moonRS.set) || "—"}</div></div></div>`;
     }
     function hourLabel(h) {
       const warm = isWarmEnough(h);
@@ -880,8 +1007,8 @@
       if (hourly.length === 0) { $("loading").classList.remove("hidden"); $("app").classList.add("hidden"); }
       try {
         const loc = allLocations()[LS.loc] || BUILTIN.telaviv;
-        const data = await fetchLocation(loc);
-        hourly = data; dataCache[LS.loc] = data;
+        const { hourly: data, sun } = await fetchLocation(loc);
+        hourly = data; dataCache[LS.loc] = data; dailySun = sun;
         $("loading").classList.add("hidden"); $("app").classList.remove("hidden");
         renderAll(); maybeNotify(); scanAlerts(); loadJelly();
       } catch (e) { console.error(e); if (hourly.length === 0) showError("לא ניתן לטעון נתונים. בדוק חיבור לאינטרנט ונסה שוב."); }
