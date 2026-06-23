@@ -1,8 +1,40 @@
 {
-  "updated": "2026-06-22T20:33:45.313Z",
+  "updated": "2026-06-23T07:39:05.942Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25288",
+      "reporter": "sharon hazut",
+      "location": "תל אביב מרכז - גורדון, בוגרשוב, פרישמן, צ'ארלס קלור",
+      "lat": 32.085,
+      "lon": 34.766,
+      "date": "2026-06-23T09:19",
+      "dateText": "23.06.2026",
+      "time": "09:19",
+      "activity": "הליכה על החוף",
+      "distance": "0-200",
+      "quantity": "15",
+      "species": "חוטית נודדת",
+      "diameter": "11-30",
+      "url": "https://www.meduzot.co.il/observation/25288"
+    },
+    {
+      "id": "25287",
+      "reporter": "קותי גרוס",
+      "location": "בת ים וראשון לציון",
+      "lat": 32.015,
+      "lon": 34.743,
+      "date": "2026-06-22T07:45",
+      "dateText": "22.06.2026",
+      "time": "07:45",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25287"
+    },
     {
       "id": "25286",
       "reporter": "רבקה",
@@ -1250,38 +1282,6 @@
       "species": "חוטית נודדת",
       "diameter": "11-30",
       "url": "https://www.meduzot.co.il/observation/25199"
-    },
-    {
-      "id": "25194",
-      "reporter": "Matisr",
-      "location": "צפון חוף הכרמל",
-      "lat": 32.835,
-      "lon": 34.956,
-      "date": "2026-06-19T17:28",
-      "dateText": "19.06.2026",
-      "time": "17:28",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": "חוטית נודדת",
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25194"
-    },
-    {
-      "id": "25191",
-      "reporter": "הודיה",
-      "location": "תל אביב צפון - הירקון, מציצים, הילטון ומרינה תל אביב",
-      "lat": 32.085,
-      "lon": 34.766,
-      "date": "2026-06-19T16:16",
-      "dateText": "19.06.2026",
-      "time": "16:16",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": "5",
-      "species": "חוטית נודדת",
-      "diameter": "6-10",
-      "url": "https://www.meduzot.co.il/observation/25191"
     }
   ]
 }
