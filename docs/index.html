@@ -43,8 +43,7 @@
     .streak.on { display: inline-flex; }
     .streak .n { font-family: var(--mono); color: var(--calm); }
     .install-btn { display: none; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%;
-      background: var(--card); border: 1px solid var(--border); color: var(--calm); cursor: pointer; line-height: 1; padding: 0; }
-    .install-btn svg { width: 17px; height: 17px; }
+      background: var(--card); border: 1px solid var(--border); color: var(--calm); cursor: pointer; line-height: 1; padding: 0; font-size: 19px; }
     .install-btn.show { display: inline-flex; }
     .install-btn:hover { border-color: #3a4a6e; }
     .install-steps { list-style: none; margin: 14px 0 18px; padding: 0; counter-reset: step; }
@@ -297,9 +296,7 @@
       <div class="brand"><img class="brand-logo" src="icon-192.png" alt="" /><span class="wordmark">YAM PALATA</span></div>
       <div class="topbar-left">
         <div class="streak" id="streak"><span>🔥</span><span class="n" id="streakN">0</span><span>ימים רצופים</span></div>
-        <button class="install-btn" id="installBtn" onclick="App.installApp()" title="הוסף כאפליקציה">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
-        </button>
+        <button class="install-btn" id="installBtn" onclick="App.installApp()" title="הוסף כאפליקציה">📲</button>
       </div>
     </div>
 
