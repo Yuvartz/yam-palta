@@ -182,7 +182,7 @@
     .tl-h { font-family: var(--mono); font-size: 12px; color: var(--muted); }
     .tl-row.tl-now .tl-h { color: var(--text); font-weight: 700; }
     .tl-wave { display: flex; align-items: center; }
-    .tl-wave svg { width: 100%; height: 20px; display: block; }
+    .tl-wave-img { height: 20px; width: auto; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; }
     .tl-height { font-size: 12px; color: var(--text); white-space: nowrap; }
     .tl-status { font-size: 11.5px; font-weight: 700; text-align: left; white-space: nowrap; }
 
@@ -712,12 +712,15 @@
       return `<div class="score-detail" onclick="event.stopPropagation()">${body}${capNote ? `<div class="sd-note">${capNote}</div>` : ""}</div>`;
     }
     function toggleScore() { scoreOpen = !scoreOpen; renderHero(); }
+    // Hand-drawn wave sprite frames (flat -> breaking), recolored live via CSS mask so they
+    // still track the calm/rough status color like the previous procedural SVG did.
+    const WAVE_SPRITE_DIMS = [[212, 110], [208, 110], [208, 110], [208, 110], [207, 110], [204, 110], [189, 110], [190, 110], [191, 110], [190, 110]];
     function miniWave(height, color) {
       const h = height == null ? 0.15 : height;
-      const amp = Math.max(2, Math.min(9, h * 9 + 2));
-      const mid = 12; let d = `M0 ${mid}`;
-      for (let x = 4; x <= 60; x += 4) d += ` L${x} ${(mid - amp * Math.sin((2 * Math.PI * x) / 26)).toFixed(1)}`;
-      return `<svg viewBox="0 0 60 24" preserveAspectRatio="none"><path d="${d}" fill="none" stroke="${color}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+      const n = Math.min(1, Math.max(0, h / 1.1));
+      const idx = Math.round(Math.pow(n, 0.85) * (WAVE_SPRITE_DIMS.length - 1));
+      const [w, hgt] = WAVE_SPRITE_DIMS[idx];
+      return `<div class="tl-wave-img" style="aspect-ratio:${w}/${hgt};background-color:${color};-webkit-mask-image:url('img/waves/wave-${idx}.png');mask-image:url('img/waves/wave-${idx}.png')"></div>`;
     }
     function sunsetHourFor(month) { if (month >= 6 && month <= 8) return 19; if (month >= 3 && month <= 5) return 18; if (month >= 9 && month <= 11) return 17; return 16; }
     function addDays(dateStr, n) { const d = new Date(dateStr + "T12:00"); d.setDate(d.getDate() + n); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; }
