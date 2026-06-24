@@ -38,9 +38,21 @@
     .brand-logo { width: 30px; height: 30px; border-radius: 50%; display: block; box-shadow: 0 2px 8px -2px rgba(0,0,0,.5); }
     .brand .wordmark { font-family: var(--mono); font-weight: 800; font-size: 21px; letter-spacing: 3px;
       background: linear-gradient(90deg, var(--calm), var(--calm-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .topbar-left { display: flex; align-items: center; gap: 8px; }
     .streak { display: none; align-items: center; gap: 6px; background: var(--card); border: 1px solid var(--border); padding: 7px 12px; border-radius: 999px; font-weight: 700; font-size: 14px; }
     .streak.on { display: inline-flex; }
     .streak .n { font-family: var(--mono); color: var(--calm); }
+    .install-btn { display: none; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%;
+      background: var(--card); border: 1px solid var(--border); color: var(--calm); cursor: pointer; line-height: 1; padding: 0; }
+    .install-btn svg { width: 17px; height: 17px; }
+    .install-btn.show { display: inline-flex; }
+    .install-btn:hover { border-color: #3a4a6e; }
+    .install-steps { list-style: none; margin: 14px 0 18px; padding: 0; counter-reset: step; }
+    .install-steps li { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px; font-size: 14px; line-height: 1.5; }
+    .install-steps li::before { counter-increment: step; content: counter(step); flex: 0 0 auto; width: 22px; height: 22px;
+      border-radius: 50%; background: var(--card-2); border: 1px solid var(--border); color: var(--calm); font-family: var(--mono);
+      font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+    .install-steps b { color: var(--calm); }
 
     .locations { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; scrollbar-width: none; }
     .locations::-webkit-scrollbar { display: none; }
@@ -283,7 +295,12 @@
   <div class="wrap">
     <div class="topbar">
       <div class="brand"><img class="brand-logo" src="icon-192.png" alt="" /><span class="wordmark">YAM PALATA</span></div>
-      <div class="streak" id="streak"><span>🔥</span><span class="n" id="streakN">0</span><span>ימים רצופים</span></div>
+      <div class="topbar-left">
+        <div class="streak" id="streak"><span>🔥</span><span class="n" id="streakN">0</span><span>ימים רצופים</span></div>
+        <button class="install-btn" id="installBtn" onclick="App.installApp()" title="הוסף כאפליקציה">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+        </button>
+      </div>
     </div>
 
     <div class="locations" id="locations"></div>
@@ -361,6 +378,16 @@
       <div class="modal-actions">
         <button class="btn ok" onclick="App.confirmAdd()">הוסף</button>
         <button class="btn ghost" onclick="App.closeAdd()">ביטול</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-back" id="installModal">
+    <div class="modal">
+      <h3>הוספה למסך הבית</h3>
+      <div id="installSteps"></div>
+      <div class="modal-actions">
+        <button class="btn ok" onclick="App.closeInstall()">הבנתי</button>
       </div>
     </div>
   </div>
@@ -984,6 +1011,45 @@
       recomputeAlert();
     }
 
+    // ---------- Install as app ----------
+    let installPromptEvent = null;
+    const isStandaloneMode = () => window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+    const isIOSDevice = () => /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+    function renderInstallSteps() {
+      const el = $("installSteps");
+      if (isIOSDevice()) {
+        el.innerHTML = `<ol class="install-steps">
+          <li>הקישו על כפתור <b>השיתוף</b> ⬆️ בסרגל התחתון של Safari</li>
+          <li>גללו ובחרו <b>"הוסף למסך הבית"</b></li>
+          <li>הקישו <b>"הוסף"</b> בפינה הימנית העליונה</li>
+        </ol>`;
+      } else {
+        el.innerHTML = `<ol class="install-steps">
+          <li>פתחו את תפריט הדפדפן (⋮ או ⋯)</li>
+          <li>בחרו <b>"התקן אפליקציה"</b> או <b>"הוסף למסך הבית"</b></li>
+        </ol>`;
+      }
+    }
+    function setupInstall() {
+      const btn = $("installBtn");
+      if (isStandaloneMode()) { btn.classList.remove("show"); return; }
+      btn.classList.add("show");
+      renderInstallSteps();
+      window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installPromptEvent = e; });
+      window.addEventListener("appinstalled", () => { installPromptEvent = null; btn.classList.remove("show"); });
+    }
+    async function installApp() {
+      if (installPromptEvent) {
+        installPromptEvent.prompt();
+        try { await installPromptEvent.userChoice; } catch (e) {}
+        installPromptEvent = null;
+        return;
+      }
+      $("installModal").classList.add("show");
+    }
+    function closeInstall() { $("installModal").classList.remove("show"); }
+
     // Notifications (now active 24/7 — night tracking is no longer suppressed)
     function refreshNotifyBtn() {
       const btn = $("notifyBtn");
@@ -1044,10 +1110,12 @@
       wd.addEventListener("input", () => { windMax = parseFloat(wd.value); LS.wind = windMax; $("windVal").textContent = Math.round(windMax); if (hourly.length) { renderAll(); recomputeAlert(); } });
       wt.addEventListener("input", () => { waterMin = parseFloat(wt.value); LS.water = waterMin; $("waterVal").textContent = fmtT(waterMin); if (hourly.length) { renderAll(); recomputeAlert(); } });
       $("addModal").addEventListener("click", e => { if (e.target.id === "addModal") closeAdd(); });
+      $("installModal").addEventListener("click", e => { if (e.target.id === "installModal") closeInstall(); });
+      setupInstall();
       load(); setInterval(load, REFRESH_MS); setInterval(() => { if (hourly.length) renderAll(); }, 60 * 1000);
     }
 
-    return { init, setLocation, refresh: load, enableNotifications, openAdd, closeAdd, confirmAdd, toggleDay, toggleJelly, toggleScore };
+    return { init, setLocation, refresh: load, enableNotifications, openAdd, closeAdd, confirmAdd, toggleDay, toggleJelly, toggleScore, installApp, closeInstall };
   })();
 
   document.addEventListener("DOMContentLoaded", App.init);
