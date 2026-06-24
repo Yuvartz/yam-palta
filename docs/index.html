@@ -35,7 +35,7 @@
 
     .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
     .brand { display: flex; align-items: center; gap: 10px; }
-    .brand .dot { font-size: 24px; line-height: 1; }
+    .brand-logo { width: 30px; height: 30px; border-radius: 50%; display: block; box-shadow: 0 2px 8px -2px rgba(0,0,0,.5); }
     .brand .wordmark { font-family: var(--mono); font-weight: 800; font-size: 21px; letter-spacing: 3px;
       background: linear-gradient(90deg, var(--calm), var(--calm-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .streak { display: none; align-items: center; gap: 6px; background: var(--card); border: 1px solid var(--border); padding: 7px 12px; border-radius: 999px; font-weight: 700; font-size: 14px; }
@@ -282,7 +282,7 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="brand"><span class="dot">🌊</span><span class="wordmark">YAM PALATA</span></div>
+      <div class="brand"><img class="brand-logo" src="icon-192.png" alt="" /><span class="wordmark">YAM PALATA</span></div>
       <div class="streak" id="streak"><span>🔥</span><span class="n" id="streakN">0</span><span>ימים רצופים</span></div>
     </div>
 
