@@ -77,10 +77,13 @@
     .alert-banner .ic { font-size: 22px; line-height: 1; }
     .alert-banner:empty { display: none; }
     .alert-banner b { color: #ffd479; }
-    .jelly-warn { display: flex; gap: 9px; align-items: flex-start; margin: 0 0 14px; padding: 11px 13px; border-radius: 12px; background: linear-gradient(135deg, rgba(240,106,106,.16), rgba(200,90,170,.10)); border: 1px solid rgba(240,106,106,.45); font-size: 13px; font-weight: 700; line-height: 1.45; }
+    .jelly-warn { display: flex; gap: 9px; align-items: flex-start; margin: 0 0 14px; padding: 11px 13px; border-radius: 12px; font-size: 13px; font-weight: 700; line-height: 1.45; }
     .jelly-warn:empty { display: none; }
+    .jelly-warn.mid { background: linear-gradient(135deg, rgba(233,196,106,.16), rgba(233,196,106,.08)); border: 1px solid rgba(233,196,106,.45); }
+    .jelly-warn.mid b { color: #e9c46a; }
+    .jelly-warn.high { background: linear-gradient(135deg, rgba(240,106,106,.16), rgba(200,90,170,.10)); border: 1px solid rgba(240,106,106,.45); }
+    .jelly-warn.high b { color: #ff9db0; }
     .jelly-warn .jw-ic { font-size: 18px; line-height: 1; }
-    .jelly-warn b { color: #ff9db0; }
     .jelly-warn.clickable { cursor: pointer; }
     .jelly-warn .jw-text { flex: 1; }
     .jelly-warn .jw-chev { font-size: 11px; opacity: .85; align-self: center; white-space: nowrap; }
@@ -95,6 +98,8 @@
     .jelly-meta { color: var(--muted); font-size: 12px; }
     .jelly-when { color: var(--muted); font-size: 11px; font-family: var(--mono); white-space: nowrap; }
     .credit { font-size: 11px; color: var(--muted); margin-top: 12px; }
+    .beachcam-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 12px; display: block; background: var(--bg-2); }
+    .beachcam-card .credit { margin-top: 8px; }
     .credit a { color: var(--calm); }
 
     /* Hero */
@@ -119,23 +124,34 @@
     .sd-note { font-size: 11px; color: var(--warn); padding: 8px 2px 4px; border-top: 1px solid var(--border); margin-top: 2px; line-height: 1.5; }
     .hero h1 { font-size: 30px; font-weight: 900; margin: 0 0 6px; transition: color .4s; }
     .hero .sub { color: var(--muted); font-size: 15px; margin: 0; max-width: 330px; }
-    .hero.calm { background: linear-gradient(160deg, rgba(45,212,191,.14), var(--card) 72%); border-color: rgba(45,212,191,.45); box-shadow: 0 0 60px -22px var(--calm-glow); }
-    .hero.calm h1 { color: var(--calm); }
+    .hero .conf { color: var(--muted); font-size: 12px; margin: 4px 0 0; opacity: .8; }
     .hero.deluxe { background: linear-gradient(160deg, rgba(255,212,121,.16), rgba(45,212,191,.06) 55%, var(--card)); border-color: rgba(255,212,121,.5); box-shadow: 0 0 70px -20px rgba(255,212,121,.3); }
     .hero.deluxe h1 { color: #ffd479; }
-    .hero.rough { background: linear-gradient(160deg, rgba(74,134,197,.12), var(--card) 72%); border-color: rgba(74,134,197,.35); }
-    .hero.rough h1 { color: #cfe0f5; }
+    .hero.palata { background: linear-gradient(160deg, rgba(45,212,191,.14), var(--card) 72%); border-color: rgba(45,212,191,.45); box-shadow: 0 0 60px -22px var(--calm-glow); }
+    .hero.palata h1 { color: var(--calm); }
+    .hero.almost { background: linear-gradient(160deg, rgba(94,201,194,.13), var(--card) 72%); border-color: rgba(94,201,194,.4); }
+    .hero.almost h1 { color: #5ec9c2; }
+    .hero.pleasant { background: linear-gradient(160deg, rgba(233,196,106,.13), var(--card) 72%); border-color: rgba(233,196,106,.4); }
+    .hero.pleasant h1 { color: #e9c46a; }
+    .hero.working { background: linear-gradient(160deg, rgba(90,160,224,.12), var(--card) 72%); border-color: rgba(90,160,224,.35); }
+    .hero.working h1 { color: #5aa0e0; }
+    .hero.wavy { background: linear-gradient(160deg, rgba(74,111,168,.12), var(--card) 72%); border-color: rgba(74,111,168,.35); }
+    .hero.wavy h1 { color: #cfe0f5; }
 
     /* Waves */
     .wave-scene { position: absolute; left: 0; right: 0; bottom: 0; height: 132px; z-index: 1; pointer-events: none; overflow: hidden; }
     .wave-scene::before { content: ""; position: absolute; inset: 0; z-index: 6; pointer-events: none; background: linear-gradient(180deg, transparent 35%, rgba(0,0,0,.14)); }
+    .horizon-line { position: absolute; top: 0; left: 0; right: 0; height: 1px; z-index: 5; pointer-events: none;
+      background: linear-gradient(90deg, transparent, rgba(255,212,121,.9) 20%, rgba(255,212,121,.9) 80%, transparent);
+      box-shadow: 0 0 8px 1px rgba(255,212,121,.55); }
     .wave-layer { position: absolute; inset: 0; will-change: transform; animation: swell ease-in-out infinite; }
     .wave-layer.back { opacity: .40; } .wave-layer.mid { opacity: .65; } .wave-layer.front { opacity: .98; }
     .wave-track { position: absolute; bottom: 0; left: 0; width: 200%; height: 100%; display: flex; will-change: transform; animation: waveX linear infinite; }
     .wave-track .wtile { width: 50%; height: 100%; display: block; }
-    .hero.calm .wave-scene, .hero.neutral .wave-scene { color: #2dd4bf; }
+    .hero.palata .wave-scene, .hero.almost .wave-scene, .hero.neutral .wave-scene { color: #2dd4bf; }
     .hero.deluxe .wave-scene { color: #ffd479; }
-    .hero.rough .wave-scene { color: #5aa0e0; }
+    .hero.pleasant .wave-scene { color: #e9c46a; }
+    .hero.working .wave-scene, .hero.wavy .wave-scene { color: #5aa0e0; }
     @keyframes waveX { from { transform: translateX(0); } to { transform: translateX(-50%); } }
     @keyframes swell { 0%,100% { transform: translateY(0); } 50% { transform: translateY(calc(var(--sy, 5px) * -1)); } }
     .sparkle { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #fff; opacity: 0; z-index: 2; box-shadow: 0 0 7px 1px rgba(255,255,255,.8); animation: twinkle ease-in-out infinite; }
@@ -210,24 +226,24 @@
     .tl-status { font-size: 11.5px; font-weight: 700; text-align: left; white-space: nowrap; }
 
     /* Indicators — three across */
-    .indicators { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+    .indicators { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
     .ind { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 14px 9px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: border-color .3s; }
     .ind.ok { border-color: rgba(45,212,191,.45); }
+    .ind.warn { border-color: rgba(233,196,106,.45); }
     .ind.over { border-color: rgba(240,165,90,.45); }
     .ind-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: var(--card-2); }
     .ind-icon svg { width: 23px; height: 23px; }
     .ind.ok .ind-icon { color: var(--calm); background: rgba(45,212,191,.12); }
+    .ind.warn .ind-icon { color: #e9c46a; background: rgba(233,196,106,.12); }
     .ind.over .ind-icon { color: var(--warn); background: rgba(240,165,90,.12); }
     .ind-label { font-weight: 700; font-size: 12px; }
     .ind.ok .ind-label { color: var(--calm); }
+    .ind.warn .ind-label { color: #e9c46a; }
     .ind.over .ind-label { color: var(--warn); }
     .ind-value { font-family: var(--mono); font-size: 20px; font-weight: 800; color: var(--text); }
     .ind-value small { font-size: 11px; color: var(--muted); font-weight: 500; }
     .ind-bar { position: relative; width: 100%; height: 7px; background: var(--bg-2); border-radius: 999px; direction: ltr; }
     .ind-bar > i { position: absolute; left: 0; top: 0; height: 100%; border-radius: 999px; transition: width .5s; }
-    .ind.ok .ind-bar > i { background: linear-gradient(90deg, var(--calm), var(--calm-2)); }
-    .ind.over .ind-bar > i { background: linear-gradient(90deg, #e8b06a, var(--warn)); }
-    .ind-bar .thr { position: absolute; top: -3px; width: 2px; height: 13px; background: var(--text); opacity: .5; border-radius: 2px; }
     .ind-cap { font-size: 10px; color: var(--muted); font-family: var(--mono); }
 
     /* Metrics */
@@ -335,6 +351,12 @@
         <div class="metrics" id="metrics"></div>
       </div>
 
+      <div class="card beachcam-card" id="beachcamCard" style="display:none">
+        <h2>📷 תמונה חיה מהחוף</h2>
+        <img id="beachcamImg" class="beachcam-img" alt="תמונה חיה מהמצלמה בחוף" onerror="App.hideBeachcam()" />
+        <div class="credit" id="beachcamCredit"></div>
+      </div>
+
       <div class="card">
         <h2>פירוט גלים</h2>
         <div class="metrics" id="waveDetail"></div>
@@ -347,21 +369,12 @@
       </div>
 
       <div class="card">
-        <h2>צפי לשחייה הקרוב</h2>
+        <h2>חלון הפלטה</h2>
         <div id="nextWindow"></div>
       </div>
 
       <div class="card">
-        <h2>כיול אישי</h2>
-        <div class="slider-row">
-          <div class="top"><span class="lbl">גובה גל מרבי</span><span class="val"><span id="calmVal" class="num">0.30</span> מ׳</span></div>
-          <input type="range" id="calmSlider" min="0.1" max="2" step="0.05" value="0.3" />
-          <div class="ind-cap" id="calmDerived"></div>
-        </div>
-        <div class="slider-row">
-          <div class="top"><span class="lbl">מהירות רוח מרבית</span><span class="val"><span id="windVal" class="num">10</span> קשר</span></div>
-          <input type="range" id="windSlider" min="1" max="30" step="1" value="10" />
-        </div>
+        <h2>העדפה אישית</h2>
         <div class="slider-row">
           <div class="top"><span class="lbl">טמפ׳ מים מינימלית לשחייה</span><span class="val"><span id="waterVal" class="num">26</span>°C</span></div>
           <input type="range" id="waterSlider" min="18" max="31" step="0.1" value="26" />
@@ -414,19 +427,41 @@
       ashkelon: { name: "אשקלון", lat: 31.6699, lon: 34.5738 }, herzliya: { name: "הרצליה", lat: 32.1624, lon: 34.7990 },
       netanya: { name: "נתניה", lat: 32.3215, lon: 34.8532 }, eilat: { name: "אילת", lat: 29.5577, lon: 34.9519 },
     };
+    // Live beach snapshots hotlinked from beachcam.co.il's ipcamlive feeds (verified working aliases,
+    // only for built-in/preset locations that actually have a camera — no fake placeholders elsewhere).
+    const BEACHCAMS = {
+      telaviv: { alias: "664cd75b7639c", label: "מצלמת חוף יפו", page: "https://beachcam.co.il/yafo.html" },
+      herzliya: { alias: "634548590c353", label: "מצלמת חוף זבולון", page: "https://beachcam.co.il/zvulun.html" },
+      haifa: { alias: "60997a5d22ca9", label: "מצלמת חוף בת גלים", page: "https://beachcam.co.il/batgalim.html" },
+      netanya: { alias: "65ccf0508a902", label: "מצלמת חוף קונטיקי", page: "https://beachcam.co.il/kontiki.html" },
+    };
 
     const DAY_START = 6, DAY_END = 19;          // used ONLY for percentage/streak summaries
     const KMH_PER_KNOT = 1.852;
     const REFRESH_MS = 15 * 60 * 1000;
-    const DELUXE_CHOP = 0.1;
     const WONDERFUL_SEA = 29;
     const ALERT_PCT = 80;
+    const HISTORY_HOURS = 10;                   // trailing window for the "Wind History" factor (doc says 8-12h)
     const COMPASS = ["צפונית", "צפונית-מזרחית", "מזרחית", "דרומית-מזרחית", "דרומית", "דרומית-מערבית", "מערבית", "צפונית-מערבית"];
     const ARROWS = ["↓", "↙", "←", "↖", "↑", "↗", "→", "↘"];
+
+    // Palata Index v2: 4 weighted factors (0-100). Thresholds are the vision doc's own draft
+    // assumptions, not final — kept as named, easily-tunable curves rather than scattered magic numbers.
+    const PALATA_WEIGHTS = { chop: 0.40, wind: 0.30, history: 0.20, swell: 0.10 };
+    const PALATA_TIERS = [
+      { min: 95, key: "deluxe",   emoji: "🪞", label: "פלטה דלוקס",  short: "דלוקס",  color: "#ffd479" },
+      { min: 80, key: "palata",   emoji: "🌊", label: "ים פלטה",     short: "פלטה",   color: "#2dd4bf" },
+      { min: 65, key: "almost",   emoji: "🐢", label: "כמעט פלטה",   short: "כמעט",   color: "#5ec9c2" },
+      { min: 50, key: "pleasant", emoji: "🏊", label: "ים נעים",     short: "נעים",   color: "#e9c46a" },
+      { min: 25, key: "working",  emoji: "🌬", label: "ים עובד",     short: "עובד",   color: "#5aa0e0" },
+      { min: 0,  key: "wavy",     emoji: "🌊", label: "ים גלי",      short: "גלי",    color: "#4a6fa8" },
+    ];
 
     const HEIGHT_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 15c3.5 0 4-9 8-9s4.5 9 8 9 4-4 4-4"/><path d="M2 20h20" opacity=".4"/></svg>`;
     const CHOP_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l3-4 3 4 3-4 3 4 3-4 3 4 2-2.5"/><path d="M2 19h20" opacity=".4"/></svg>`;
     const WIND_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h11a3 3 0 1 0-3-3"/><path d="M3 12h15.5a3 3 0 1 1-3 3"/><path d="M3 16h8.5a2.5 2.5 0 1 1-2.5 2.5"/></svg>`;
+    const HISTORY_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>`;
+    const SWELL_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 15c4-8 8-8 10 0s6 8 10 0"/><path d="M2 19h20" opacity=".4"/></svg>`;
     const SWIM_ART = `<svg viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="46" cy="22" r="6" fill="currentColor" stroke="none"/><path d="M12 40c7-5 13-5 19-2l7 4c4 2 9 2 13-1"/><path d="M38 42l7-11"/><path d="M5 54c4 0 4 3 8 3s4-3 8-3 4 3 8 3 4-3 8-3 4 3 8 3 4-3 8-3" opacity=".5"/></svg>`;
     const SNORKEL_ART = `<svg viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><rect x="15" y="24" width="31" height="20" rx="7"/><path d="M30 44c0 4 2 7 6 7"/><path d="M46 28c6 0 9 4 9 10v15"/><path d="M50 53h9"/><path d="M15 31H8" opacity=".7"/><path d="M5 62c4 0 4 3 8 3s4-3 8-3 4 3 8 3 4-3 8-3 4 3 8 3 4-3 8-3" opacity=".45"/></svg>`;
     const SUP_ART = `<svg viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="31" cy="13" r="5" fill="currentColor" stroke="none"/><path d="M31 18v15M31 33l-5 9M31 33l5 9"/><path d="M31 23l11-7"/><path d="M47 7L37 42"/><ellipse cx="34" cy="50" rx="23" ry="4.5"/><path d="M5 62c4 0 4 3 8 3s4-3 8-3 4 3 8 3 4-3 8-3 4 3 8 3 4-3 8-3" opacity=".45"/></svg>`;
@@ -435,8 +470,6 @@
 
     const LS = {
       get loc() { return localStorage.getItem("yp-loc") || "telaviv"; }, set loc(v) { localStorage.setItem("yp-loc", v); },
-      get height() { return parseFloat(localStorage.getItem("yp-height")) || 0.3; }, set height(v) { localStorage.setItem("yp-height", String(v)); },
-      get wind() { return parseFloat(localStorage.getItem("yp-wind")) || 10; }, set wind(v) { localStorage.setItem("yp-wind", String(v)); },
       get water() { const v = parseFloat(localStorage.getItem("yp-water")); return isNaN(v) ? 26 : v; }, set water(v) { localStorage.setItem("yp-water", String(v)); },
       get customs() { try { return JSON.parse(localStorage.getItem("yp-locs")) || {}; } catch (e) { return {}; } }, set customs(o) { localStorage.setItem("yp-locs", JSON.stringify(o)); },
     };
@@ -444,9 +477,7 @@
 
     let hourly = [];
     let jelly = [], jellyUpdated = null, jellyOpen = false, scoreOpen = false, dailySun = {};
-    let heightMax = LS.height, windMax = LS.wind, waterMin = LS.water;
-    const chopMaxOf = h => Math.round(h * 0.4 * 100) / 100;   // chop cap derived from the (primary) total-height cap, stricter
-    let chopMax = chopMaxOf(heightMax);
+    let waterMin = LS.water;   // informational comfort threshold only — no longer gates the Palata Index
     const dataCache = {};
 
     const $ = id => document.getElementById(id);
@@ -463,53 +494,71 @@
     }
     const isDaytimeHour = h => h >= DAY_START && h < DAY_END;
     const chopHeight = h => h.windWave != null ? h.windWave : h.waveHeight;
-    const isCalmHour = h => { const c = chopHeight(h); return c != null && h.windKmh != null && c <= chopMax && (h.waveHeight == null || h.waveHeight <= heightMax) && toKnots(h.windKmh) <= windMax; };
-    const isDeluxeHour = h => { const c = chopHeight(h); return isCalmHour(h) && c != null && c < DELUXE_CHOP && (h.wavePeriod == null || h.wavePeriod >= 6); };
-    const isWarmEnough = h => h.seaTemp != null && h.seaTemp >= waterMin;   // personal min water temp
-    const isSwimHour = h => isCalmHour(h) && isWarmEnough(h);               // calm AND warm = good to swim
     const fmtT = v => Number.isInteger(v) ? String(v) : v.toFixed(1);
 
-    // 26°C = swimmable but cool (0.75), gradually improving to 29°C = wonderful (1.0, capped).
-    function tempScore(water) {
-      if (water == null) return .5;
-      if (water >= 29) return 1;
-      if (water >= 26) return 0.75 + 0.25 * (water - 26) / 3;
-      return clamp01(0.75 * (water - 18) / 8);
+    // ----- Palata Index v2: pure sea-state, 4 weighted factors (0-100) -----
+    // Per-factor curves follow the vision doc's draft bands (doc explicitly flags these as
+    // assumptions, not final). Each returns a 0-1 sub-score; clamp01 keeps them in range.
+    function chopScoreFn(chop) { return chop == null ? .5 : clamp01(1 - Math.max(0, chop - 0.10) / 0.45); }   // 0-0.10m excellent -> 0.55m+ ~0
+    function windScoreFn(knots) { return knots == null ? .5 : clamp01(1 - knots / 14); }                       // 0kt excellent -> 14kt+ ~0
+    function swellScoreFn(swell) { return swell == null ? .5 : clamp01(1 - Math.max(0, swell - 0.4) / 1.2); }  // 0-0.4m excellent -> 1.6m+ ~0
+
+    // Trailing average wind speed (km/h) ending at hour h — "the sea doesn't flatten immediately."
+    function windHistoryAt(h, hours = HISTORY_HOURS) {
+      const idx = hourly.findIndex(x => x.time === h.time);
+      if (idx < 0) return h.windKmh;
+      const slice = hourly.slice(Math.max(0, idx - hours + 1), idx + 1).map(x => x.windKmh).filter(v => v != null);
+      return slice.length ? slice.reduce((a, b) => a + b, 0) / slice.length : h.windKmh;
     }
-    function swimScore(h) {
+
+    function palataBreakdown(h) {
       if (!h) return null;
-      const chop = chopHeight(h), height = h.waveHeight;
-      const wind = h.windKmh != null ? toKnots(h.windKmh) : null, water = h.seaTemp;
-      const chopS = chop == null ? .5 : clamp01(1 - (chop - 0.05) / 0.55);
-      const heightS = height == null ? .5 : clamp01(1 - (height - 0.3) / 1.5);
-      const windS = wind == null ? .5 : clamp01(1 - (wind - 5) / 18);
-      const tempS = tempScore(water);
-      return Math.round((chopS * 0.34 + windS * 0.28 + heightS * 0.16 + tempS * 0.22) * 100) / 10;
-    }
-    function scoreBreakdown(h) {
-      if (!h) return null;
-      const chop = chopHeight(h), height = h.waveHeight;
-      const wind = h.windKmh != null ? toKnots(h.windKmh) : null, water = h.seaTemp;
-      const chopS = chop == null ? .5 : clamp01(1 - (chop - 0.05) / 0.55);
-      const heightS = height == null ? .5 : clamp01(1 - (height - 0.3) / 1.5);
-      const windS = wind == null ? .5 : clamp01(1 - (wind - 5) / 18);
-      const tempS = tempScore(water);
+      const chop = chopHeight(h), wind = h.windKmh != null ? toKnots(h.windKmh) : null;
+      const histKmh = windHistoryAt(h), hist = histKmh != null ? toKnots(histKmh) : null;
+      const swell = h.swell;
       return [
-        { label: "גלי רוח (קוצים)", icon: CHOP_ICON, value: chop, unit: "מ׳", dec: 2, sub: chopS, weight: 34 },
-        { label: "עוצמת רוח", icon: WIND_ICON, value: wind, unit: "קשר", dec: 1, sub: windS, weight: 28 },
-        { label: "טמפ׳ מים", icon: null, emoji: "🌊", value: water, unit: "°C", dec: 1, sub: tempS, weight: 22 },
-        { label: "גובה גל", icon: HEIGHT_ICON, value: height, unit: "מ׳", dec: 2, sub: heightS, weight: 16 },
+        { key: "chop", label: "גלי רוח (קוצים)", icon: CHOP_ICON, value: chop, unit: "מ׳", dec: 2, sub: chopScoreFn(chop), weight: Math.round(PALATA_WEIGHTS.chop * 100) },
+        { key: "wind", label: "עוצמת רוח", icon: WIND_ICON, value: wind, unit: "קשר", dec: 1, sub: windScoreFn(wind), weight: Math.round(PALATA_WEIGHTS.wind * 100) },
+        { key: "history", label: "רוח ב-10 השעות האחרונות", icon: HISTORY_ICON, value: hist, unit: "קשר", dec: 1, sub: windScoreFn(hist), weight: Math.round(PALATA_WEIGHTS.history * 100) },
+        { key: "swell", label: "סוול (גל רחוק)", icon: SWELL_ICON, value: swell, unit: "מ׳", dec: 2, sub: swellScoreFn(swell), weight: Math.round(PALATA_WEIGHTS.swell * 100) },
       ];
     }
-    function scoreColor(s) { return s >= 8 ? "#34d399" : s >= 6.5 ? "#2dd4bf" : s >= 5 ? "#e9c46a" : s >= 3.5 ? "#f0a55a" : "#f06a6a"; }
-    function scoreDesc(state, s, h) {
+    function palataIndex(h) {
+      const b = palataBreakdown(h); if (!b) return null;
+      const sum = b.reduce((acc, r) => acc + r.sub * (PALATA_WEIGHTS[r.key]), 0);
+      return Math.round(clamp01(sum) * 100);
+    }
+    function palataTier(score) {
+      if (score == null) return null;
+      return PALATA_TIERS.find(t => score >= t.min) || PALATA_TIERS[PALATA_TIERS.length - 1];
+    }
+    const isCalmHour = h => { const s = palataIndex(h); return s != null && s >= 80; };    // "ים פלטה" tier or better
+    const isDeluxeHour = h => { const s = palataIndex(h); return s != null && s >= 95; };  // "פלטה דלוקס" tier
+    const isSwimHour = isCalmHour;   // temperature no longer gates — it's shown alongside, not multiplied in
+
+    function subScoreColor(s) { return s >= 0.8 ? "#34d399" : s >= 0.65 ? "#2dd4bf" : s >= 0.45 ? "#e9c46a" : s >= 0.2 ? "#f0a55a" : "#f06a6a"; }
+    // Qualitative trust signal from the ensemble spread we already compute (waveLo/Hi, windLo/Hi) —
+    // no raw confidence % shown, just a short phrase, per explicit product decision.
+    function confidenceLabel(h) {
+      if (!h) return null;
+      const waveSpread = (h.waveHi != null && h.waveLo != null) ? h.waveHi - h.waveLo : null;
+      const windSpreadKt = (h.windHi != null && h.windLo != null) ? toKnots(h.windHi - h.windLo) : null;
+      if ((waveSpread != null && waveSpread > 0.3) || (windSpreadKt != null && windSpreadKt > 6)) return "תנאים פחות צפויים כרגע";
+      if ((waveSpread != null && waveSpread > 0.12) || (windSpreadKt != null && windSpreadKt > 3)) return "תנאים עשויים להשתנות";
+      return "המודלים מסכימים";
+    }
+    function tierSubtitle(tier, h) {
       const temp = h && h.seaTemp != null ? round(h.seaTemp) : null;
       const w = temp != null ? ` · מים ${temp}°` : "";
-      if (state === "neutral" || s == null) return "—";
-      if (state === "rough") return "לא מתאים לשחייה כרגע" + w;
-      if (!isWarmEnough(h)) return `הים פלטה, אך המים ${temp != null ? temp + "° " : ""}מתחת ל-${fmtT(waterMin)}° שהעדפת`;
-      if (state === "deluxe") return "פלטה דלוקס ומים חמימים — מושלם לשחייה!" + w;
-      return "מתאים לשחייה — ים פלטה ומים חמימים!" + w;
+      if (!tier) return "—";
+      switch (tier.key) {
+        case "deluxe": return "הים שטוח כמו מראה — מושלם!" + w;
+        case "palata": return "ים רגוע ויפה — תנאים מצוינים" + w;
+        case "almost": return "כמעט פלטה — תנודות קלות בלבד" + w;
+        case "pleasant": return "ים נעים, מורגשת תנועה קלה" + w;
+        case "working": return "ים עם תנועה — שימו לב לתנאים" + w;
+        default: return "ים גלי — לא מומלץ כרגע" + w;
+      }
     }
 
     // ----- Multi-model "ensemble" for accuracy + confidence -----
@@ -600,16 +649,6 @@
 
     function currentHourData() { const now = israelNow(); const k = `${now.dateStr}T${pad(now.hour)}`; return hourly.find(h => h.time.slice(0, 13) === k) || null; }
     function nearestHourData() { const now = israelNow(); const k = `${now.dateStr}T${pad(now.hour)}`; return currentHourData() || hourly.find(h => h.time.slice(0, 13) >= k) || null; }
-    function nextWindowBy(pred) {
-      const now = israelNow(); const nowKey = `${now.dateStr}T${pad(now.hour)}`;
-      let start = null, prev = null;
-      for (const h of hourly) {
-        if (h.time.slice(0, 13) <= nowKey) continue;
-        const ok = isDaytimeHour(h.hour) && pred(h);
-        if (ok) { if (!start) start = h; prev = h; } else if (start) return { start, end: prev };
-      }
-      return start ? { start, end: prev } : null;
-    }
     function dayGroups(data) { const m = new Map(); for (const h of data) { if (!m.has(h.dateStr)) m.set(h.dateStr, []); m.get(h.dateStr).push(h); } return m; }
     function streakCount() {
       const g = dayGroups(hourly), now = israelNow(); let cur = new Date(now.dateStr + "T12:00"), s = 0;
@@ -659,15 +698,19 @@
       const foamPath = foam ? `<path d="${top}" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2" stroke-linecap="round"/>` : "";
       return `<svg class="wtile" viewBox="0 0 600 132" preserveAspectRatio="none"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity="0.95"/><stop offset="1" stop-color="currentColor" stop-opacity="0.45"/></linearGradient></defs><path d="${fill}" fill="url(#${id})"/>${foamPath}</svg>`;
     }
-    function waveScene(waveH, period = 6) {
-      const aF = ampFromHeight(waveH), durMul = Math.max(0.55, Math.min(1.6, 1.6 - waveH)), sy = (3 + waveH * 6).toFixed(1) + "px";
+    function waveScene(waveH, period = 6, deluxe = false) {
+      // Mirror Deluxe: flatten further still and slow the swell bob almost to a standstill,
+      // plus a sharp glowing horizon line — "almost static sea" per the vision doc.
+      const flat = deluxe ? 0.4 : 1;
+      const aF = ampFromHeight(waveH) * flat, durMul = Math.max(0.55, Math.min(1.6, 1.6 - waveH)) * (deluxe ? 1.6 : 1), sy = ((3 + waveH * 6) * flat).toFixed(1) + "px";
       const cyF = period >= 9 ? 2 : period >= 6.5 ? 3 : period >= 4.5 ? 4 : 5;
       const layers = [
-        { cls: "back", amp: aF * 0.50, mid: 60, cyc: Math.max(1, cyF - 2), scroll: 16, swell: 8 },
-        { cls: "mid", amp: aF * 0.72, mid: 74, cyc: Math.max(2, cyF - 1), scroll: 11, swell: 6.5 },
-        { cls: "front", amp: aF * 1.00, mid: 90, cyc: cyF, scroll: 7.5, swell: 5, foam: true },
+        { cls: "back", amp: aF * 0.50, mid: 60, cyc: Math.max(1, cyF - 2), scroll: 16, swell: deluxe ? 14 : 8 },
+        { cls: "mid", amp: aF * 0.72, mid: 74, cyc: Math.max(2, cyF - 1), scroll: 11, swell: deluxe ? 11 : 6.5 },
+        { cls: "front", amp: aF * 1.00, mid: 90, cyc: cyF, scroll: 7.5, swell: deluxe ? 9 : 5, foam: true },
       ];
-      return `<div class="wave-scene">` + layers.map((l, i) => {
+      const horizon = deluxe ? `<div class="horizon-line"></div>` : "";
+      return `<div class="wave-scene">${horizon}` + layers.map((l, i) => {
         const t = waveTile(l.amp, l.mid, 600 / l.cyc, l.foam);
         return `<div class="wave-layer ${l.cls}" style="--sy:${sy};animation-duration:${l.swell}s;animation-delay:${(-i * 1.3).toFixed(1)}s"><div class="wave-track" style="animation-duration:${(l.scroll * durMul).toFixed(1)}s">${t}${t}</div></div>`;
       }).join("") + `</div>`;
@@ -689,21 +732,18 @@
       const hero = $("hero"); const ref = nearestHourData();
       const waveH = ref && ref.waveHeight != null ? ref.waveHeight : 0.2;
       const period = ref && ref.wavePeriod != null ? ref.wavePeriod : 6;
-      let state, title;
-      if (!ref) { state = "neutral"; title = "אין נתונים"; }
-      else if (isDeluxeHour(ref)) { state = "deluxe"; title = "פלטה דלוקס"; }
-      else if (isCalmHour(ref)) { state = "calm"; title = "ים פלטה"; }
-      else { state = "rough"; title = "ים לא פלטה"; }
-      let sc = swimScore(ref); let capNote = null;
-      if (sc != null) {
-        if (state === "rough") { sc = Math.min(sc, 4.5); capNote = "⚠️ הציון מוגבל ל-4.5 לכל היותר כי הים לא פלטה כרגע."; }
-        else if (ref && !isWarmEnough(ref)) { sc = Math.min(sc, 5.5); capNote = `⚠️ הציון מוגבל ל-5.5 לכל היותר כי המים מתחת ל-${fmtT(waterMin)}° שהעדפת.`; }
-      }
-      const scCol = sc != null ? scoreColor(sc) : "var(--muted)", desc = scoreDesc(state, sc, ref);
-      const calm = state === "calm" || state === "deluxe";
+      const score = ref ? palataIndex(ref) : null;
+      const tier = score != null ? palataTier(score) : null;
+      const title = tier ? tier.label : "אין נתונים";
+      const desc = tierSubtitle(tier, ref);
+      const conf = ref ? confidenceLabel(ref) : null;
+      const scCol = tier ? tier.color : "var(--muted)";
+      const stateKey = tier ? tier.key : "neutral";
+      const calm = stateKey === "palata" || stateKey === "deluxe";
+      const deluxe = stateKey === "deluxe";
       const swimReady = ref ? isSwimHour(ref) : false;
       const turtle = calm ? `<div class="turtle"><div class="turtle-inner">${TURTLE_ART}</div></div>` : "";
-      const sparks = calm ? sparkles(7) : "";
+      const sparks = calm ? sparkles(deluxe ? 16 : 7) : "";
       const seajelly = nearbyJelly().length ? `<div class="seajelly"><div class="seajelly-in">${JELLY_ART}</div></div>` : "";
       const night = isNightNow();
       const skyStars = night ? stars(14) : "";
@@ -712,18 +752,19 @@
         <div class="surfer sup"><div class="surfer-inner">${SUP_ART}</div></div>
         <div class="surfer snorkel"><div class="surfer-inner">${SNORKEL_ART}</div></div>
         <div class="surfer swim"><div class="surfer-inner">${SWIM_ART}</div></div>` : "";
-      hero.className = "hero " + state;
+      hero.className = "hero " + stateKey;
       hero.innerHTML = `
         ${skyStars}${moon}
         <div class="hero-content">
           <div class="hero-score${scoreOpen ? " open" : ""}" style="color:${scCol}" onclick="App.toggleScore()">
-            <span class="sc-num">${sc != null ? sc.toFixed(1) : "—"}</span><span class="sc-max">/10</span>
-            <div class="sc-label">התאמה לשחייה <span class="sc-chev">${scoreOpen ? "▴" : "▾"}</span></div>
+            <span class="sc-num">${score != null ? score : "—"}</span><span class="sc-max">%</span>
+            <div class="sc-label">מדד הפלטה <span class="sc-chev">${scoreOpen ? "▴" : "▾"}</span></div>
           </div>
-          ${scoreOpen ? scoreDetailHTML(ref, capNote) : ""}
-          <h1>${title}</h1><p class="sub">${desc}</p>
+          ${scoreOpen ? scoreDetailHTML(ref) : ""}
+          <h1>${tier ? tier.emoji + " " + title : title}</h1><p class="sub">${desc}</p>
+          ${conf ? `<p class="conf">${conf}</p>` : ""}
           ${todayTimeline()}
-        </div>${turtle}${sparks}${seajelly}${surfers}${waveScene(waveH, period)}`;
+        </div>${turtle}${sparks}${seajelly}${surfers}${waveScene(waveH, period, deluxe)}`;
     }
     function isNightNow() {
       const now = israelNow();
@@ -736,16 +777,16 @@
       for (let i = 0; i < n; i++) s += `<span class="star" style="left:${(3 + Math.random() * 94).toFixed(0)}%;top:${(8 + Math.random() * 130).toFixed(0)}px;animation-delay:${(Math.random() * 4).toFixed(1)}s;animation-duration:${(2 + Math.random() * 3).toFixed(1)}s"></span>`;
       return s;
     }
-    function scoreDetailHTML(h, capNote) {
-      const rows = scoreBreakdown(h); if (!rows) return "";
+    function scoreDetailHTML(h) {
+      const rows = palataBreakdown(h); if (!rows) return "";
       const body = rows.map(r => `
         <div class="sd-row">
-          <span class="sd-icon">${r.icon || `<span>${r.emoji}</span>`}</span>
+          <span class="sd-icon">${r.icon}</span>
           <span class="sd-label">${r.label}<small>משקל ${r.weight}%</small></span>
           <span class="sd-value num">${r.value != null ? r.value.toFixed(r.dec) + " " + r.unit : "—"}</span>
-          <span class="sd-sub num" style="color:${scoreColor(r.sub * 10)}">${(r.sub * 10).toFixed(1)}</span>
+          <span class="sd-sub num" style="color:${subScoreColor(r.sub)}">${r.sub >= 0.65 ? "✅" : r.sub >= 0.35 ? "⚠️" : "❗"}</span>
         </div>`).join("");
-      return `<div class="score-detail" onclick="event.stopPropagation()">${body}${capNote ? `<div class="sd-note">${capNote}</div>` : ""}</div>`;
+      return `<div class="score-detail" onclick="event.stopPropagation()">${body}</div>`;
     }
     function toggleScore() { scoreOpen = !scoreOpen; renderHero(); }
     // Hand-drawn wave sprite frames (flat -> breaking), recolored live via CSS mask so they
@@ -869,29 +910,26 @@
     function renderGoodFor() {
       const el = $("goodFor"); const ref = nearestHourData();
       if (!ref || !isSwimHour(ref)) { el.innerHTML = ""; return; }
-      const deluxe = isDeluxeHour(ref) && isWarmEnough(ref);
+      const deluxe = isDeluxeHour(ref);
       const act = (art, name) => `<div class="act"><div class="scene">${art}</div><div class="name">${name}</div></div>`;
       el.innerHTML = `<div class="card good-card${deluxe ? " deluxe" : ""}"><h2>${deluxe ? "💎 מושלם עכשיו ל…" : "🐢 מצוין עכשיו ל…"}</h2><div class="activities">${act(SWIM_ART, "שחייה")}${act(SNORKEL_ART, "שנירקול")}${act(SUP_ART, "סאפ")}</div></div>`;
     }
-    function indicatorCard(icon, label, value, dec, unit, threshold, scaleMax, thrText) {
-      const ok = value <= threshold;
-      const fill = Math.max(3, Math.min(100, value / scaleMax * 100));
-      const thrPos = Math.max(0, Math.min(100, threshold / scaleMax * 100));
-      return `<div class="ind ${ok ? "ok" : "over"}">
-        <div class="ind-icon">${icon}</div>
-        <div class="ind-label">${label} ${ok ? "✓" : "⚠︎"}</div>
-        <div class="ind-value"><span class="num">${value.toFixed(dec)}</span><small> ${unit}</small></div>
-        <div class="ind-bar"><i style="width:${fill}%"></i><span class="thr" style="left:${thrPos}%"></span></div>
-        <div class="ind-cap">≤ ${thrText} ${unit}</div></div>`;
+    function indicatorCard(row) {
+      const cls = row.sub >= 0.65 ? "ok" : row.sub >= 0.35 ? "warn" : "over";
+      const mark = row.sub >= 0.65 ? "✓" : row.sub >= 0.35 ? "⚠︎" : "❗";
+      const fill = Math.max(3, Math.min(100, row.sub * 100));
+      return `<div class="ind ${cls}">
+        <div class="ind-icon">${row.icon}</div>
+        <div class="ind-label">${row.label} ${mark}</div>
+        <div class="ind-value"><span class="num">${row.value != null ? row.value.toFixed(row.dec) : "—"}</span><small> ${row.unit}</small></div>
+        <div class="ind-bar"><i style="width:${fill}%;background:${subScoreColor(row.sub)}"></i></div>
+        <div class="ind-cap">משקל ${row.weight}%</div></div>`;
     }
     function renderIndicators() {
       const el = $("indicators"); const cur = nearestHourData();
-      if (!cur || cur.windKmh == null) { el.innerHTML = ""; return; }
-      const chop = chopHeight(cur);
-      el.innerHTML =
-        indicatorCard(HEIGHT_ICON, "גובה גל", cur.waveHeight != null ? cur.waveHeight : 0, 2, "מ׳", heightMax, 2.0, heightMax.toFixed(2)) +
-        indicatorCard(CHOP_ICON, "גלי רוח", chop != null ? chop : 0, 2, "מ׳", chopMax, 0.8, chopMax.toFixed(2)) +
-        indicatorCard(WIND_ICON, "עוצמת רוח", toKnots(cur.windKmh), 1, "קשר", windMax, 30, Math.round(windMax));
+      const rows = palataBreakdown(cur);
+      if (!rows || cur.windKmh == null) { el.innerHTML = ""; return; }
+      el.innerHTML = rows.map(indicatorCard).join("");
     }
     function renderWaveDetails() {
       const el = $("waveDetail"); const cur = nearestHourData();
@@ -922,11 +960,8 @@
         <div class="metric combo"><div class="sub"><div class="label">🌙 זריחת ירח</div><div class="value">${fmtIsraelHM(moonRS.rise) || "—"}</div></div><div class="sub"><div class="label">🌙 שקיעת ירח</div><div class="value">${fmtIsraelHM(moonRS.set) || "—"}</div></div></div>`;
     }
     function hourLabel(h) {
-      const warm = isWarmEnough(h);
-      if (isDeluxeHour(h) && warm) return ["דלוקס", "#ffd479"];
-      if (isCalmHour(h) && warm) return ["לשחייה", "#34d399"];
-      if (isCalmHour(h)) return ["פלטה·קר", "#7bb8d6"];
-      return ["גלי", "#4a86c5"];
+      const tier = palataTier(palataIndex(h));
+      return tier ? [tier.short, tier.color] : ["—", "var(--muted)"];
     }
     function dayHoursHTML(ds) {
       const rows = hourly.filter(h => h.dateStr === ds && h.hour >= 5 && h.hour <= 20 && (h.hour - 5) % 3 === 0);
@@ -947,13 +982,33 @@
       if (open && !el.innerHTML) el.innerHTML = dayHoursHTML(ds);
       if (row) row.classList.toggle("expanded", open);
     }
+    // Best contiguous swim-worthy (tier >= Palata) window within one day, by average index.
+    function bestWindowForDay(ds) {
+      const dt = (dayGroups(hourly).get(ds) || []).filter(h => isDaytimeHour(h.hour));
+      let best = null, bestAvg = -1, curStart = null, curEnd = null, curScores = [];
+      const flush = () => {
+        if (!curStart) return;
+        const avg = curScores.reduce((a, b) => a + b, 0) / curScores.length;
+        if (avg > bestAvg) { bestAvg = avg; best = { start: curStart, end: curEnd }; }
+        curStart = null; curEnd = null; curScores = [];
+      };
+      for (const h of dt) {
+        if (isSwimHour(h)) { if (!curStart) curStart = h; curEnd = h; curScores.push(palataIndex(h)); }
+        else flush();
+      }
+      flush();
+      if (!best) return null;
+      return { ...best, tier: palataTier(Math.round(bestAvg)) };
+    }
     function renderNextWindow() {
       const el = $("nextWindow");
-      const c = nextWindowBy(isSwimHour), d = nextWindowBy(h => isDeluxeHour(h) && isWarmEnough(h));
-      const line = (label, w, cls) => w
-        ? `<div class="next-line ${cls}"><span class="when">${label} · ${hebrewDay(w.start.dateStr)} <small style="color:var(--muted)">${shortDate(w.start.dateStr)}</small></span><span class="time">${pad(w.start.hour)}:00–${pad(w.end.hour + 1)}:00</span></div>`
-        : `<div class="next-empty">${label} · לא צפוי ב-7 הימים הקרובים</div>`;
-      el.innerHTML = line("מתאים לשחייה", c, "calm") + line("💎 פלטה דלוקס", d, "deluxe");
+      el.innerHTML = forecastDays(3).map(d => {
+        const label = `${hebrewDay(d.dateStr)} <small style="color:var(--muted)">${shortDate(d.dateStr)}</small>`;
+        const w = bestWindowForDay(d.dateStr);
+        return w
+          ? `<div class="next-line"><span class="when">${label}</span><span class="time" style="color:${w.tier.color}">${w.tier.emoji} ${pad(w.start.hour)}:00–${pad(w.end.hour + 1)}:00</span></div>`
+          : `<div class="next-line"><span class="when">${label}</span><span class="time" style="color:var(--muted);font-weight:600">ללא פלטה</span></div>`;
+      }).join("");
     }
     // Jellyfish reports (scraped hourly from meduzot.co.il into data/jellyfish.json)
     function haversine(la1, lo1, la2, lo2) { const R = 6371, r = x => x * Math.PI / 180; const dLa = r(la2 - la1), dLo = r(lo2 - lo1); const x = Math.sin(dLa / 2) ** 2 + Math.cos(r(la1)) * Math.cos(r(la2)) * Math.sin(dLo / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(x)); }
@@ -963,13 +1018,21 @@
       const loc = allLocations()[LS.loc]; if (!loc) return [];
       return jelly.filter(r => r.lat != null && hoursSince(r.date) <= 48 && haversine(loc.lat, loc.lon, r.lat, r.lon) <= 25).sort((a, b) => new Date(b.date) - new Date(a.date));
     }
+    // Severity band from report count within the existing 25km/48h window — a sting-severity
+    // field isn't scraped from meduzot.co.il, so this counts sightings rather than guessing toxicity.
+    function jellySeverity(count) {
+      if (count >= 5) return { key: "high", emoji: "🔴", word: "זהירות מוגברת" };
+      if (count >= 1) return { key: "mid", emoji: "🟡", word: "זהירות" };
+      return null;
+    }
     function renderJellyAlert() {
       const el = $("jellyAlert"); if (!el) return; const near = nearbyJelly();
-      if (near.length) {
+      const sev = jellySeverity(near.length);
+      if (sev) {
         const n = allLocations()[LS.loc].name;
-        el.className = "jelly-warn clickable";
+        el.className = `jelly-warn clickable ${sev.key}`;
         el.onclick = () => App.toggleJelly();
-        el.innerHTML = `<span class="jw-ic">🪼</span><span class="jw-text">זהירות — <b>${near.length}</b> דיווחי מדוזות ליד <b>${n}</b> ב-48 השעות האחרונות (${near[0].location}, ${timeAgo(near[0].date)})</span><span class="jw-chev">${jellyOpen ? "▴ סגור" : "▾ פרטים"}</span>`;
+        el.innerHTML = `<span class="jw-ic">${sev.emoji}</span><span class="jw-text">${sev.word} — <b>${near.length}</b> דיווחי מדוזות ליד <b>${n}</b> ב-48 השעות האחרונות (${near[0].location}, ${timeAgo(near[0].date)})</span><span class="jw-chev">${jellyOpen ? "▴ סגור" : "▾ פרטים"}</span>`;
       } else { el.className = "jelly-warn"; el.onclick = null; el.innerHTML = ""; jellyOpen = false; }
     }
     function renderJellyReports() {
@@ -986,6 +1049,16 @@
       list.innerHTML = items + `<div class="credit">מקור: דיווחי גולשים ב-<a href="https://www.meduzot.co.il/list" target="_blank" rel="noopener">מדוזות בים</a> · מתעדכן כל שעה</div>`;
     }
     function renderJelly() { renderJellyAlert(); renderJellyReports(); }
+    // Live beach photo: plain <img> hotlink to the snapshot endpoint (no CORS/referer restriction,
+    // unlike the live player iframe which is CSP-locked to beachcam.co.il's own domains).
+    function renderBeachcam() {
+      const card = $("beachcamCard"), cam = BEACHCAMS[LS.loc];
+      if (!cam) { card.style.display = "none"; return; }
+      card.style.display = "";
+      $("beachcamImg").src = `https://g1.ipcamlive.com/player/snapshot.php?alias=${cam.alias}&t=${Date.now()}`;
+      $("beachcamCredit").innerHTML = `${cam.label} · קרדיט: <a href="${cam.page}" target="_blank" rel="noopener">beachcam.co.il</a>`;
+    }
+    function hideBeachcam() { $("beachcamCard").style.display = "none"; }
     function toggleJelly() { jellyOpen = !jellyOpen; renderJellyAlert(); renderJellyReports(); }
     async function loadJelly() {
       try {
@@ -997,7 +1070,7 @@
 
     function renderStreak() { const s = streakCount(), b = $("streak"); if (s >= 1) { b.classList.add("on"); $("streakN").textContent = s; } else b.classList.remove("on"); }
     function renderUpdated() { const now = israelNow(); $("updated").innerHTML = `עודכן לאחרונה <span class="num">${pad(now.hour)}:${pad(now.minute)}</span> · מקור: Open-Meteo`; }
-    function renderAll() { renderHero(); renderGoodFor(); renderIndicators(); renderWaveDetails(); renderMetrics(); renderForecast(); renderNextWindow(); renderStreak(); renderUpdated(); renderJelly(); }
+    function renderAll() { renderHero(); renderGoodFor(); renderIndicators(); renderWaveDetails(); renderMetrics(); renderForecast(); renderNextWindow(); renderStreak(); renderUpdated(); renderJelly(); renderBeachcam(); }
 
     function hebrewDay(ds) {
       const now = israelNow();
@@ -1109,14 +1182,10 @@
     function finishAdd(key) { closeAdd(); LS.loc = key; renderLocations(); hourly = []; load(); }
 
     function setLocation(key) { if (!allLocations()[key] || key === LS.loc) return; LS.loc = key; sessionStorage.setItem("yp-was-swim", "0"); renderLocations(); hourly = []; load(); }
-    function updateCalmLabels() { $("calmVal").textContent = heightMax.toFixed(2); $("calmDerived").textContent = `סף קוצים (גלי רוח) נגזר אוטומטית: ≤ ${chopMax.toFixed(2)}מ׳`; }
     function init() {
       renderLocations(); refreshNotifyBtn();
-      const cs = $("calmSlider"), wd = $("windSlider"), wt = $("waterSlider");
-      cs.value = heightMax; wd.value = windMax; wt.value = waterMin;
-      updateCalmLabels(); $("windVal").textContent = Math.round(windMax); $("waterVal").textContent = fmtT(waterMin);
-      cs.addEventListener("input", () => { heightMax = parseFloat(cs.value); chopMax = chopMaxOf(heightMax); LS.height = heightMax; updateCalmLabels(); if (hourly.length) { renderAll(); recomputeAlert(); } });
-      wd.addEventListener("input", () => { windMax = parseFloat(wd.value); LS.wind = windMax; $("windVal").textContent = Math.round(windMax); if (hourly.length) { renderAll(); recomputeAlert(); } });
+      const wt = $("waterSlider");
+      wt.value = waterMin; $("waterVal").textContent = fmtT(waterMin);
       wt.addEventListener("input", () => { waterMin = parseFloat(wt.value); LS.water = waterMin; $("waterVal").textContent = fmtT(waterMin); if (hourly.length) { renderAll(); recomputeAlert(); } });
       $("addModal").addEventListener("click", e => { if (e.target.id === "addModal") closeAdd(); });
       $("installModal").addEventListener("click", e => { if (e.target.id === "installModal") closeInstall(); });
@@ -1124,7 +1193,7 @@
       load(); setInterval(load, REFRESH_MS); setInterval(() => { if (hourly.length) renderAll(); }, 60 * 1000);
     }
 
-    return { init, setLocation, refresh: load, enableNotifications, openAdd, closeAdd, confirmAdd, toggleDay, toggleJelly, toggleScore, installApp, closeInstall };
+    return { init, setLocation, refresh: load, enableNotifications, openAdd, closeAdd, confirmAdd, toggleDay, toggleJelly, toggleScore, installApp, closeInstall, hideBeachcam };
   })();
 
   document.addEventListener("DOMContentLoaded", App.init);
