@@ -141,12 +141,14 @@
     .hero.palata h1 { color: var(--calm); }
     .hero.almost { background: linear-gradient(160deg, rgba(94,201,194,.13), var(--card) 72%); border-color: rgba(94,201,194,.4); }
     .hero.almost h1 { color: #5ec9c2; }
-    .hero.pleasant { background: linear-gradient(160deg, rgba(233,196,106,.13), var(--card) 72%); border-color: rgba(233,196,106,.4); }
-    .hero.pleasant h1 { color: #e9c46a; }
-    .hero.working { background: linear-gradient(160deg, rgba(90,160,224,.12), var(--card) 72%); border-color: rgba(90,160,224,.35); }
-    .hero.working h1 { color: #5aa0e0; }
-    .hero.wavy { background: linear-gradient(160deg, rgba(74,111,168,.12), var(--card) 72%); border-color: rgba(74,111,168,.35); }
-    .hero.wavy h1 { color: #cfe0f5; }
+    .hero.gentle { background: linear-gradient(160deg, rgba(233,196,106,.13), var(--card) 72%); border-color: rgba(233,196,106,.4); }
+    .hero.gentle h1 { color: #e9c46a; }
+    .hero.waves { background: linear-gradient(160deg, rgba(240,165,90,.12), var(--card) 72%); border-color: rgba(240,165,90,.38); }
+    .hero.waves h1 { color: #f0a55a; }
+    .hero.big { background: linear-gradient(160deg, rgba(236,122,90,.13), var(--card) 72%); border-color: rgba(236,122,90,.4); }
+    .hero.big h1 { color: #ec7a5a; }
+    .hero.stormy { background: linear-gradient(160deg, rgba(240,106,106,.14), var(--card) 72%); border-color: rgba(240,106,106,.42); }
+    .hero.stormy h1 { color: #f06a6a; }
 
     /* Waves */
     .wave-scene { position: absolute; left: 0; right: 0; bottom: 0; height: 132px; z-index: 1; pointer-events: none; overflow: hidden; }
@@ -160,8 +162,9 @@
     .wave-track .wtile { width: 50%; height: 100%; display: block; }
     .hero.palata .wave-scene, .hero.almost .wave-scene, .hero.neutral .wave-scene { color: #2dd4bf; }
     .hero.deluxe .wave-scene { color: #ffd479; }
-    .hero.pleasant .wave-scene { color: #e9c46a; }
-    .hero.working .wave-scene, .hero.wavy .wave-scene { color: #5aa0e0; }
+    .hero.gentle .wave-scene { color: #e9c46a; }
+    .hero.waves .wave-scene { color: #f0a55a; }
+    .hero.big .wave-scene, .hero.stormy .wave-scene { color: #5aa0e0; }
     @keyframes waveX { from { transform: translateX(0); } to { transform: translateX(-50%); } }
     @keyframes swell { 0%,100% { transform: translateY(0); } 50% { transform: translateY(calc(var(--sy, 5px) * -1)); } }
     .sparkle { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #fff; opacity: 0; z-index: 2; box-shadow: 0 0 7px 1px rgba(255,255,255,.8); animation: twinkle ease-in-out infinite; }
@@ -478,12 +481,13 @@
     // assumptions, not final — kept as named, easily-tunable curves rather than scattered magic numbers.
     const PALATA_WEIGHTS = { chop: 0.40, wind: 0.30, history: 0.20, swell: 0.10 };
     const PALATA_TIERS = [
-      { min: 95, key: "deluxe",   emoji: "🪞", label: "פלטה דלוקס",  short: "דלוקס",  color: "#ffd479" },
-      { min: 80, key: "palata",   emoji: "🌊", label: "ים פלטה",     short: "פלטה",   color: "#2dd4bf" },
-      { min: 65, key: "almost",   emoji: "🐢", label: "כמעט פלטה",   short: "כמעט",   color: "#5ec9c2" },
-      { min: 50, key: "pleasant", emoji: "🏊", label: "ים נעים",     short: "נעים",   color: "#e9c46a" },
-      { min: 25, key: "working",  emoji: "🌬", label: "ים עובד",     short: "עובד",   color: "#5aa0e0" },
-      { min: 0,  key: "wavy",     emoji: "🌊", label: "ים גלי",      short: "גלי",    color: "#4a6fa8" },
+      { min: 98, key: "deluxe", emoji: "🪞",  label: "מראה דלוקס", short: "דלוקס", color: "#ffd479" },
+      { min: 90, key: "palata", emoji: "🌊",  label: "ים פלטה",    short: "פלטה",  color: "#2dd4bf" },
+      { min: 80, key: "almost", emoji: "🐢",  label: "כמעט פלטה",  short: "כמעט",  color: "#5ec9c2" },
+      { min: 60, key: "gentle", emoji: "🏊",  label: "גלי עדין",   short: "עדין",  color: "#e9c46a" },
+      { min: 40, key: "waves",  emoji: "🌬️", label: "יש גלים",    short: "גלים",  color: "#f0a55a" },
+      { min: 20, key: "big",    emoji: "🏄",  label: "גל גדול",    short: "גדול",  color: "#ec7a5a" },
+      { min: 0,  key: "stormy", emoji: "⛈️", label: "סוער",       short: "סוער",  color: "#f06a6a" },
     ];
 
     const HEIGHT_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 15c3.5 0 4-9 8-9s4.5 9 8 9 4-4 4-4"/><path d="M2 20h20" opacity=".4"/></svg>`;
@@ -561,8 +565,8 @@
       if (score == null) return null;
       return PALATA_TIERS.find(t => score >= t.min) || PALATA_TIERS[PALATA_TIERS.length - 1];
     }
-    const isCalmHour = h => { const s = palataIndex(h); return s != null && s >= 80; };    // "ים פלטה" tier or better
-    const isDeluxeHour = h => { const s = palataIndex(h); return s != null && s >= 95; };  // "פלטה דלוקס" tier
+    const isCalmHour = h => { const s = palataIndex(h); return s != null && s >= 80; };    // "כמעט פלטה" tier or better
+    const isDeluxeHour = h => { const s = palataIndex(h); return s != null && s >= 98; };  // "מראה דלוקס" tier
     const isSwimHour = isCalmHour;   // temperature no longer gates — it's shown alongside, not multiplied in
 
     function subScoreColor(s) { return s >= 0.8 ? "#34d399" : s >= 0.65 ? "#2dd4bf" : s >= 0.45 ? "#e9c46a" : s >= 0.2 ? "#f0a55a" : "#f06a6a"; }
@@ -582,11 +586,12 @@
       if (!tier) return "—";
       switch (tier.key) {
         case "deluxe": return "הים שטוח כמו מראה — מושלם!" + w;
-        case "palata": return "ים רגוע ויפה — תנאים מצוינים" + w;
+        case "palata": return "ים פלטה — רגוע ויפה, תנאים מצוינים" + w;
         case "almost": return "כמעט פלטה — תנודות קלות בלבד" + w;
-        case "pleasant": return "ים נעים, מורגשת תנועה קלה" + w;
-        case "working": return "ים עם תנועה — שימו לב לתנאים" + w;
-        default: return "ים גלי — לא מומלץ כרגע" + w;
+        case "gentle": return "גלי עדין — ים נעים עם תנועה קלה" + w;
+        case "waves": return "יש גלים — מורגשת תנועה בים" + w;
+        case "big": return "גל גדול — ים פעיל, שימו לב" + w;
+        default: return "ים סוער — לא מומלץ כרגע" + w;
       }
     }
 
@@ -768,7 +773,7 @@
       const conf = ref ? confidenceLabel(ref) : null;
       const scCol = tier ? tier.color : "var(--muted)";
       const stateKey = tier ? tier.key : "neutral";
-      const calm = stateKey === "palata" || stateKey === "deluxe";
+      const calm = ref ? isCalmHour(ref) : false;   // "כמעט פלטה" or better → turtle + sparkles
       const deluxe = stateKey === "deluxe";
       const swimReady = ref ? isSwimHour(ref) : false;
       const turtle = calm ? `<div class="turtle"><div class="turtle-inner">${TURTLE_ART}</div></div>` : "";
