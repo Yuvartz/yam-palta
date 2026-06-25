@@ -757,7 +757,7 @@
         ${skyStars}${moon}
         <div class="hero-content">
           <div class="hero-score${scoreOpen ? " open" : ""}" style="color:${scCol}" onclick="App.toggleScore()">
-            <span class="sc-num">${score != null ? score : "—"}</span><span class="sc-max">%</span>
+            <span class="sc-num">${score != null ? (score / 10).toFixed(1) : "—"}</span><span class="sc-max">/10</span>
             <div class="sc-label">מדד הפלטה <span class="sc-chev">${scoreOpen ? "▴" : "▾"}</span></div>
           </div>
           ${scoreOpen ? scoreDetailHTML(ref) : ""}
@@ -983,8 +983,10 @@
       if (row) row.classList.toggle("expanded", open);
     }
     // Best contiguous swim-worthy (tier >= Palata) window within one day, by average index.
+    // For today, only future hours count — a window that already passed isn't "the next window".
     function bestWindowForDay(ds) {
-      const dt = (dayGroups(hourly).get(ds) || []).filter(h => isDaytimeHour(h.hour));
+      const now = israelNow();
+      const dt = (dayGroups(hourly).get(ds) || []).filter(h => isDaytimeHour(h.hour) && !(ds === now.dateStr && h.hour < now.hour));
       let best = null, bestAvg = -1, curStart = null, curEnd = null, curScores = [];
       const flush = () => {
         if (!curStart) return;
