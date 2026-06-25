@@ -733,11 +733,15 @@
       const foamPath = foam ? `<path d="${top}" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2" stroke-linecap="round"/>` : "";
       return `<svg class="wtile" viewBox="0 0 600 132" preserveAspectRatio="none"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity="0.95"/><stop offset="1" stop-color="currentColor" stop-opacity="0.45"/></linearGradient></defs><path d="${fill}" fill="url(#${id})"/>${foamPath}</svg>`;
     }
-    function waveScene(waveH, period = 6, deluxe = false) {
+    function waveScene(chopH, period = 6, deluxe = false, bobH = null) {
+      // Wave amplitude tracks the WIND CHOP (what actually makes a sea "not palata"), not the
+      // total height — so a smooth-swell day reads as calm even when total height is high. The
+      // long swell instead shows as a gentle vertical bob (bobH).
       // Mirror Deluxe: flatten further still and slow the swell bob almost to a standstill,
       // plus a sharp glowing horizon line — "almost static sea" per the vision doc.
       const flat = deluxe ? 0.4 : 1;
-      const aF = ampFromHeight(waveH) * flat, durMul = Math.max(0.55, Math.min(1.6, 1.6 - waveH)) * (deluxe ? 1.6 : 1), sy = ((3 + waveH * 6) * flat).toFixed(1) + "px";
+      const bob = bobH != null ? bobH : chopH;
+      const aF = ampFromHeight(chopH) * flat, durMul = Math.max(0.55, Math.min(1.6, 1.6 - chopH)) * (deluxe ? 1.6 : 1), sy = ((3 + bob * 6) * flat).toFixed(1) + "px";
       const cyF = period >= 9 ? 2 : period >= 6.5 ? 3 : period >= 4.5 ? 4 : 5;
       const layers = [
         { cls: "back", amp: aF * 0.50, mid: 60, cyc: Math.max(1, cyF - 2), scroll: 16, swell: deluxe ? 14 : 8 },
@@ -765,7 +769,8 @@
     }
     function renderHero() {
       const hero = $("hero"); const ref = nearestHourData();
-      const waveH = ref && ref.waveHeight != null ? ref.waveHeight : 0.2;
+      const waveH = ref && ref.waveHeight != null ? ref.waveHeight : 0.2;   // total height → gentle swell bob
+      const chopH = ref && chopHeight(ref) != null ? chopHeight(ref) : 0.08; // wind chop → wave amplitude (matches the verdict)
       const period = ref && ref.wavePeriod != null ? ref.wavePeriod : 6;
       const score = ref ? palataIndex(ref) : null;
       const tier = score != null ? palataTier(score) : null;
@@ -799,7 +804,7 @@
           <h1>${tier ? tier.emoji + " " + title : title}</h1><p class="sub">${desc}</p>
           ${conf ? `<p class="conf">${conf}</p>` : ""}
           ${todayTimeline()}
-        </div>${turtle}${sparks}${seajelly}${surfers}${waveScene(waveH, period, deluxe)}`;
+        </div>${turtle}${sparks}${seajelly}${surfers}${waveScene(chopH, period, deluxe, waveH)}`;
     }
     function isNightNow() {
       const now = israelNow();
@@ -933,10 +938,11 @@
         const h = hourly.find(x => x.dateStr === baseDate && x.hour === hr);
         const [lbl, col] = h ? hourLabel(h) : ["—", "var(--border)"];
         const height = h && h.waveHeight != null ? h.waveHeight : null;
+        const chop = h ? chopHeight(h) : null;   // icon reflects chop (the verdict driver), not total height
         const idx = h ? palataIndex(h) : null;
         return `<div class="tl-row ${hr === nowSlot ? "tl-now" : ""}">
           <span class="tl-h">${pad(hr)}:00</span>
-          <span class="tl-wave">${miniWave(height, col)}</span>
+          <span class="tl-wave">${miniWave(chop, col)}</span>
           <span class="tl-height num">${height != null ? height.toFixed(2) + " מ׳" : "—"}</span>
           <span class="tl-score num" style="color:${col}">${idx != null ? (idx / 10).toFixed(1) : "—"}</span>
           <span class="tl-status" style="color:${col}">${lbl}</span>
