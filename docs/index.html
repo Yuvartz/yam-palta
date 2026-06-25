@@ -100,6 +100,16 @@
     .credit { font-size: 11px; color: var(--muted); margin-top: 12px; }
     .beachcam-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 12px; display: block; background: var(--bg-2); }
     .beachcam-card .credit { margin-top: 8px; }
+    .feedback-card .fb-q { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
+    .fb-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .fb-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 4px; border-radius: 12px;
+      background: var(--card-2); border: 1px solid var(--border); color: var(--text); cursor: pointer; font-family: var(--sans); font-weight: 700; font-size: 12px; transition: border-color .2s, transform .1s; }
+    .fb-btn:hover { border-color: #3a4a6e; }
+    .fb-btn:active { transform: scale(.96); }
+    .fb-btn .fb-emoji { font-size: 20px; }
+    .fb-thanks { display: none; text-align: center; padding: 14px 0 4px; font-weight: 700; color: var(--calm); }
+    .feedback-card.done .fb-buttons, .feedback-card.done .fb-q { display: none; }
+    .feedback-card.done .fb-thanks { display: block; }
     .credit a { color: var(--calm); }
 
     /* Hero */
@@ -343,6 +353,13 @@
       <section id="goodFor"></section>
       <section class="indicators" id="indicators"></section>
 
+      <div class="card feedback-card" id="feedbackCard" style="display:none">
+        <h2>🌊 אתה בים עכשיו?</h2>
+        <p class="fb-q">איך הים נראה לך באמת? הדיווח שלך עוזר לדייק את המדד.</p>
+        <div class="fb-buttons" id="fbButtons"></div>
+        <div class="fb-thanks" id="fbThanks">תודה! הדיווח נשמר 🙏</div>
+      </div>
+
       <div class="card">
         <h2>נתונים נוכחיים</h2>
         <div id="jellyAlert" class="jelly-warn"></div>
@@ -426,6 +443,18 @@
       haifa: { name: "חיפה", lat: 32.8275, lon: 34.9897 }, ashdod: { name: "אשדוד", lat: 31.8044, lon: 34.6473 },
       ashkelon: { name: "אשקלון", lat: 31.6699, lon: 34.5738 }, herzliya: { name: "הרצליה", lat: 32.1624, lon: 34.7990 },
       netanya: { name: "נתניה", lat: 32.3215, lon: 34.8532 }, eilat: { name: "אילת", lat: 29.5577, lon: 34.9519 },
+    };
+    // User feedback → a Google Form the owner controls (no backend, no new account).
+    // Stays HIDDEN until formUrl + entry IDs are filled in. To switch on: create a Google Form
+    // with 4 short-answer questions, open "Get pre-filled link", and paste the entry.NNN ids below.
+    const FEEDBACK = {
+      formUrl: "",   // e.g. https://docs.google.com/forms/d/e/XXXX/formResponse
+      entry: {
+        reported: "",    // the tier the swimmer says it really is (Hebrew label)
+        location: "",    // beach name (Hebrew)
+        predicted: "",   // predicted Palata Index 0-100
+        snapshot: "",    // compact param string (chop/wind/hist/swell/water/wave/time)
+      },
     };
     // Live beach snapshots hotlinked from beachcam.co.il's ipcamlive feeds (verified working aliases,
     // only for built-in/preset locations that actually have a camera — no fake placeholders elsewhere).
@@ -1061,6 +1090,35 @@
       $("beachcamCredit").innerHTML = `${cam.label} · קרדיט: <a href="${cam.page}" target="_blank" rel="noopener">beachcam.co.il</a>`;
     }
     function hideBeachcam() { $("beachcamCard").style.display = "none"; }
+
+    // ---- User feedback → Google Form (no backend) ----
+    const fbKey = () => `yp-fb-${LS.loc}-${israelNow().dateStr}`;   // throttle: one "done" state per beach per day
+    function renderFeedback() {
+      const card = $("feedbackCard");
+      if (!FEEDBACK.formUrl) { card.style.display = "none"; return; }   // hidden until the form is connected
+      card.style.display = "";
+      card.classList.toggle("done", localStorage.getItem(fbKey()) === "1");
+      $("fbButtons").innerHTML = PALATA_TIERS.map(t =>
+        `<button class="fb-btn" onclick="App.submitFeedback('${t.key}')"><span class="fb-emoji">${t.emoji}</span><span>${t.short}</span></button>`).join("");
+    }
+    function submitFeedback(tierKey) {
+      const cur = nearestHourData(); const reported = PALATA_TIERS.find(t => t.key === tierKey);
+      if (!FEEDBACK.formUrl || !reported) return;
+      const b = palataBreakdown(cur) || [];
+      const val = k => { const r = b.find(x => x.key === k); return r && r.value != null ? r.value.toFixed(r.dec) : "—"; };
+      const predicted = cur ? palataIndex(cur) : "";
+      const snapshot = `idx=${predicted};chop=${val("chop")};wind=${val("wind")};hist=${val("history")};swell=${val("swell")};water=${cur && cur.seaTemp != null ? round(cur.seaTemp) : "—"};wave=${cur && cur.waveHeight != null ? cur.waveHeight.toFixed(2) : "—"};time=${cur ? cur.time : ""}`;
+      const fd = new FormData();
+      const e = FEEDBACK.entry;
+      if (e.reported) fd.append(e.reported, reported.label);
+      if (e.location) fd.append(e.location, (allLocations()[LS.loc] || {}).name || LS.loc);
+      if (e.predicted) fd.append(e.predicted, String(predicted));
+      if (e.snapshot) fd.append(e.snapshot, snapshot);
+      // Fire-and-forget: Forms returns an opaque cross-origin response, so we can't read it — that's fine.
+      fetch(FEEDBACK.formUrl, { method: "POST", mode: "no-cors", body: fd }).catch(() => {});
+      localStorage.setItem(fbKey(), "1");
+      $("feedbackCard").classList.add("done");
+    }
     function toggleJelly() { jellyOpen = !jellyOpen; renderJellyAlert(); renderJellyReports(); }
     async function loadJelly() {
       try {
@@ -1072,7 +1130,7 @@
 
     function renderStreak() { const s = streakCount(), b = $("streak"); if (s >= 1) { b.classList.add("on"); $("streakN").textContent = s; } else b.classList.remove("on"); }
     function renderUpdated() { const now = israelNow(); $("updated").innerHTML = `עודכן לאחרונה <span class="num">${pad(now.hour)}:${pad(now.minute)}</span> · מקור: Open-Meteo`; }
-    function renderAll() { renderHero(); renderGoodFor(); renderIndicators(); renderWaveDetails(); renderMetrics(); renderForecast(); renderNextWindow(); renderStreak(); renderUpdated(); renderJelly(); renderBeachcam(); }
+    function renderAll() { renderHero(); renderGoodFor(); renderIndicators(); renderWaveDetails(); renderMetrics(); renderForecast(); renderNextWindow(); renderStreak(); renderUpdated(); renderJelly(); renderBeachcam(); renderFeedback(); }
 
     function hebrewDay(ds) {
       const now = israelNow();
@@ -1195,7 +1253,7 @@
       load(); setInterval(load, REFRESH_MS); setInterval(() => { if (hourly.length) renderAll(); }, 60 * 1000);
     }
 
-    return { init, setLocation, refresh: load, enableNotifications, openAdd, closeAdd, confirmAdd, toggleDay, toggleJelly, toggleScore, installApp, closeInstall, hideBeachcam };
+    return { init, setLocation, refresh: load, enableNotifications, openAdd, closeAdd, confirmAdd, toggleDay, toggleJelly, toggleScore, installApp, closeInstall, hideBeachcam, submitFeedback };
   })();
 
   document.addEventListener("DOMContentLoaded", App.init);
