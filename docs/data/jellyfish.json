@@ -1,8 +1,40 @@
 {
-  "updated": "2026-06-25T16:14:52.583Z",
+  "updated": "2026-06-25T19:00:59.831Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25333",
+      "reporter": "יוני",
+      "location": "תל אביב צפון - הירקון, מציצים, הילטון ומרינה תל אביב",
+      "lat": 32.085,
+      "lon": 34.766,
+      "date": "2026-06-25T11:00",
+      "dateText": "25.06.2026",
+      "time": "11:00",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": "1",
+      "species": "חוטית נודדת",
+      "diameter": "31-60",
+      "url": "https://www.meduzot.co.il/observation/25333"
+    },
+    {
+      "id": "25332",
+      "reporter": "שליו עוקשי",
+      "location": "פלמחים",
+      "lat": 31.93,
+      "lon": 34.697,
+      "date": "2026-06-25T19:40",
+      "dateText": "25.06.2026",
+      "time": "19:40",
+      "activity": "רחצה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25332"
+    },
     {
       "id": "25331",
       "reporter": "Alex Golo",
@@ -1250,38 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25250"
-    },
-    {
-      "id": "25249",
-      "reporter": "יעקב",
-      "location": "בת גלים",
-      "lat": 32.827,
-      "lon": 34.987,
-      "date": "2026-06-19T08:34",
-      "dateText": "19.06.2026",
-      "time": "08:34",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25249"
-    },
-    {
-      "id": "25248",
-      "reporter": "almush מגנאג׳י",
-      "location": "יפו",
-      "lat": 32.053,
-      "lon": 34.75,
-      "date": "2026-06-20T21:51",
-      "dateText": "20.06.2026",
-      "time": "21:51",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": "1-5",
-      "species": "חוטית נודדת",
-      "diameter": "1-5",
-      "url": "https://www.meduzot.co.il/observation/25248"
     }
   ]
 }
