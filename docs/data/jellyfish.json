@@ -1,8 +1,40 @@
 {
-  "updated": "2026-06-27T13:08:04.757Z",
+  "updated": "2026-06-27T15:07:51.725Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25368",
+      "reporter": "Yarden Zangaoker",
+      "location": "חופי אשקלון והדרום",
+      "lat": 31.67,
+      "lon": 34.556,
+      "date": "2026-06-27T17:27",
+      "dateText": "27.06.2026",
+      "time": "17:27",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": "6-50",
+      "species": "חוטית נודדת",
+      "diameter": "6-10",
+      "url": "https://www.meduzot.co.il/observation/25368"
+    },
+    {
+      "id": "25367",
+      "reporter": "דנה תשובה",
+      "location": "אולגה וגדור",
+      "lat": 32.45,
+      "lon": 34.88,
+      "date": "2026-06-27T16:53",
+      "dateText": "27.06.2026",
+      "time": "16:53",
+      "activity": "רחצה",
+      "distance": "0-200",
+      "quantity": "1-5",
+      "species": "חוטית נודדת",
+      "diameter": "6-10",
+      "url": "https://www.meduzot.co.il/observation/25367"
+    },
     {
       "id": "25366",
       "reporter": "vizpaypal viz",
@@ -1250,38 +1282,6 @@
       "species": "חוטית נודדת",
       "diameter": "11-30",
       "url": "https://www.meduzot.co.il/observation/25283"
-    },
-    {
-      "id": "25282",
-      "reporter": "‫חנן‬‎",
-      "location": "חופי אשקלון והדרום",
-      "lat": 31.67,
-      "lon": 34.556,
-      "date": "2026-06-22T14:00",
-      "dateText": "22.06.2026",
-      "time": "14:00",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": "2",
-      "species": "חוטית נודדת",
-      "diameter": "6-10",
-      "url": "https://www.meduzot.co.il/observation/25282"
-    },
-    {
-      "id": "25281",
-      "reporter": "‫חנן ט (יש לי אבא מלךꞛ‏)‬‎",
-      "location": "אשדוד",
-      "lat": 31.79,
-      "lon": 34.63,
-      "date": "2026-06-19T20:56",
-      "dateText": "19.06.2026",
-      "time": "20:56",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": "1-5",
-      "species": "חוטית נודדת",
-      "diameter": "1-5",
-      "url": "https://www.meduzot.co.il/observation/25281"
     }
   ]
 }
