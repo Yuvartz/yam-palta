@@ -1,8 +1,24 @@
 {
-  "updated": "2026-06-28T21:53:40.168Z",
+  "updated": "2026-06-29T09:21:36.849Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25383",
+      "reporter": "Ido Lapidot",
+      "location": "פלמחים",
+      "lat": 31.93,
+      "lon": 34.697,
+      "date": "2026-06-29T11:07",
+      "dateText": "29.06.2026",
+      "time": "11:07",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": "10",
+      "species": "חוטית נודדת",
+      "diameter": "11-30",
+      "url": "https://www.meduzot.co.il/observation/25383"
+    },
     {
       "id": "25382",
       "reporter": "נעמה פרידמן",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25293"
-    },
-    {
-      "id": "25292",
-      "reporter": "אלו",
-      "location": "תל אביב מרכז - גורדון, בוגרשוב, פרישמן, צ'ארלס קלור",
-      "lat": 32.085,
-      "lon": 34.766,
-      "date": "2026-06-23T12:55",
-      "dateText": "23.06.2026",
-      "time": "12:55",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": "3",
-      "species": "חוטית נודדת",
-      "diameter": "6-10",
-      "url": "https://www.meduzot.co.il/observation/25292"
     }
   ]
 }
