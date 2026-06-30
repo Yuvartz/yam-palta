@@ -1,8 +1,40 @@
 {
-  "updated": "2026-06-30T18:28:29.154Z",
+  "updated": "2026-06-30T22:08:17.525Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25422",
+      "reporter": "דנייל מן",
+      "location": "בת ים וראשון לציון",
+      "lat": 32.015,
+      "lon": 34.743,
+      "date": "2026-07-01T00:33",
+      "dateText": "01.07.2026",
+      "time": "00:33",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25422"
+    },
+    {
+      "id": "25421",
+      "reporter": "יעקב עציון",
+      "location": "חופי אשקלון והדרום",
+      "lat": 31.67,
+      "lon": 34.556,
+      "date": "2026-07-01T00:16",
+      "dateText": "01.07.2026",
+      "time": "00:16",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25421"
+    },
     {
       "id": "25420",
       "reporter": "שלמה פטל",
@@ -1250,38 +1282,6 @@
       "species": "חוטית נודדת",
       "diameter": "11-30",
       "url": "https://www.meduzot.co.il/observation/25339"
-    },
-    {
-      "id": "25337",
-      "reporter": "Shiri Nakibly",
-      "location": "חיפה דרום - חוף זמיר, דדו והסטודנטים",
-      "lat": 32.83,
-      "lon": 34.98,
-      "date": "2026-06-26T12:37",
-      "dateText": "26.06.2026",
-      "time": "12:37",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": "1",
-      "species": "חוטית נודדת",
-      "diameter": "6-10",
-      "url": "https://www.meduzot.co.il/observation/25337"
-    },
-    {
-      "id": "25336",
-      "reporter": "דרור שטר",
-      "location": "חיפה דרום - חוף זמיר, דדו והסטודנטים",
-      "lat": 32.83,
-      "lon": 34.98,
-      "date": "2026-06-26T12:07",
-      "dateText": "26.06.2026",
-      "time": "12:07",
-      "activity": "גלישת גלים",
-      "distance": "0-200",
-      "quantity": "6",
-      "species": "חוטית נודדת",
-      "diameter": "6-10",
-      "url": "https://www.meduzot.co.il/observation/25336"
     }
   ]
 }
