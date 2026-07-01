@@ -246,7 +246,11 @@
 
     /* Today timeline inside the hero */
     .timeline { display: flex; flex-direction: column; gap: 2px; margin-top: 14px; background: rgba(10,14,22,.55); border: 1px solid var(--border); border-radius: 14px; padding: 7px 10px; backdrop-filter: blur(5px); width: 100%; max-width: 380px; }
-    .tl-date { text-align: center; font-size: 11px; font-weight: 700; color: var(--muted); padding: 2px 0 7px; border-bottom: 1px solid var(--border); margin-bottom: 3px; }
+    .tl-date { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 11px; font-weight: 700; color: var(--muted); padding: 2px 0 7px; border-bottom: 1px solid var(--border); margin-bottom: 3px; }
+    .tl-nav { width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--border); background: rgba(255,255,255,.04); color: var(--muted);
+      font-family: var(--sans); font-size: 12px; line-height: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
+    .tl-nav:disabled { opacity: .25; cursor: default; }
+    .tl-nav:not(:disabled):active { transform: scale(.9); }
     .tl-row { display: grid; grid-template-columns: 42px 1fr 50px 38px 58px; align-items: center; gap: 7px; padding: 6px 3px; border-radius: 9px; }
     .tl-row.tl-now { background: rgba(255,255,255,.08); }
     .tl-h { font-family: var(--mono); font-size: 12px; color: var(--muted); }
@@ -534,7 +538,8 @@
     const allLocations = () => ({ ...BUILTIN, ...LS.customs });
 
     let hourly = [];
-    let jelly = [], jellyUpdated = null, jellyOpen = false, scoreOpen = false, dailySun = {}, buoy = null, fbOpen = false, climatology = {};
+    let jelly = [], jellyUpdated = null, jellyOpen = false, scoreOpen = false, dailySun = {}, buoy = null, fbOpen = false, climatology = {}, heroDay = 0;
+    const HERO_DAY_MAX = 1;   // today (0) or tomorrow (1) in the hero timeline
     let waterMin = LS.water;   // informational comfort threshold only — no longer gates the Palata Index
     const dataCache = {};
 
@@ -984,13 +989,16 @@
         <circle cx="${darkX}" cy="${cy}" r="${R - 1}" fill="#1b2436"/>
       </svg>`;
     }
+    // Hero mini-timeline: today by default (or tomorrow once past sunset — "today" is over).
+    // heroDay adds a swipeable/tappable offset on top of that so tomorrow is always one step away.
     function todayTimeline() {
       const now = israelNow();
       const month = parseInt(now.dateStr.slice(5, 7), 10);
       const afterSunset = now.hour >= sunsetHourFor(month);
-      const baseDate = afterSunset ? addDays(now.dateStr, 1) : now.dateStr;
+      const anchorDate = afterSunset ? addDays(now.dateStr, 1) : now.dateStr;
+      const baseDate = addDays(anchorDate, heroDay);
       const slots = [6, 9, 12, 15, 18];   // 5 rows spanning the active 06:00-19:00 window
-      const nowSlot = afterSunset ? null : slots.reduce((a, b) => Math.abs(b - now.hour) < Math.abs(a - now.hour) ? b : a, slots[0]);
+      const nowSlot = (!afterSunset && heroDay === 0) ? slots.reduce((a, b) => Math.abs(b - now.hour) < Math.abs(a - now.hour) ? b : a, slots[0]) : null;
       const rows = slots.map(hr => {
         const h = hourly.find(x => x.dateStr === baseDate && x.hour === hr);
         const [lbl, col] = h ? hourLabel(h) : ["—", "var(--border)"];
@@ -1005,7 +1013,27 @@
           <span class="tl-status" style="color:${col}">${lbl}</span>
         </div>`;
       }).join("");
-      return `<div class="timeline"><div class="tl-date">${hebrewDay(baseDate)} · ${shortDate(baseDate)}</div>${rows}</div>`;
+      return `<div class="timeline" ontouchstart="App.heroSwipeStart(event)" ontouchend="App.heroSwipeEnd(event)">
+        <div class="tl-date">
+          <button class="tl-nav" onclick="App.heroDayNav(-1)" ${heroDay <= 0 ? "disabled" : ""} aria-label="יום קודם">›</button>
+          <span>${hebrewDay(baseDate)} · ${shortDate(baseDate)}</span>
+          <button class="tl-nav" onclick="App.heroDayNav(1)" ${heroDay >= HERO_DAY_MAX ? "disabled" : ""} aria-label="יום הבא">‹</button>
+        </div>
+        ${rows}
+      </div>`;
+    }
+    function heroDayNav(dir) {
+      const next = Math.max(0, Math.min(HERO_DAY_MAX, heroDay + dir));
+      if (next === heroDay) return;
+      heroDay = next; if (hourly.length) renderHero();
+    }
+    let heroSwipeX = null;
+    function heroSwipeStart(e) { heroSwipeX = e.touches[0].clientX; }
+    function heroSwipeEnd(e) {
+      if (heroSwipeX == null) return;
+      const dx = e.changedTouches[0].clientX - heroSwipeX; heroSwipeX = null;
+      if (Math.abs(dx) < 40) return;
+      heroDayNav(dx < 0 ? 1 : -1);   // swipe left -> next day, swipe right -> previous day
     }
     function renderGoodFor() {
       const el = $("goodFor"); const ref = nearestHourData();
@@ -1363,7 +1391,7 @@
     }
     function finishAdd(key) { closeAdd(); LS.loc = key; renderLocations(); hourly = []; load(); }
 
-    function setLocation(key) { if (!allLocations()[key] || key === LS.loc) return; LS.loc = key; sessionStorage.setItem("yp-was-swim", "0"); renderLocations(); hourly = []; load(); }
+    function setLocation(key) { if (!allLocations()[key] || key === LS.loc) return; LS.loc = key; sessionStorage.setItem("yp-was-swim", "0"); renderLocations(); hourly = []; heroDay = 0; load(); }
     function init() {
       renderLocations(); refreshNotifyBtn();
       const wt = $("waterSlider");
@@ -1375,7 +1403,7 @@
       load(); setInterval(load, REFRESH_MS); setInterval(() => { if (hourly.length) renderAll(); }, 60 * 1000);
     }
 
-    return { init, setLocation, refresh: load, enableNotifications, openAdd, closeAdd, confirmAdd, toggleDay, toggleJelly, toggleScore, installApp, closeInstall, hideBeachcam, submitFeedback, toggleFeedback };
+    return { init, setLocation, refresh: load, enableNotifications, openAdd, closeAdd, confirmAdd, toggleDay, toggleJelly, toggleScore, installApp, closeInstall, hideBeachcam, submitFeedback, toggleFeedback, heroDayNav, heroSwipeStart, heroSwipeEnd };
   })();
 
   document.addEventListener("DOMContentLoaded", App.init);
