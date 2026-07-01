@@ -1,8 +1,24 @@
 {
-  "updated": "2026-07-01T19:39:11.155Z",
+  "updated": "2026-07-01T21:17:06.083Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25441",
+      "reporter": "מאיר עוזרי",
+      "location": "נתניה דרום - סירונית, ארגמן, פולג",
+      "lat": 32.33,
+      "lon": 34.853,
+      "date": "2026-07-01T07:45",
+      "dateText": "01.07.2026",
+      "time": "07:45",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": "10",
+      "species": "חוטית נודדת",
+      "diameter": "11-30",
+      "url": "https://www.meduzot.co.il/observation/25441"
+    },
     {
       "id": "25440",
       "reporter": "‫חנן‬‎",
@@ -1266,22 +1282,6 @@
       "species": "חוטית נודדת",
       "diameter": "31-60",
       "url": "https://www.meduzot.co.il/observation/25345"
-    },
-    {
-      "id": "25344",
-      "reporter": "ג",
-      "location": "נתניה צפון - נעורים, חבצלת השרון, בלו-ביי, צאנז",
-      "lat": 32.33,
-      "lon": 34.853,
-      "date": "2026-06-26T17:51",
-      "dateText": "26.06.2026",
-      "time": "17:51",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25344"
     }
   ]
 }
