@@ -1,8 +1,24 @@
 {
-  "updated": "2026-07-01T17:06:06.564Z",
+  "updated": "2026-07-01T19:39:11.155Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25440",
+      "reporter": "‫חנן‬‎",
+      "location": "אשדוד",
+      "lat": 31.79,
+      "lon": 34.63,
+      "date": "2026-07-01T14:44",
+      "dateText": "01.07.2026",
+      "time": "14:44",
+      "activity": "רחצה",
+      "distance": "0-200",
+      "quantity": "3",
+      "species": "כחולת שולייים חלקה",
+      "diameter": "6-10",
+      "url": "https://www.meduzot.co.il/observation/25440"
+    },
     {
       "id": "25439",
       "reporter": "Heckfy",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25344"
-    },
-    {
-      "id": "25343",
-      "reporter": "איתי קרצנר",
-      "location": "פלמחים",
-      "lat": 31.93,
-      "lon": 34.697,
-      "date": "2026-06-26T12:00",
-      "dateText": "26.06.2026",
-      "time": "12:00",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": "1-5",
-      "species": "חוטית נודדת",
-      "diameter": "11-30",
-      "url": "https://www.meduzot.co.il/observation/25343"
     }
   ]
 }
