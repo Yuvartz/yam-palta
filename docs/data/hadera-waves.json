@@ -1,0 +1,16 @@
+{
+  "updated": "2026-06-28T11:04:08.571Z",
+  "source": "ISRAMAR — Hadera buoy",
+  "sourceUrl": "https://isramar.ocean.org.il/isramar2009/station/HaderaRDI.aspx",
+  "station": {
+    "name": "מצוף חדרה",
+    "lat": 32.47,
+    "lon": 34.88
+  },
+  "measured": {
+    "waveHeight": 0.5,
+    "wavePeriod": 5,
+    "waveMax": 0.635,
+    "measuredAt": "2026-06-28T10:00:00Z"
+  }
+}

@@ -1,0 +1,35 @@
+name: Update buoy measurements
+
+on:
+  schedule:
+    - cron: "20 * * * *"   # hourly, offset from the jellyfish job
+  workflow_dispatch:        # allow manual run
+
+permissions:
+  contents: write
+
+concurrency:
+  group: buoy
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Fetch & parse Hadera buoy measurements
+        run: node scripts/fetch-buoy.mjs
+      - name: Commit if changed
+        run: |
+          if [[ -n "$(git status --porcelain docs/data/hadera-waves.json)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add docs/data/hadera-waves.json
+            git commit -m "data: refresh buoy measurements [skip ci]"
+            git push
+          else
+            echo "No changes."
+          fi
