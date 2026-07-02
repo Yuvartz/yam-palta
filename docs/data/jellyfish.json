@@ -1,8 +1,24 @@
 {
-  "updated": "2026-07-02T12:01:45.969Z",
+  "updated": "2026-07-02T15:05:12.084Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25448",
+      "reporter": "אלון",
+      "location": "נווה ים, הבונים ודור-נחשולים",
+      "lat": null,
+      "lon": null,
+      "date": "2026-07-02T09:00",
+      "dateText": "02.07.2026",
+      "time": "09:00",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25448"
+    },
     {
       "id": "25447",
       "reporter": "עמוס גלי",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25352"
-    },
-    {
-      "id": "25351",
-      "reporter": "אשרת",
-      "location": "הרצליה",
-      "lat": 32.166,
-      "lon": 34.796,
-      "date": "2026-06-27T12:36",
-      "dateText": "27.06.2026",
-      "time": "12:36",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25351"
     }
   ]
 }
