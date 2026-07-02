@@ -1,8 +1,24 @@
 {
-  "updated": "2026-07-02T06:29:56.035Z",
+  "updated": "2026-07-02T09:51:33.853Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25443",
+      "reporter": "ג'וליה מור",
+      "location": "נווה ים, הבונים ודור-נחשולים",
+      "lat": null,
+      "lon": null,
+      "date": "2026-07-02T10:08",
+      "dateText": "02.07.2026",
+      "time": "10:08",
+      "activity": "רחצה",
+      "distance": "0-200",
+      "quantity": "1",
+      "species": "חוטית נודדת",
+      "diameter": "11-30",
+      "url": "https://www.meduzot.co.il/observation/25443"
+    },
     {
       "id": "25442",
       "reporter": "MARIYA POLONSKAYA",
@@ -1266,22 +1282,6 @@
       "species": "חוטית נודדת",
       "diameter": "11-30",
       "url": "https://www.meduzot.co.il/observation/25347"
-    },
-    {
-      "id": "25346",
-      "reporter": "עופר הדרי",
-      "location": "חיפה דרום - חוף זמיר, דדו והסטודנטים",
-      "lat": 32.83,
-      "lon": 34.98,
-      "date": "2026-06-27T09:14",
-      "dateText": "27.06.2026",
-      "time": "09:14",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": "1",
-      "species": "חוטית נודדת",
-      "diameter": "11-30",
-      "url": "https://www.meduzot.co.il/observation/25346"
     }
   ]
 }
