@@ -1,8 +1,40 @@
 {
-  "updated": "2026-07-03T15:47:58.346Z",
+  "updated": "2026-07-03T19:00:44.268Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25491",
+      "reporter": "יאיר מנשה",
+      "location": "אשדוד",
+      "lat": 31.79,
+      "lon": 34.63,
+      "date": "2026-07-03T21:37",
+      "dateText": "03.07.2026",
+      "time": "21:37",
+      "activity": "רחצה",
+      "distance": "0-200",
+      "quantity": "3",
+      "species": "חוטית נודדת",
+      "diameter": "6-10",
+      "url": "https://www.meduzot.co.il/observation/25491"
+    },
+    {
+      "id": "25490",
+      "reporter": "Yinon",
+      "location": "תל אביב מרכז - גורדון, בוגרשוב, פרישמן, צ'ארלס קלור",
+      "lat": 32.085,
+      "lon": 34.766,
+      "date": "2026-07-03T15:00",
+      "dateText": "03.07.2026",
+      "time": "15:00",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": "1-5",
+      "species": "כחולת שולייים חלקה",
+      "diameter": "11-30",
+      "url": "https://www.meduzot.co.il/observation/25490"
+    },
     {
       "id": "25489",
       "reporter": "חושן בן משה",
@@ -1250,38 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25395"
-    },
-    {
-      "id": "25394",
-      "reporter": "מרים הורביץ",
-      "location": "בת ים וראשון לציון",
-      "lat": 32.015,
-      "lon": 34.743,
-      "date": "2026-06-29T18:05",
-      "dateText": "29.06.2026",
-      "time": "18:05",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25394"
-    },
-    {
-      "id": "25393",
-      "reporter": "רן",
-      "location": "פלמחים",
-      "lat": 31.93,
-      "lon": 34.697,
-      "date": "2026-06-29T17:42",
-      "dateText": "29.06.2026",
-      "time": "17:42",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": "חוטית נודדת",
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25393"
     }
   ]
 }
