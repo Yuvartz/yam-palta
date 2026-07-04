@@ -1,8 +1,24 @@
 {
-  "updated": "2026-07-03T19:00:44.268Z",
+  "updated": "2026-07-04T06:09:53.394Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25492",
+      "reporter": "שלמה יער-בר",
+      "location": "ראש הנקרה - בצת",
+      "lat": null,
+      "lon": null,
+      "date": "2026-07-04T08:31",
+      "dateText": "04.07.2026",
+      "time": "08:31",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25492"
+    },
     {
       "id": "25491",
       "reporter": "יאיר מנשה",
@@ -1266,22 +1282,6 @@
       "species": "חוטית נודדת",
       "diameter": "11-30",
       "url": "https://www.meduzot.co.il/observation/25396"
-    },
-    {
-      "id": "25395",
-      "reporter": "גלי שייה סימון",
-      "location": "חופי אשקלון והדרום",
-      "lat": 31.67,
-      "lon": 34.556,
-      "date": "2026-06-29T19:16",
-      "dateText": "29.06.2026",
-      "time": "19:16",
-      "activity": "צלילה חופשית שנירקול",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25395"
     }
   ]
 }
