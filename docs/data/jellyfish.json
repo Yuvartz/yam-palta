@@ -1,8 +1,40 @@
 {
-  "updated": "2026-07-06T07:01:19.644Z",
+  "updated": "2026-07-06T11:54:39.342Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25536",
+      "reporter": "Devo Kessin",
+      "location": "תל אביב מרכז - גורדון, בוגרשוב, פרישמן, צ'ארלס קלור",
+      "lat": 32.085,
+      "lon": 34.766,
+      "date": "2026-07-06T13:21",
+      "dateText": "06.07.2026",
+      "time": "13:21",
+      "activity": "רחצה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25536"
+    },
+    {
+      "id": "25535",
+      "reporter": "Constantin Skoblinsky",
+      "location": "פלמחים",
+      "lat": 31.93,
+      "lon": 34.697,
+      "date": "2026-07-06T11:45",
+      "dateText": "06.07.2026",
+      "time": "11:45",
+      "activity": "רחצה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25535"
+    },
     {
       "id": "25534",
       "reporter": "אמיר פרלברג",
@@ -1250,38 +1282,6 @@
       "species": "חוטית נודדת",
       "diameter": "11-30",
       "url": "https://www.meduzot.co.il/observation/25436"
-    },
-    {
-      "id": "25435",
-      "reporter": "עמיחי תבור",
-      "location": "חופי אשקלון והדרום",
-      "lat": 31.67,
-      "lon": 34.556,
-      "date": "2026-07-01T17:16",
-      "dateText": "01.07.2026",
-      "time": "17:16",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": "1",
-      "species": "כחולת שולייים חלקה",
-      "diameter": "11-30",
-      "url": "https://www.meduzot.co.il/observation/25435"
-    },
-    {
-      "id": "25433",
-      "reporter": "רעות",
-      "location": "בת ים וראשון לציון",
-      "lat": 32.015,
-      "lon": 34.743,
-      "date": "2026-07-01T15:13",
-      "dateText": "01.07.2026",
-      "time": "15:13",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25433"
     }
   ]
 }
