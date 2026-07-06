@@ -1,8 +1,24 @@
 {
-  "updated": "2026-07-06T11:54:39.342Z",
+  "updated": "2026-07-06T14:57:26.134Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25537",
+      "reporter": "Julie T",
+      "location": "קיסריה ושדות ים",
+      "lat": 32.5,
+      "lon": 34.89,
+      "date": "2026-07-06T15:00",
+      "dateText": "06.07.2026",
+      "time": "15:00",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25537"
+    },
     {
       "id": "25536",
       "reporter": "Devo Kessin",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25437"
-    },
-    {
-      "id": "25436",
-      "reporter": "מישמיש בורא",
-      "location": "בת ים וראשון לציון",
-      "lat": 32.015,
-      "lon": 34.743,
-      "date": "2026-07-01T09:00",
-      "dateText": "01.07.2026",
-      "time": "09:00",
-      "activity": "-",
-      "distance": "0-200",
-      "quantity": "4",
-      "species": "חוטית נודדת",
-      "diameter": "11-30",
-      "url": "https://www.meduzot.co.il/observation/25436"
     }
   ]
 }
