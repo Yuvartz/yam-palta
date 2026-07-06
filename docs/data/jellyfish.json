@@ -1,8 +1,24 @@
 {
-  "updated": "2026-07-06T14:57:26.134Z",
+  "updated": "2026-07-06T19:41:10.839Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25538",
+      "reporter": "יוסף גוגנהיים",
+      "location": "בת ים וראשון לציון",
+      "lat": 32.015,
+      "lon": 34.743,
+      "date": "2026-07-06T19:29",
+      "dateText": "06.07.2026",
+      "time": "19:29",
+      "activity": "גלישת גלים",
+      "distance": "0-200",
+      "quantity": null,
+      "species": "אין מדוזות",
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25538"
+    },
     {
       "id": "25537",
       "reporter": "Julie T",
@@ -1266,22 +1282,6 @@
       "species": "אחר, לא מזוהה",
       "diameter": "1-5",
       "url": "https://www.meduzot.co.il/observation/25438"
-    },
-    {
-      "id": "25437",
-      "reporter": "תמר",
-      "location": "תל אביב צפון - חוף הצוק ותל ברוך",
-      "lat": 32.085,
-      "lon": 34.766,
-      "date": "2026-07-01T18:05",
-      "dateText": "01.07.2026",
-      "time": "18:05",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25437"
     }
   ]
 }
