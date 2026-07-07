@@ -1,8 +1,24 @@
 {
-  "updated": "2026-07-06T19:41:10.839Z",
+  "updated": "2026-07-07T08:14:30.539Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25539",
+      "reporter": "עומר דיין",
+      "location": "קריית חיים",
+      "lat": null,
+      "lon": null,
+      "date": "2026-07-07T10:38",
+      "dateText": "07.07.2026",
+      "time": "10:38",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25539"
+    },
     {
       "id": "25538",
       "reporter": "יוסף גוגנהיים",
@@ -1266,22 +1282,6 @@
       "species": "אחר, לא מזוהה",
       "diameter": "6-10",
       "url": "https://www.meduzot.co.il/observation/25439"
-    },
-    {
-      "id": "25438",
-      "reporter": "אדוה גל",
-      "location": "הרצליה",
-      "lat": 32.166,
-      "lon": 34.796,
-      "date": "2026-05-28T13:30",
-      "dateText": "28.05.2026",
-      "time": "13:30",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": "1",
-      "species": "אחר, לא מזוהה",
-      "diameter": "1-5",
-      "url": "https://www.meduzot.co.il/observation/25438"
     }
   ]
 }
