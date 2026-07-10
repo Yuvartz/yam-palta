@@ -1,8 +1,24 @@
 {
-  "updated": "2026-07-10T12:19:27.176Z",
+  "updated": "2026-07-10T17:40:07.077Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25573",
+      "reporter": "יבגני זוריה",
+      "location": "בת ים וראשון לציון",
+      "lat": 32.015,
+      "lon": 34.743,
+      "date": "2026-07-10T18:00",
+      "dateText": "10.07.2026",
+      "time": "18:00",
+      "activity": "רחצה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25573"
+    },
     {
       "id": "25572",
       "reporter": "אימרי",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25486"
-    },
-    {
-      "id": "25485",
-      "reporter": "רפאל אלטין",
-      "location": "אשדוד",
-      "lat": 31.79,
-      "lon": 34.63,
-      "date": "2026-07-03T16:57",
-      "dateText": "03.07.2026",
-      "time": "16:57",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": "200",
-      "species": "חוטית נודדת",
-      "diameter": "11-30",
-      "url": "https://www.meduzot.co.il/observation/25485"
     }
   ]
 }
