@@ -1,8 +1,24 @@
 {
-  "updated": "2026-07-11T15:43:42.547Z",
+  "updated": "2026-07-11T18:43:59.132Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25606",
+      "reporter": "קוקו",
+      "location": "נתניה צפון - נעורים, חבצלת השרון, בלו-ביי, צאנז",
+      "lat": 32.33,
+      "lon": 34.853,
+      "date": "2026-07-11T09:12",
+      "dateText": "11.07.2026",
+      "time": "09:12",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": "1",
+      "species": "אין מדוזות",
+      "diameter": "1-5",
+      "url": "https://www.meduzot.co.il/observation/25606"
+    },
     {
       "id": "25605",
       "reporter": "מישמיש בורא",
@@ -1266,22 +1282,6 @@
       "species": "חוטית נודדת",
       "diameter": "6-10",
       "url": "https://www.meduzot.co.il/observation/25488"
-    },
-    {
-      "id": "25487",
-      "reporter": "‫חנן‬‎",
-      "location": "אשדוד",
-      "lat": 31.79,
-      "lon": 34.63,
-      "date": "2026-07-03T14:57",
-      "dateText": "03.07.2026",
-      "time": "14:57",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": "5",
-      "species": "חוטית נודדת",
-      "diameter": "6-10",
-      "url": "https://www.meduzot.co.il/observation/25487"
     }
   ]
 }
