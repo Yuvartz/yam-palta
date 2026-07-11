@@ -1,8 +1,40 @@
 {
-  "updated": "2026-07-11T04:53:33.399Z",
+  "updated": "2026-07-11T07:05:09.647Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25576",
+      "reporter": "טלי טריינין",
+      "location": "ראש הנקרה - בצת",
+      "lat": null,
+      "lon": null,
+      "date": "2026-07-11T10:02",
+      "dateText": "11.07.2026",
+      "time": "10:02",
+      "activity": "הליכה על החוף",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25576"
+    },
+    {
+      "id": "25575",
+      "reporter": "שלמה יער-בר",
+      "location": "ראש הנקרה - בצת",
+      "lat": null,
+      "lon": null,
+      "date": "2026-07-11T08:38",
+      "dateText": "11.07.2026",
+      "time": "08:38",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25575"
+    },
     {
       "id": "25574",
       "reporter": "טלי טריינין",
@@ -1250,38 +1282,6 @@
       "species": "חוטית נודדת",
       "diameter": "6-10",
       "url": "https://www.meduzot.co.il/observation/25489"
-    },
-    {
-      "id": "25488",
-      "reporter": "‫חנן‬‎",
-      "location": "אשדוד",
-      "lat": 31.79,
-      "lon": 34.63,
-      "date": "2026-07-03T15:58",
-      "dateText": "03.07.2026",
-      "time": "15:58",
-      "activity": "הליכה על החוף",
-      "distance": "0-200",
-      "quantity": "25",
-      "species": "חוטית נודדת",
-      "diameter": "6-10",
-      "url": "https://www.meduzot.co.il/observation/25488"
-    },
-    {
-      "id": "25487",
-      "reporter": "‫חנן‬‎",
-      "location": "אשדוד",
-      "lat": 31.79,
-      "lon": 34.63,
-      "date": "2026-07-03T14:57",
-      "dateText": "03.07.2026",
-      "time": "14:57",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": "5",
-      "species": "חוטית נודדת",
-      "diameter": "6-10",
-      "url": "https://www.meduzot.co.il/observation/25487"
     }
   ]
 }
