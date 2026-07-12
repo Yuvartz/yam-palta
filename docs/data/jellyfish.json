@@ -1,8 +1,24 @@
 {
-  "updated": "2026-07-12T14:22:43.731Z",
+  "updated": "2026-07-12T16:44:53.717Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25619",
+      "reporter": "שי מיניס",
+      "location": "פלמחים",
+      "lat": 31.93,
+      "lon": 34.697,
+      "date": "2026-07-12T06:20",
+      "dateText": "12.07.2026",
+      "time": "06:20",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": "50",
+      "species": "מסרקנית זהרורית",
+      "diameter": "1-5",
+      "url": "https://www.meduzot.co.il/observation/25619"
+    },
     {
       "id": "25618",
       "reporter": "Dor Edelist",
@@ -1266,22 +1282,6 @@
       "species": "אין מדוזות",
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25510"
-    },
-    {
-      "id": "25503",
-      "reporter": "Mika Timor",
-      "location": "",
-      "lat": null,
-      "lon": null,
-      "date": "2026-07-04T18:08",
-      "dateText": "04.07.2026",
-      "time": "18:08",
-      "activity": "הליכה על החוף",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25503"
     }
   ]
 }
