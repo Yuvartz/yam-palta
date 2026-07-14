@@ -1,8 +1,24 @@
 {
-  "updated": "2026-07-13T20:48:40.403Z",
+  "updated": "2026-07-14T09:45:42.662Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25626",
+      "reporter": "Nir Daniel Burmanov",
+      "location": "תל אביב צפון - הירקון, מציצים, הילטון ומרינה תל אביב",
+      "lat": 32.085,
+      "lon": 34.766,
+      "date": "2026-07-14T10:30",
+      "dateText": "14.07.2026",
+      "time": "10:30",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": "1",
+      "species": "חוטית נודדת",
+      "diameter": "6-10",
+      "url": "https://www.meduzot.co.il/observation/25626"
+    },
     {
       "id": "25625",
       "reporter": "רחל",
@@ -1266,22 +1282,6 @@
       "species": "כחולת שולייים חלקה",
       "diameter": "11-30",
       "url": "https://www.meduzot.co.il/observation/25490"
-    },
-    {
-      "id": "25489",
-      "reporter": "חושן בן משה",
-      "location": "פלמחים",
-      "lat": 31.93,
-      "lon": 34.697,
-      "date": "2026-07-03T18:19",
-      "dateText": "03.07.2026",
-      "time": "18:19",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": "1",
-      "species": "חוטית נודדת",
-      "diameter": "6-10",
-      "url": "https://www.meduzot.co.il/observation/25489"
     }
   ]
 }
