@@ -1,0 +1,30 @@
+name: Send palata push notifications
+
+on:
+  schedule:
+    - cron: "10 * * * *"   # hourly at :10 — after the buoy (:20 is buoy, :00 jellyfish) window opens
+  workflow_dispatch:        # allow manual run
+
+permissions:
+  contents: read
+
+concurrency:
+  group: push-notify
+  cancel-in-progress: false
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install web-push
+        run: npm install --no-save web-push@3
+      - name: Check forecast & send palata alerts
+        env:
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          SUBSCRIBERS_CSV_URL: ${{ secrets.SUBSCRIBERS_CSV_URL }}
+        run: node scripts/send-push.mjs
