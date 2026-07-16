@@ -1,8 +1,24 @@
 {
-  "updated": "2026-07-16T07:14:55.563Z",
+  "updated": "2026-07-16T09:56:18.956Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25632",
+      "reporter": "ליאת גלאון",
+      "location": "אשדוד",
+      "lat": 31.79,
+      "lon": 34.63,
+      "date": "2026-07-16T06:00",
+      "dateText": "16.07.2026",
+      "time": "06:00",
+      "activity": "הליכה על החוף",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25632"
+    },
     {
       "id": "25631",
       "reporter": "luba aronov",
@@ -1266,22 +1282,6 @@
       "species": "חוטית נודדת",
       "diameter": "6-10",
       "url": "https://www.meduzot.co.il/observation/25497"
-    },
-    {
-      "id": "25495",
-      "reporter": "ניצן שמיר",
-      "location": "פלמחים",
-      "lat": 31.93,
-      "lon": 34.697,
-      "date": "2026-07-04T11:07",
-      "dateText": "04.07.2026",
-      "time": "11:07",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": "1",
-      "species": "חוטית נודדת",
-      "diameter": "11-30",
-      "url": "https://www.meduzot.co.il/observation/25495"
     }
   ]
 }
