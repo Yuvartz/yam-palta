@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-16T03:42:13.364Z",
+  "updated": "2026-07-16T06:34:31.629Z",
   "source": "ISRAMAR — Hadera buoy",
   "sourceUrl": "https://isramar.ocean.org.il/isramar2009/station/HaderaRDI.aspx",
   "station": {
@@ -9,8 +9,8 @@
   },
   "measured": {
     "waveHeight": 1.02,
-    "wavePeriod": 7.3,
+    "wavePeriod": 7.7,
     "waveMax": 1.2954,
-    "measuredAt": "2026-07-16T03:00:00Z"
+    "measuredAt": "2026-07-16T06:00:00Z"
   }
 }
