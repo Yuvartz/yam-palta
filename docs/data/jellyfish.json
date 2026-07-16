@@ -1,8 +1,40 @@
 {
-  "updated": "2026-07-16T09:56:18.956Z",
+  "updated": "2026-07-16T13:18:44.077Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25634",
+      "reporter": "natalia L",
+      "location": "קיסריה ושדות ים",
+      "lat": 32.5,
+      "lon": 34.89,
+      "date": "2026-07-15T15:30",
+      "dateText": "15.07.2026",
+      "time": "15:30",
+      "activity": "רחצה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25634"
+    },
+    {
+      "id": "25633",
+      "reporter": "מישמיש בורא",
+      "location": "בת ים וראשון לציון",
+      "lat": 32.015,
+      "lon": 34.743,
+      "date": "2026-07-16T10:00",
+      "dateText": "16.07.2026",
+      "time": "10:00",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25633"
+    },
     {
       "id": "25632",
       "reporter": "ליאת גלאון",
@@ -1250,38 +1282,6 @@
       "species": "אחר, לא מזוהה",
       "diameter": "11-30",
       "url": "https://www.meduzot.co.il/observation/25501"
-    },
-    {
-      "id": "25500",
-      "reporter": "יואל פוירמן",
-      "location": "נווה ים, הבונים ודור-נחשולים",
-      "lat": null,
-      "lon": null,
-      "date": "2026-07-04T12:32",
-      "dateText": "04.07.2026",
-      "time": "12:32",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": "אין מדוזות",
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25500"
-    },
-    {
-      "id": "25497",
-      "reporter": "עקים זחאלקה",
-      "location": "נמל חיפה והחוף השקט",
-      "lat": 32.83,
-      "lon": 34.98,
-      "date": "2026-07-04T16:14",
-      "dateText": "04.07.2026",
-      "time": "16:14",
-      "activity": "יאכטה",
-      "distance": "0-200",
-      "quantity": "800",
-      "species": "חוטית נודדת",
-      "diameter": "6-10",
-      "url": "https://www.meduzot.co.il/observation/25497"
     }
   ]
 }
