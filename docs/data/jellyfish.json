@@ -1,8 +1,40 @@
 {
-  "updated": "2026-07-17T09:46:09.314Z",
+  "updated": "2026-07-17T13:03:08.287Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25646",
+      "reporter": "דן פיקוס",
+      "location": "חופי אשקלון והדרום",
+      "lat": 31.67,
+      "lon": 34.556,
+      "date": "2026-07-17T15:22",
+      "dateText": "17.07.2026",
+      "time": "15:22",
+      "activity": "רחצה",
+      "distance": "0-200",
+      "quantity": "1",
+      "species": "חוטית נודדת",
+      "diameter": "6-10",
+      "url": "https://www.meduzot.co.il/observation/25646"
+    },
+    {
+      "id": "25645",
+      "reporter": "אמיר פרלברג",
+      "location": "נווה ים, הבונים ודור-נחשולים",
+      "lat": null,
+      "lon": null,
+      "date": "2026-07-17T07:30",
+      "dateText": "17.07.2026",
+      "time": "07:30",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25645"
+    },
     {
       "id": "25644",
       "reporter": "דניס זבלב",
@@ -1250,38 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25534"
-    },
-    {
-      "id": "25532",
-      "reporter": "Vera",
-      "location": "חופי אשקלון והדרום",
-      "lat": 31.67,
-      "lon": 34.556,
-      "date": "2026-07-06T07:19",
-      "dateText": "06.07.2026",
-      "time": "07:19",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": "חוטית נודדת",
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25532"
-    },
-    {
-      "id": "25531",
-      "reporter": "Ido",
-      "location": "בת ים וראשון לציון",
-      "lat": 32.015,
-      "lon": 34.743,
-      "date": "2026-07-05T22:08",
-      "dateText": "05.07.2026",
-      "time": "22:08",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": "10",
-      "species": "חוטית נודדת",
-      "diameter": "6-10",
-      "url": "https://www.meduzot.co.il/observation/25531"
     }
   ]
 }
