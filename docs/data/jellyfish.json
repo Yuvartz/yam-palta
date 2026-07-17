@@ -1,8 +1,24 @@
 {
-  "updated": "2026-07-17T16:58:54.540Z",
+  "updated": "2026-07-17T19:58:13.211Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25650",
+      "reporter": "שי מיניס",
+      "location": "פלמחים",
+      "lat": 31.93,
+      "lon": 34.697,
+      "date": "2026-07-17T06:10",
+      "dateText": "17.07.2026",
+      "time": "06:10",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": "1",
+      "species": "פעמונית נקודה",
+      "diameter": "11-30",
+      "url": "https://www.meduzot.co.il/observation/25650"
+    },
     {
       "id": "25649",
       "reporter": "שלמה יער-בר",
@@ -1266,22 +1282,6 @@
       "species": "חוטית נודדת",
       "diameter": "11-30",
       "url": "https://www.meduzot.co.il/observation/25529"
-    },
-    {
-      "id": "25528",
-      "reporter": "אמיר פרלברג",
-      "location": "תל אביב מרכז - גורדון, בוגרשוב, פרישמן, צ'ארלס קלור",
-      "lat": 32.085,
-      "lon": 34.766,
-      "date": "2026-07-04T09:30",
-      "dateText": "04.07.2026",
-      "time": "09:30",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": "2",
-      "species": "חוטית נודדת",
-      "diameter": "6-10",
-      "url": "https://www.meduzot.co.il/observation/25528"
     }
   ]
 }
