@@ -1,8 +1,24 @@
 {
-  "updated": "2026-07-18T06:52:47.525Z",
+  "updated": "2026-07-18T08:42:12.041Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25652",
+      "reporter": "עומר דיין",
+      "location": "קריית חיים",
+      "lat": null,
+      "lon": null,
+      "date": "2026-07-18T10:22",
+      "dateText": "18.07.2026",
+      "time": "10:22",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": "אין מדוזות",
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25652"
+    },
     {
       "id": "25651",
       "reporter": "שלמה יער-בר",
@@ -1266,22 +1282,6 @@
       "species": "חוטית נודדת",
       "diameter": "6-10",
       "url": "https://www.meduzot.co.il/observation/25531"
-    },
-    {
-      "id": "25530",
-      "reporter": "אמיר פרלברג",
-      "location": "תל אביב מרכז - גורדון, בוגרשוב, פרישמן, צ'ארלס קלור",
-      "lat": 32.085,
-      "lon": 34.766,
-      "date": "2026-07-05T21:52",
-      "dateText": "05.07.2026",
-      "time": "21:52",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": "1",
-      "species": "חוטית נודדת",
-      "diameter": "6-10",
-      "url": "https://www.meduzot.co.il/observation/25530"
     }
   ]
 }
