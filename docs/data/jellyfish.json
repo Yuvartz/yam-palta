@@ -1,8 +1,24 @@
 {
-  "updated": "2026-07-19T11:03:24.315Z",
+  "updated": "2026-07-19T18:49:56.280Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25657",
+      "reporter": "אמיר פרלברג",
+      "location": "תל אביב מרכז - גורדון, בוגרשוב, פרישמן, צ'ארלס קלור",
+      "lat": 32.085,
+      "lon": 34.766,
+      "date": "2026-07-19T07:30",
+      "dateText": "19.07.2026",
+      "time": "07:30",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25657"
+    },
     {
       "id": "25656",
       "reporter": "מישמיש בורא",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25536"
-    },
-    {
-      "id": "25535",
-      "reporter": "Constantin Skoblinsky",
-      "location": "פלמחים",
-      "lat": 31.93,
-      "lon": 34.697,
-      "date": "2026-07-06T11:45",
-      "dateText": "06.07.2026",
-      "time": "11:45",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25535"
     }
   ]
 }
