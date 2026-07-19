@@ -1,8 +1,24 @@
 {
-  "updated": "2026-07-18T16:43:36.954Z",
+  "updated": "2026-07-19T09:49:13.856Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25655",
+      "reporter": "יהונתן גולדברג",
+      "location": "אשדוד",
+      "lat": 31.79,
+      "lon": 34.63,
+      "date": "2026-07-19T10:00",
+      "dateText": "19.07.2026",
+      "time": "10:00",
+      "activity": "גלישת גלים",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25655"
+    },
     {
       "id": "25654",
       "reporter": "עתי מזרחי",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25534"
-    },
-    {
-      "id": "25532",
-      "reporter": "Vera",
-      "location": "חופי אשקלון והדרום",
-      "lat": 31.67,
-      "lon": 34.556,
-      "date": "2026-07-06T07:19",
-      "dateText": "06.07.2026",
-      "time": "07:19",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": "חוטית נודדת",
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25532"
     }
   ]
 }
