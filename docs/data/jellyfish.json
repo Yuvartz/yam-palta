@@ -1,8 +1,24 @@
 {
-  "updated": "2026-07-22T20:05:55.519Z",
+  "updated": "2026-07-23T08:10:54.599Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25671",
+      "reporter": "טלי טריינין",
+      "location": "ראש הנקרה - בצת",
+      "lat": null,
+      "lon": null,
+      "date": "2026-07-23T10:00",
+      "dateText": "23.07.2026",
+      "time": "10:00",
+      "activity": "הליכה על החוף",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25671"
+    },
     {
       "id": "25670",
       "reporter": "עופר",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25560"
-    },
-    {
-      "id": "25559",
-      "reporter": "תאיר ציון הררי",
-      "location": "נתניה צפון - נעורים, חבצלת השרון, בלו-ביי, צאנז",
-      "lat": 32.33,
-      "lon": 34.853,
-      "date": "2026-07-08T23:40",
-      "dateText": "08.07.2026",
-      "time": "23:40",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25559"
     }
   ]
 }
