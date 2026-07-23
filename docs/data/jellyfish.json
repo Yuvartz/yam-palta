@@ -1,8 +1,24 @@
 {
-  "updated": "2026-07-23T08:10:54.599Z",
+  "updated": "2026-07-23T15:01:03.891Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25672",
+      "reporter": "מישמיש בורא",
+      "location": "בת ים וראשון לציון",
+      "lat": 32.015,
+      "lon": 34.743,
+      "date": "2026-07-23T12:15",
+      "dateText": "23.07.2026",
+      "time": "12:15",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25672"
+    },
     {
       "id": "25671",
       "reporter": "טלי טריינין",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25561"
-    },
-    {
-      "id": "25560",
-      "reporter": "Dor Edelist",
-      "location": "צפון חוף הכרמל",
-      "lat": 32.835,
-      "lon": 34.956,
-      "date": "2026-07-09T23:43",
-      "dateText": "09.07.2026",
-      "time": "23:43",
-      "activity": "הליכה על החוף",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25560"
     }
   ]
 }
