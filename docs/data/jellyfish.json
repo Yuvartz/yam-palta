@@ -1,8 +1,24 @@
 {
-  "updated": "2026-07-24T18:10:30.063Z",
+  "updated": "2026-07-25T11:01:36.896Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25677",
+      "reporter": "מישמיש בורא",
+      "location": "בת ים וראשון לציון",
+      "lat": 32.015,
+      "lon": 34.743,
+      "date": "2026-07-25T11:30",
+      "dateText": "25.07.2026",
+      "time": "11:30",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25677"
+    },
     {
       "id": "25676",
       "reporter": "עומר דיין",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25567"
-    },
-    {
-      "id": "25564",
-      "reporter": "עידית א.",
-      "location": "יפו",
-      "lat": 32.053,
-      "lon": 34.75,
-      "date": "2026-07-10T09:15",
-      "dateText": "10.07.2026",
-      "time": "09:15",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": "אין מדוזות",
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25564"
     }
   ]
 }
