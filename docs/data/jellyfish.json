@@ -1,8 +1,24 @@
 {
-  "updated": "2026-07-26T08:07:00.744Z",
+  "updated": "2026-07-26T16:46:17.585Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25682",
+      "reporter": "אמיר פרלברג",
+      "location": "תל אביב מרכז - גורדון, בוגרשוב, פרישמן, צ'ארלס קלור",
+      "lat": 32.085,
+      "lon": 34.766,
+      "date": "2026-07-26T07:30",
+      "dateText": "26.07.2026",
+      "time": "07:30",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": "150",
+      "species": "מסרקנית זהרורית",
+      "diameter": "1-5",
+      "url": "https://www.meduzot.co.il/observation/25682"
+    },
     {
       "id": "25681",
       "reporter": "יוליה פרוטסובסקי",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25575"
-    },
-    {
-      "id": "25574",
-      "reporter": "טלי טריינין",
-      "location": "ראש הנקרה - בצת",
-      "lat": null,
-      "lon": null,
-      "date": "2026-07-11T06:51",
-      "dateText": "11.07.2026",
-      "time": "06:51",
-      "activity": "הליכה על החוף",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25574"
     }
   ]
 }
