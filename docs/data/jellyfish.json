@@ -1,8 +1,24 @@
 {
-  "updated": "2026-07-25T21:43:16.717Z",
+  "updated": "2026-07-26T08:07:00.744Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25681",
+      "reporter": "יוליה פרוטסובסקי",
+      "location": "צפון חוף הכרמל",
+      "lat": 32.835,
+      "lon": 34.956,
+      "date": "2026-07-25T14:10",
+      "dateText": "25.07.2026",
+      "time": "14:10",
+      "activity": "הליכה על החוף",
+      "distance": "0-200",
+      "quantity": "1",
+      "species": "פעמונית נקודה",
+      "diameter": "11-30",
+      "url": "https://www.meduzot.co.il/observation/25681"
+    },
     {
       "id": "25680",
       "reporter": "איגור פרוטסובסקי",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25574"
-    },
-    {
-      "id": "25573",
-      "reporter": "יבגני זוריה",
-      "location": "בת ים וראשון לציון",
-      "lat": 32.015,
-      "lon": 34.743,
-      "date": "2026-07-10T18:00",
-      "dateText": "10.07.2026",
-      "time": "18:00",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25573"
     }
   ]
 }
