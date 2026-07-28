@@ -1297,7 +1297,7 @@
     function toggleJelly() { jellyOpen = !jellyOpen; if (hourly.length) renderHero(); renderJellyReports(); if (jellyOpen) { const l = $("jellyList"); if (l) l.scrollIntoView({ behavior: "smooth", block: "center" }); } }
     async function loadJelly() {
       try {
-        const res = await fetch("data/jellyfish.json?v=" + Math.floor(Date.now() / 3600000));
+        const res = await fetch("data/jellyfish.json?v=" + Math.floor(Date.now() / 3600000), { cache: "no-cache" });
         if (!res.ok) return;
         const j = await res.json(); jelly = j.reports || []; renderJelly(); if (hourly.length) renderHero();
       } catch (e) { console.warn("jellyfish feed failed", e); }
@@ -1306,7 +1306,7 @@
     // by the buoy GitHub Action (same-origin, no CORS — same pattern as the jellyfish feed).
     async function loadBuoy() {
       try {
-        const res = await fetch("data/hadera-waves.json?v=" + Math.floor(Date.now() / 3600000));
+        const res = await fetch("data/hadera-waves.json?v=" + Math.floor(Date.now() / 3600000), { cache: "no-cache" });
         if (!res.ok) return;
         buoy = await res.json(); if (hourly.length) renderHero();
       } catch (e) { console.warn("buoy feed failed", e); }
