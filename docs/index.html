@@ -92,8 +92,6 @@
     .jelly-meta { color: var(--muted); font-size: 12px; }
     .jelly-when { color: var(--muted); font-size: 11px; font-family: var(--mono); white-space: nowrap; }
     .credit { font-size: 11px; color: var(--muted); margin-top: 12px; }
-    .beachcam-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 12px; display: block; background: var(--bg-2); }
-    .beachcam-card .credit { margin-top: 8px; }
     .feedback-card .fb-q { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
     .fb-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .fb-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 4px; border-radius: 12px;
@@ -408,17 +406,12 @@
         <div id="jellyList" class="jelly-collapse"></div>
         <div id="metricsDate" class="metrics-date"></div>
         <div class="metrics" id="metrics"></div>
+        <div class="credit">מקורות: תחזית — <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> (CC-BY 4.0) · גלים נמדדים — <a href="https://isramar.ocean.org.il/isramar2009/station/HaderaRDI.aspx" target="_blank" rel="noopener">מצוף חדרה, ISRAMAR / חקר ימים ואגמים</a> · מדוזות — <a href="https://www.meduzot.co.il/list" target="_blank" rel="noopener">מדוזות בים</a></div>
       </div>
 
       <div class="card clim-card" id="climCard" style="display:none">
         <h2>🌡️ שיא חום המים</h2>
         <div id="climBody"></div>
-      </div>
-
-      <div class="card beachcam-card" id="beachcamCard" style="display:none">
-        <h2>📷 תמונה חיה מהחוף</h2>
-        <img id="beachcamImg" class="beachcam-img" alt="תמונה חיה מהמצלמה בחוף" onerror="App.hideBeachcam()" />
-        <div class="credit" id="beachcamCredit"></div>
       </div>
 
       <div class="card">
@@ -540,17 +533,8 @@
       entry: { beach: "", lat: "", lon: "", sub: "" },
     };
 
-    // Live beach snapshots hotlinked from beachcam.co.il's ipcamlive feeds (verified working aliases,
-    // only for built-in/preset locations that actually have a camera — no fake placeholders elsewhere).
-    // ⚠️ TODO BEFORE PUBLIC LAUNCH: remove this feature (or obtain written permission from
-    // info@beachcam.co.il). No published license exists; fine for private research, NOT for a
-    // commercial/monetized release. To disable: empty this object — the card hides itself.
-    const BEACHCAMS = {
-      telaviv: { alias: "664cd75b7639c", label: "מצלמת חוף יפו", page: "https://beachcam.co.il/yafo.html" },
-      herzliya: { alias: "634548590c353", label: "מצלמת חוף זבולון", page: "https://beachcam.co.il/zvulun.html" },
-      haifa: { alias: "60997a5d22ca9", label: "מצלמת חוף בת גלים", page: "https://beachcam.co.il/batgalim.html" },
-      netanya: { alias: "65ccf0508a902", label: "מצלמת חוף קונטיקי", page: "https://beachcam.co.il/kontiki.html" },
-    };
+    // NOTE: the live beach-camera card (hotlinked snapshots from beachcam.co.il) was removed
+    // pending written permission from info@beachcam.co.il — see EMAIL-beachcam.md in the repo root.
 
     const DAY_START = 6, DAY_END = 19;          // used ONLY for percentage/streak summaries
     const KMH_PER_KNOT = 1.852;
@@ -881,11 +865,13 @@
       const loc = allLocations()[LS.loc];
       if (!loc || haversine(loc.lat, loc.lon, buoy.station.lat, buoy.station.lon) > 150) return "";
       const meas = m.waveHeight, fc = ref && ref.waveHeight != null ? ref.waveHeight : null;
+      // Attribution: the measurement is © ISRAMAR / IOLR — always name and link the source.
+      const stn = `<a href="${esc(buoy.sourceUrl || "https://isramar.ocean.org.il/")}" target="_blank" rel="noopener">${esc(buoy.station.name)} (ISRAMAR)</a>`;
       if (fc != null && meas - fc >= 0.3)
-        return `<p class="buoy warn">⚠️ המצוף מודד גל גבוה מהתחזית — ${meas.toFixed(1)}מ׳ בפועל מול ${fc.toFixed(1)}מ׳ צפוי · ייתכן שהים סוער מהצפוי</p>`;
+        return `<p class="buoy warn">⚠️ המצוף מודד גל גבוה מהתחזית — ${meas.toFixed(1)}מ׳ בפועל מול ${fc.toFixed(1)}מ׳ צפוי · ייתכן שהים סוער מהצפוי · ${stn}</p>`;
       if (fc != null && fc - meas >= 0.3)
-        return `<p class="buoy">🛟 המצוף מודד גל נמוך מהתחזית — ${meas.toFixed(1)}מ׳ בפועל · ${buoy.station.name}</p>`;
-      return `<p class="buoy">🛟 נמדד עכשיו: גל ${meas.toFixed(1)}מ׳ · ${buoy.station.name} · התחזית מאומתת</p>`;
+        return `<p class="buoy">🛟 המצוף מודד גל נמוך מהתחזית — ${meas.toFixed(1)}מ׳ בפועל · ${stn}</p>`;
+      return `<p class="buoy">🛟 נמדד עכשיו: גל ${meas.toFixed(1)}מ׳ · ${stn} · התחזית מאומתת</p>`;
     }
     // Warnings zone at the top of the hero. A short, illustrated chip per active hazard; tapping it
     // opens the details. Jellyfish is live now; the structure is ready for more (e.g. polluted sea).
@@ -1265,17 +1251,6 @@
       list.innerHTML = items + `<div class="credit">מקור: דיווחי גולשים ב-<a href="https://www.meduzot.co.il/list" target="_blank" rel="noopener">מדוזות בים</a> · מתעדכן כל שעה</div>`;
     }
     function renderJelly() { if (hourly.length) renderHero(); renderJellyReports(); }   // hero first: warningsHTML resets jellyOpen when the chip is gone
-    // Live beach photo: plain <img> hotlink to the snapshot endpoint (no CORS/referer restriction,
-    // unlike the live player iframe which is CSP-locked to beachcam.co.il's own domains).
-    function renderBeachcam() {
-      const card = $("beachcamCard"), cam = BEACHCAMS[LS.loc];
-      if (!cam) { card.style.display = "none"; return; }
-      card.style.display = "";
-      $("beachcamImg").src = `https://g1.ipcamlive.com/player/snapshot.php?alias=${cam.alias}&t=${Date.now()}`;
-      $("beachcamCredit").innerHTML = `${cam.label} · קרדיט: <a href="${cam.page}" target="_blank" rel="noopener">beachcam.co.il</a>`;
-    }
-    function hideBeachcam() { $("beachcamCard").style.display = "none"; }
-
     // ---- User feedback → Google Form (no backend) ----
     const fbKey = () => `yp-fb-${LS.loc}-${israelNow().dateStr}`;   // throttle: one "done" state per beach per day
     function renderFeedback() {
@@ -1372,12 +1347,12 @@
       if (d.error) { body.innerHTML = `<div class="clim-loading">אין מספיק נתוני עבר לחוף זה.</div>`; return; }
       body.innerHTML = `
         <div class="clim-peak"><span class="clim-temp">${d.avgMax}°</span><span class="clim-when">בדרך כלל סביב ${d.day} ${HEB_MONTHS[d.month]}</span></div>
-        <div class="clim-note">הטמפ׳ המקסימלית הממוצעת של המים, לפי ${d.years} השנים האחרונות · מקור: Open-Meteo</div>`;
+        <div class="clim-note">הטמפ׳ המקסימלית הממוצעת של המים, לפי ${d.years} השנים האחרונות · מקור: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a></div>`;
     }
 
     function renderStreak() { const s = streakCount(), b = $("streak"); if (s >= 1) { b.classList.add("on"); $("streakN").textContent = s; } else b.classList.remove("on"); }
-    function renderUpdated() { const now = israelNow(); $("updated").innerHTML = `עודכן לאחרונה <span class="num">${pad(now.hour)}:${pad(now.minute)}</span> · מקור: Open-Meteo`; }
-    function renderAll() { renderHero(); renderGoodFor(); renderIndicators(); renderWaveDetails(); renderMetrics(); renderForecast(); renderNextWindow(); renderStreak(); renderUpdated(); renderJelly(); renderBeachcam(); renderFeedback(); renderClimatology(); }
+    function renderUpdated() { const now = israelNow(); $("updated").innerHTML = `עודכן לאחרונה <span class="num">${pad(now.hour)}:${pad(now.minute)}</span> · מקור: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>`; }
+    function renderAll() { renderHero(); renderGoodFor(); renderIndicators(); renderWaveDetails(); renderMetrics(); renderForecast(); renderNextWindow(); renderStreak(); renderUpdated(); renderJelly(); renderFeedback(); renderClimatology(); }
 
     function hebrewDay(ds) {
       const now = israelNow();
@@ -1593,7 +1568,7 @@
       load(); setInterval(load, REFRESH_MS); setInterval(() => { if (hourly.length) renderAll(); }, 60 * 1000);
     }
 
-    return { init, setLocation, refresh: load, enableNotifications, openAdd, closeAdd, confirmAdd, toggleDay, toggleJelly, toggleScore, installApp, closeInstall, hideBeachcam, submitFeedback, toggleFeedback, heroDayNav, heroSwipeStart, heroSwipeMove, heroSwipeEnd, useMyLocation };
+    return { init, setLocation, refresh: load, enableNotifications, openAdd, closeAdd, confirmAdd, toggleDay, toggleJelly, toggleScore, installApp, closeInstall, submitFeedback, toggleFeedback, heroDayNav, heroSwipeStart, heroSwipeMove, heroSwipeEnd, useMyLocation };
   })();
 
   document.addEventListener("DOMContentLoaded", App.init);
