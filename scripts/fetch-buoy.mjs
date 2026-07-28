@@ -17,7 +17,10 @@ const STATION = { name: "מצוף חדרה", lat: 32.470, lon: 34.880 };
 const pick = (params, name) => {
   const p = (params || []).find(x => x.name === name);
   const v = p && Array.isArray(p.values) ? p.values[0] : null;
-  return v == null ? null : Number(v);
+  const n = v == null ? null : Number(v);
+  // NaN would survive a `== null` check and serialize to null, clobbering good data;
+  // negative or absurd wave values mean a sensor/format glitch, not a measurement.
+  return n != null && Number.isFinite(n) && n >= 0 && n < 30 ? n : null;
 };
 
 // "2026-06-27 18:00 UTC" -> ISO string the browser can parse reliably.

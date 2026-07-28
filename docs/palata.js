@@ -23,7 +23,9 @@
   const heightScoreFn = h => h == null ? .5 : clamp01(1 - Math.max(0, h - 0.10) / 1.1);            // 0-0.10m glassy -> 1.2m+ ~0
   // Hard ceiling by total wave height: "palata" means a FLAT sea — real waves can never be
   // called palata no matter how calm the wind. Caps sit just under each tier's floor.
-  const heightTierCap = h => h == null ? 100 : h > 0.35 ? 79 : h > 0.20 ? 89 : h > 0.10 ? 97 : 100;
+  // Missing height caps below the calm bar too: we won't declare a sea swim-flat without
+  // actually knowing the wave height (wind+chop alone could otherwise reach 83).
+  const heightTierCap = h => h == null ? 79 : h > 0.35 ? 79 : h > 0.20 ? 89 : h > 0.10 ? 97 : 100;
 
   // Core score from raw factor values (waveHeight m, chop m, wind kt, windHistory kt).
   function scoreOf(waveHeight, chop, windKt, histKt) {
@@ -57,7 +59,10 @@
       `פלטה עכשיו${w}. הים לא מחכה לנצח 🌊`,
       `מדד ${score != null ? (score / 10).toFixed(1) : "גבוה"}${w}${end}. סגור את המחשב ובוא 🏊`,
     ];
-    return { title: deluxe ? `💎 פלטה דלוקס ב${beach}!` : `🌊 ים פלטה ב${beach}!`, body: pool[Math.floor(Math.random() * pool.length)] };
+    // Honest tiering: 80-89 is "כמעט פלטה", not full palata — the title says which one it is.
+    const title = deluxe ? `💎 פלטה דלוקס ב${beach}!`
+      : (score != null && score < 90) ? `🐢 כמעט פלטה ב${beach}!` : `🌊 ים פלטה ב${beach}!`;
+    return { title, body: pool[Math.floor(Math.random() * pool.length)] };
   }
   const eveningCopy = (beach, s, e) => ({
     title: `🌅 מחר פלטה ב${beach}`,

@@ -7,7 +7,7 @@
 //     saw this morning" beats a blank screen at the beach).
 //   • Google Fonts: cache-first (immutable files).
 // Bump VERSION on any shell change — activate cleans older caches.
-const VERSION = "v4";
+const VERSION = "v5";
 const SHELL_CACHE = `yp-shell-${VERSION}`;
 const API_CACHE = `yp-api-${VERSION}`;
 const FONT_CACHE = `yp-fonts-${VERSION}`;
@@ -48,6 +48,11 @@ async function networkFirst(req, cacheName, max) {
   try {
     const res = await fetch(req);
     if (res && res.ok) { cache.put(req, res.clone()); if (max) trimCache(cache, max); }
+    else if (res && !res.ok) {
+      // A 429/500 from the API is as useless as no network — the last good forecast beats it.
+      const hit = await cache.match(req);
+      if (hit) return hit;
+    }
     return res;
   } catch (err) {
     const hit = await cache.match(req);
@@ -76,7 +81,12 @@ self.addEventListener("fetch", e => {
     e.respondWith(
       fetch(req)
         .then(res => {
-          if (res && res.ok) { const copy = res.clone(); caches.open(SHELL_CACHE).then(c => c.put("./", copy)); }
+          if (res && res.ok) {
+            const copy = res.clone();
+            // waitUntil keeps the worker alive until the write lands — on mobile the SW can be
+            // killed right after responding, losing the fresh shell mid-put.
+            e.waitUntil(caches.open(SHELL_CACHE).then(c => c.put("./", copy)));
+          }
           return res;
         })
         .catch(async () => (await caches.match(req)) || (await caches.match("./")))

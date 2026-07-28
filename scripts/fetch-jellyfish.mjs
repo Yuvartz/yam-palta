@@ -85,9 +85,14 @@ async function main() {
   if (!res.ok) throw new Error("fetch failed: " + res.status);
   const html = await res.text();
   const reports = parse(html);
-  if (reports.length === 0) {
-    // Don't overwrite good data with an empty parse (layout change / transient issue).
-    if (existsSync(OUT)) { console.error("parsed 0 reports; keeping existing file"); return; }
+  if (existsSync(OUT)) {
+    // Don't overwrite good data with an empty or suspiciously shrunken parse — a layout
+    // change that still matches a few blocks would otherwise clobber a known-good feed.
+    let prevCount = 0;
+    try { prevCount = (JSON.parse(readFileSync(OUT, "utf8")).reports || []).length; } catch (e) {}
+    if (reports.length === 0 || (prevCount >= 10 && reports.length < prevCount / 2)) {
+      console.error(`parsed ${reports.length} reports (was ${prevCount}); keeping existing file`); return;
+    }
   }
   mkdirSync("docs/data", { recursive: true });
   const out = { updated: new Date().toISOString(), source: "https://www.meduzot.co.il/list", count: reports.length, reports };

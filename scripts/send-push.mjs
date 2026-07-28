@@ -93,24 +93,39 @@ async function main() {
   const rows = parseCSV(csv).slice(1);   // drop header
   // Columns (Google Forms order): timestamp, beach, lat, lon, subscription JSON.
   // Latest row per endpoint wins (re-subscribes / beach switches).
+  // The form is publicly submittable, so every row is untrusted input: endpoints are
+  // restricted to real browser push services, coordinates to the app's region, beach
+  // names sanitized (they end up in notification titles), and totals capped so junk rows
+  // can't burn Action minutes / API quota.
+  const PUSH_HOSTS = ["fcm.googleapis.com", "push.services.mozilla.com", "notify.windows.com", "push.apple.com"];
+  const validEndpoint = ep => {
+    try { const u = new URL(ep); return u.protocol === "https:" && PUSH_HOSTS.some(h => u.hostname === h || u.hostname.endsWith("." + h)); }
+    catch (e) { return false; }
+  };
+  const cleanBeach = s => String(s || "").split("").filter(c => c.charCodeAt(0) >= 32 && !`<>&"'`.includes(c)).join("").trim().slice(0, 40);
+  const MAX_SUBS = 500, MAX_GROUPS = 30;
   const byEndpoint = new Map();
   for (const r of rows) {
     if (r.length < 5) continue;
     try {
       const sub = JSON.parse(r[4]);
-      if (sub && sub.endpoint) byEndpoint.set(sub.endpoint, { beach: r[1], lat: +r[2], lon: +r[3], sub });
+      if (sub && typeof sub.endpoint === "string" && validEndpoint(sub.endpoint))
+        byEndpoint.set(sub.endpoint, { beach: cleanBeach(r[1]), lat: +r[2], lon: +r[3], sub });
     } catch (e) {}
   }
-  const subs = [...byEndpoint.values()].filter(s => s.beach && isFinite(s.lat) && isFinite(s.lon));
+  const subs = [...byEndpoint.values()]
+    .filter(s => s.beach && isFinite(s.lat) && isFinite(s.lon) && s.lat > 20 && s.lat < 45 && s.lon > 20 && s.lon < 45)
+    .slice(0, MAX_SUBS);
   if (!subs.length) { console.log("no subscribers."); return; }
 
   const now = israelNowHour();
   // Group subscribers by coordinates — one forecast fetch per beach.
   const beaches = new Map();
   for (const s of subs) { const k = `${s.lat},${s.lon}`; (beaches.get(k) || beaches.set(k, { ...s, list: [] }).get(k)).list.push(s.sub); }
+  const groups = [...beaches.values()].slice(0, MAX_GROUPS);   // each group costs 2 API calls — cap the damage junk rows can do
 
   let sent = 0;
-  for (const b of beaches.values()) {
+  for (const b of groups) {
     let hours;
     try { hours = await fetchHours(b.lat, b.lon); } catch (e) { console.error(`fetch failed for ${b.beach}`); continue; }
     const scores = hours.map((_, i) => palataIndex(hours, i));

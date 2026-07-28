@@ -1253,7 +1253,11 @@
       list.classList.toggle("open", jellyOpen && jelly.length > 0);
       if (!jellyOpen || !jelly.length) return;
       const loc = allLocations()[LS.loc];
-      const items = jelly.slice(0, 7).map(r => {
+      // Show the reports that actually triggered the warning first (nearby+recent), then the rest
+      // by recency — the raw scraper order could bury them below unrelated far-away sightings.
+      const isNear = r => r.lat != null && loc && haversine(loc.lat, loc.lon, r.lat, r.lon) <= 25 && hoursSince(r.date) <= 48;
+      const ordered = [...jelly].sort((a, b) => (isNear(b) - isNear(a)) || (parseIsraelISO(b.date) - parseIsraelISO(a.date)));
+      const items = ordered.slice(0, 7).map(r => {
         const near = r.lat != null && loc && haversine(loc.lat, loc.lon, r.lat, r.lon) <= 25 && hoursSince(r.date) <= 48;
         const distTxt = r.distance ? (/[א-ת]/.test(r.distance) ? r.distance : r.distance + "מ׳") : null;
         const meta = [r.species, r.quantity ? "כמות " + r.quantity : null, distTxt ? "מרחק " + distTxt : null].filter(Boolean).join(" · ");
@@ -1289,10 +1293,11 @@
       if (e.location) fd.append(e.location, (allLocations()[LS.loc] || {}).name || LS.loc);
       if (e.predicted) fd.append(e.predicted, String(predicted));
       if (e.snapshot) fd.append(e.snapshot, snapshot);
-      // Fire-and-forget: Forms returns an opaque cross-origin response, so we can't read it — that's fine.
-      fetch(FEEDBACK.formUrl, { method: "POST", mode: "no-cors", body: fd }).catch(() => {});
-      localStorage.setItem(fbKey(), "1");
-      $("feedbackCard").classList.add("done");
+      // Forms returns an opaque cross-origin response so we can't read it, but a rejected fetch
+      // means it never left the device — only mark "done" when the request actually resolved.
+      fetch(FEEDBACK.formUrl, { method: "POST", mode: "no-cors", body: fd })
+        .then(() => { localStorage.setItem(fbKey(), "1"); $("feedbackCard").classList.add("done"); })
+        .catch(e => console.warn("feedback submit failed", e));
     }
     function toggleJelly() { jellyOpen = !jellyOpen; if (hourly.length) renderHero(); renderJellyReports(); if (jellyOpen) { const l = $("jellyList"); if (l) l.scrollIntoView({ behavior: "smooth", block: "center" }); } }
     async function loadJelly() {
@@ -1381,7 +1386,7 @@
       let best = null;
       for (const [k, v] of Object.entries(allLocations())) { const data = dataCache[k]; if (!data) continue; const pct = weekCalmPct(data); if (!best || pct > best.pct) best = { name: v.name, pct }; }
       const el = $("alertBanner");
-      el.innerHTML = (best && best.pct >= ALERT_PCT) ? `<span class="ic">🔥</span><span>שים לב — בשבוע הקרוב צפוי כ-<b>${best.pct}%</b> מהזמן מתאים לשחייה ב<b>${best.name}</b>!</span>` : "";
+      el.innerHTML = (best && best.pct >= ALERT_PCT) ? `<span class="ic">🔥</span><span>שים לב — בשבוע הקרוב צפוי כ-<b>${best.pct}%</b> מהזמן מתאים לשחייה ב<b>${esc(best.name)}</b>!</span>` : "";
     }
     const SCAN_TTL = 60 * 60 * 1000;   // re-scan a beach after an hour — dataCache was forever-stale within a session
     const scanFetchedAt = {};
@@ -1398,7 +1403,8 @@
     // ---------- Install as app ----------
     let installPromptEvent = null;
     const isStandaloneMode = () => window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
-    const isIOSDevice = () => /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    // Modern iPads report a macOS user agent — the touch-points check catches them.
+    const isIOSDevice = () => (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) && !window.MSStream;
 
     function renderInstallSteps() {
       const el = $("installSteps");
@@ -1474,16 +1480,18 @@
         const reg = await navigator.serviceWorker.ready;
         const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToU8(PUSH.vapidPublicKey) });
         const json = JSON.stringify(sub);
-        // One submission per subscription+beach — switching beach re-registers you for the new one.
-        const sig = `yp-push-${LS.loc}-${json.length}`;
+        // One submission per subscription+beach, keyed by the endpoint itself (a JSON-length key
+        // collided across rotated endpoints). The marker is written only after the POST resolves,
+        // so a network failure can retry on the next visit.
+        const sig = `yp-push-${LS.loc}-${sub.endpoint.slice(-32)}`;
         if (localStorage.getItem(sig) === "1") return;
-        const loc = allLocations()[LS.loc];
+        const loc = allLocations()[LS.loc] || BUILTIN.telaviv;
         const fd = new FormData(); const e = PUSH.entry;
         if (e.beach) fd.append(e.beach, loc.name);
         if (e.lat) fd.append(e.lat, String(loc.lat));
         if (e.lon) fd.append(e.lon, String(loc.lon));
         if (e.sub) fd.append(e.sub, json);
-        await fetch(PUSH.formUrl, { method: "POST", mode: "no-cors", body: fd }).catch(() => {});
+        await fetch(PUSH.formUrl, { method: "POST", mode: "no-cors", body: fd });
         localStorage.setItem(sig, "1");
       } catch (err) { /* push unsupported/blocked — in-app notifications still work */ }
     }
@@ -1515,17 +1523,23 @@
     }
 
     function showError(msg) { $("loading").classList.add("hidden"); $("app").classList.add("hidden"); $("errorText").textContent = msg; $("errorBox").classList.remove("hidden"); }
+    let loadSeq = 0;   // guards against a slow older load landing after a beach switch
     async function load() {
       $("errorBox").classList.add("hidden");
       if (hourly.length === 0) { $("loading").classList.remove("hidden"); $("app").classList.add("hidden"); }
+      const seq = ++loadSeq, locKey = LS.loc;
       try {
-        const loc = allLocations()[LS.loc] || BUILTIN.telaviv;
+        const loc = allLocations()[locKey] || BUILTIN.telaviv;
         const { hourly: data, sun } = await fetchLocation(loc);
-        hourly = data; dataCache[LS.loc] = data; dailySun = sun;
+        // The user may have switched beach while we awaited — never let the older response
+        // overwrite the newer beach's view, and always cache under the key it was fetched for.
+        dataCache[locKey] = data;
+        if (seq !== loadSeq) return;
+        hourly = data; dailySun = sun;
         lastUpdatedAt = israelNow(); lastLoadTs = Date.now();
         $("loading").classList.add("hidden"); $("app").classList.remove("hidden");
         renderAll(); maybeNotify(); scanAlerts(); loadJelly(); loadBuoy(); loadClimatology();
-      } catch (e) { console.error(e); if (hourly.length === 0) showError("לא ניתן לטעון נתונים. בדוק חיבור לאינטרנט ונסה שוב."); }
+      } catch (e) { console.error(e); if (seq === loadSeq && hourly.length === 0) showError("לא ניתן לטעון נתונים. בדוק חיבור לאינטרנט ונסה שוב."); }
     }
 
     // Modal focus management: remember the opener, focus into the dialog, restore on close.

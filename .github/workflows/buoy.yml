@@ -8,8 +8,10 @@ on:
 permissions:
   contents: write
 
+# Shared group with jellyfish.yml: both commit+push to master, and concurrent runs from
+# different groups could race to a non-fast-forward push that drops an hourly refresh.
 concurrency:
-  group: buoy
+  group: data-refresh
   cancel-in-progress: false
 
 jobs:
@@ -29,6 +31,7 @@ jobs:
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add docs/data/hadera-waves.json
             git commit -m "data: refresh buoy measurements [skip ci]"
+            git pull --rebase origin master
             git push
           else
             echo "No changes."
