@@ -6,21 +6,27 @@
 //     preferred, but the last successful response is served when offline ("the forecast you
 //     saw this morning" beats a blank screen at the beach).
 //   • Google Fonts: cache-first (immutable files).
-//   • Beachcam snapshots are deliberately NOT cached (unique URL every request).
 // Bump VERSION on any shell change — activate cleans older caches.
-const VERSION = "v2";
+const VERSION = "v3";
 const SHELL_CACHE = `yp-shell-${VERSION}`;
 const API_CACHE = `yp-api-${VERSION}`;
 const FONT_CACHE = `yp-fonts-${VERSION}`;
+const API_CACHE_MAX = 60;   // the hourly ?v= cache-busters would otherwise grow this forever
 
 const SHELL = [
-  "./", "index.html", "manifest.json",
-  "icon-192.png", "icon-512.png", "brand-badge.png", "apple-touch-icon.png", "favicon.ico",
+  "./", "manifest.json",
+  "icon-192.png", "icon-512.png", "icon-192-maskable.png", "icon-512-maskable.png",
+  "brand-badge.png", "apple-touch-icon.png", "favicon.ico", "badge-96.png",
   ...Array.from({ length: 10 }, (_, i) => `img/waves/wave-${i}.png`),
 ];
 
 self.addEventListener("install", e => {
-  e.waitUntil(caches.open(SHELL_CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  // Per-asset, not addAll: one missing PNG must not silently veto the whole install.
+  e.waitUntil(
+    caches.open(SHELL_CACHE)
+      .then(c => Promise.allSettled(SHELL.map(u => c.add(u))))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener("activate", e => {
@@ -32,11 +38,16 @@ self.addEventListener("activate", e => {
   );
 });
 
-async function networkFirst(req, cacheName) {
+async function trimCache(cache, max) {
+  const keys = await cache.keys();
+  if (keys.length > max) await Promise.all(keys.slice(0, keys.length - max).map(k => cache.delete(k)));
+}
+
+async function networkFirst(req, cacheName, max) {
   const cache = await caches.open(cacheName);
   try {
     const res = await fetch(req);
-    if (res && res.ok) cache.put(req, res.clone());
+    if (res && res.ok) { cache.put(req, res.clone()); if (max) trimCache(cache, max); }
     return res;
   } catch (err) {
     const hit = await cache.match(req);
@@ -56,52 +67,67 @@ async function cacheFirst(req, cacheName) {
 
 self.addEventListener("fetch", e => {
   const req = e.request;
-  if (req.method !== "GET") return;
+  if (req.method !== "GET" || !req.url.startsWith("http")) return;   // ignore chrome-extension:// etc.
   const url = new URL(req.url);
 
-  // Page navigations: fresh when online, cached shell when offline.
+  // Page navigations: fresh when online, cached shell when offline. Only a 2xx page may
+  // overwrite the stored shell — caching a GitHub Pages 404/500 would break offline for good.
   if (req.mode === "navigate") {
     e.respondWith(
       fetch(req)
-        .then(res => { const copy = res.clone(); caches.open(SHELL_CACHE).then(c => c.put("index.html", copy)); return res; })
-        .catch(async () => (await caches.match(req)) || (await caches.match("index.html")) || (await caches.match("./")))
+        .then(res => {
+          if (res && res.ok) { const copy = res.clone(); caches.open(SHELL_CACHE).then(c => c.put("./", copy)); }
+          return res;
+        })
+        .catch(async () => (await caches.match(req)) || (await caches.match("./")))
     );
     return;
   }
 
   if (url.origin === location.origin) {
     // Hourly-refreshed data feeds (buoy, jellyfish) — prefer fresh, fall back to last known.
-    if (url.pathname.includes("/data/")) { e.respondWith(networkFirst(req, API_CACHE)); return; }
+    if (url.pathname.includes("/data/")) { e.respondWith(networkFirst(req, API_CACHE, API_CACHE_MAX)); return; }
     // Static shell assets.
     e.respondWith(cacheFirst(req, SHELL_CACHE));
     return;
   }
 
   // Forecast + archive APIs: last successful forecast is the offline fallback.
-  if (url.hostname.endsWith("open-meteo.com")) { e.respondWith(networkFirst(req, API_CACHE)); return; }
+  if (url.hostname.endsWith("open-meteo.com")) { e.respondWith(networkFirst(req, API_CACHE, API_CACHE_MAX)); return; }
 
   // Web fonts.
   if (url.hostname === "fonts.googleapis.com" || url.hostname === "fonts.gstatic.com") {
     e.respondWith(cacheFirst(req, FONT_CACHE));
     return;
   }
-  // Everything else (e.g. beachcam snapshots): straight to the network, untouched.
+  // Everything else: straight to the network, untouched.
 });
 
 // ---- Web Push: the server-sent twin of the in-app palata alert ----
 // Payload JSON: { title, body, tag, url } — composed by scripts/send-push.mjs (the copy pool
 // lives there and in index.html's notifyCopy; keep the voice in sync).
-// TODO: add a monochrome badge-96.png (white silhouette of the logo) for the Android status bar.
 self.addEventListener("push", e => {
   let d = {};
   try { d = e.data ? e.data.json() : {}; } catch (err) {}
   e.waitUntil(self.registration.showNotification(d.title || "🌊 ים פלטה!", {
     body: d.body || "הים רגוע — שווה לבדוק.",
     icon: "icon-192.png",
+    badge: "badge-96.png",
     tag: d.tag || "yam-palata",
     lang: "he", dir: "rtl",
     data: { url: d.url || "./" },
   }));
+});
+
+// Browsers occasionally rotate push subscriptions; re-subscribe so the permission stays live.
+// The page re-submits the fresh subscription to the sheet on its next open.
+self.addEventListener("pushsubscriptionchange", e => {
+  const opts = e.oldSubscription && e.oldSubscription.options;
+  if (opts && opts.applicationServerKey) {
+    e.waitUntil(self.registration.pushManager.subscribe({
+      userVisibleOnly: true, applicationServerKey: opts.applicationServerKey,
+    }).catch(() => {}));
+  }
 });
 
 self.addEventListener("notificationclick", e => {

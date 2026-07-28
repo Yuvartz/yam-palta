@@ -27,6 +27,19 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="YAM PALATA" />
 
+  <!-- iOS launch screens (dark, logo-centred) — without these a cold launch flashes white. -->
+  <link rel="apple-touch-startup-image" media="screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/splash-640x1136.png" />
+  <link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/splash-750x1334.png" />
+  <link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/splash-828x1792.png" />
+  <link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1125x2436.png" />
+  <link rel="apple-touch-startup-image" media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1170x2532.png" />
+  <link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1179x2556.png" />
+  <link rel="apple-touch-startup-image" media="screen and (device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1206x2622.png" />
+  <link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1242x2688.png" />
+  <link rel="apple-touch-startup-image" media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1284x2778.png" />
+  <link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1290x2796.png" />
+  <link rel="apple-touch-startup-image" media="screen and (device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1320x2868.png" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet" />
@@ -354,6 +367,9 @@
     .error-box button { margin-top: 10px; }
     .hidden { display: none !important; }
 
+    .install-tip { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 58px); inset-inline-end: 12px; z-index: 40;
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 10px 14px;
+      font-size: 13px; box-shadow: 0 8px 24px -8px rgba(0,0,0,.6); cursor: pointer; animation: fadeUp .4s ease both; }
     .modal-back { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: none; align-items: center; justify-content: center; z-index: 50; padding: 20px; }
     .modal-back.show { display: flex; }
     .modal { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 22px; width: 100%; max-width: 380px; }
@@ -528,8 +544,10 @@
     //   2. Create a Google Form with 4 short-answer questions (beach / lat / lon / subscription),
     //      grab the entry.NNN ids from a pre-filled link, paste below.
     //   3. Publish the linked Sheet as CSV and add its URL as repo secret SUBSCRIBERS_CSV_URL.
+    // Public key filled in — safe to publish (the PRIVATE key lives only in repo secrets;
+    // see SETUP-PUSH.md for the remaining Form/Sheet setup that turns the pipeline on).
     const PUSH = {
-      vapidPublicKey: "",
+      vapidPublicKey: "BO4TStlec2oXqIQcRZLKGFBEQmzXwM6RMw_B9IS6elX5HQ6Xyj3KXOC6v4sEZcwtpVGen8iW8o7hFql64sM0pgM",
       formUrl: "",
       entry: { beach: "", lat: "", lon: "", sub: "" },
     };
@@ -1406,6 +1424,19 @@
       renderInstallSteps();
       window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installPromptEvent = e; });
       window.addEventListener("appinstalled", () => { installPromptEvent = null; btn.classList.remove("show"); track("pwa-install"); });
+      // The 📲 top-bar button is easy to miss on touch (its title tooltip never shows), so nudge
+      // once, from the second visit on — installing is what unlocks notifications on iOS.
+      const visits = (parseInt(localStorage.getItem("yp-visits") || "0", 10) || 0) + 1;
+      localStorage.setItem("yp-visits", String(visits));
+      if (visits >= 2 && !localStorage.getItem("yp-install-tip")) {
+        localStorage.setItem("yp-install-tip", "1");
+        const tip = document.createElement("div");
+        tip.className = "install-tip";
+        tip.textContent = "📲 אפשר להתקין את ים פלטה כאפליקציה — לחצו כאן";
+        tip.onclick = () => { tip.remove(); installApp(); };
+        document.body.appendChild(tip);
+        setTimeout(() => tip.remove(), 12000);
+      }
     }
     async function installApp() {
       if (installPromptEvent) {
@@ -1421,7 +1452,12 @@
     // Notifications (now active 24/7 — night tracking is no longer suppressed)
     function refreshNotifyBtn() {
       const btn = $("notifyBtn");
-      if (!("Notification" in window)) { btn.textContent = "🔕 הדפדפן לא תומך בהתראות"; btn.disabled = true; return; }
+      if (!("Notification" in window)) {
+        // iOS Safari only exposes Notification/Push to INSTALLED web apps (iOS 16.4+) — so a plain
+        // "not supported" message would mislead exactly the users we most want to guide.
+        if (isIOSDevice() && !isStandaloneMode()) { btn.textContent = "📲 להתראות באייפון: קודם התקינו למסך הבית"; btn.onclick = installApp; return; }
+        btn.textContent = "🔕 הדפדפן לא תומך בהתראות"; btn.disabled = true; return;
+      }
       if (Notification.permission === "granted") { btn.textContent = "✅ התראות פעילות"; btn.classList.add("ok"); }
       else if (Notification.permission === "denied") btn.textContent = "🔕 התראות חסומות בדפדפן";
       else btn.textContent = "🔔 הפעל התראות על ים פלטה";
@@ -1469,6 +1505,17 @@
       ];
       return { title: deluxe ? `💎 פלטה דלוקס ב${beach}!` : `🌊 ים פלטה ב${beach}!`, body: pool[Math.floor(Math.random() * pool.length)] };
     }
+    // iOS home-screen web apps have no window.Notification constructor — notifications MUST go
+    // through the service worker there (and it's the more robust path everywhere else too).
+    function showLocalNotification(title, body) {
+      const opts = { body, icon: "icon-192.png", badge: "badge-96.png", tag: "yam-palata", lang: "he", dir: "rtl" };
+      const fallback = () => { try { new Notification(title, opts); } catch (e) {} };
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.getRegistration()
+          .then(reg => { if (reg && reg.showNotification) reg.showNotification(title, opts); else fallback(); })
+          .catch(fallback);
+      } else fallback();
+    }
     function maybeNotify() {
       if (!("Notification" in window) || Notification.permission !== "granted") return;
       const cur = currentHourData(); const swimNow = cur ? isSwimHour(cur) : false;
@@ -1476,9 +1523,9 @@
       if (swimNow && !wasSwim) {
         const now = israelNow();
         const win = bestWindowForDay(now.dateStr);
-        const c = notifyCopy(isDeluxeHour(cur), allLocations()[LS.loc].name,
+        const c = notifyCopy(isDeluxeHour(cur), (allLocations()[LS.loc] || BUILTIN.telaviv).name,
           cur.seaTemp != null ? round(cur.seaTemp) : null, win ? win.end.hour + 1 : null, palataIndex(cur));
-        try { new Notification(c.title, { body: c.body, icon: "icon-192.png", tag: "yam-palata", lang: "he", dir: "rtl" }); } catch (e) {}
+        showLocalNotification(c.title, c.body);
       }
       sessionStorage.setItem("yp-was-swim", swimNow ? "1" : "0");
     }
