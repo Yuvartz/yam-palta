@@ -103,8 +103,8 @@
     .jelly-loc { font-weight: 700; font-size: 14px; }
     .jelly-loc.jelly-near { color: #ff9db0; }
     .jelly-meta { color: var(--muted); font-size: 12px; }
-    .jelly-when { color: var(--muted); font-size: 11px; font-family: var(--mono); white-space: nowrap; }
-    .credit { font-size: 11px; color: var(--muted); margin-top: 12px; }
+    .jelly-when { color: var(--muted); font-size: 12px; font-family: var(--mono); white-space: nowrap; }
+    .credit { font-size: 12px; color: var(--muted); margin-top: 12px; }
     .feedback-card .fb-q { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
     .fb-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .fb-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 4px; border-radius: 12px;
@@ -133,14 +133,15 @@
     .sd-icon { display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 13px; }
     .sd-icon svg { width: 16px; height: 16px; }
     .sd-label { font-size: 12.5px; font-weight: 700; color: var(--text); }
-    .sd-label small { display: block; color: var(--muted); font-weight: 500; font-size: 10.5px; }
+    .sd-label small { display: block; color: var(--muted); font-weight: 500; font-size: 11px; }
     .sd-value { font-size: 12px; color: var(--muted); text-align: left; white-space: nowrap; }
     .sd-sub { font-size: 13px; font-weight: 800; text-align: left; }
     .sd-note { font-size: 11px; color: var(--warn); padding: 8px 2px 4px; border-top: 1px solid var(--border); margin-top: 2px; line-height: 1.5; }
     .hero h1 { font-size: 30px; font-weight: 900; margin: 0 0 6px; transition: color .4s; }
     .hero .sub { color: var(--muted); font-size: 15px; margin: 0; max-width: 330px; }
-    .hero .conf { color: var(--muted); font-size: 12px; margin: 4px 0 0; opacity: .8; }
-    .hero .buoy { color: var(--muted); font-size: 12px; margin: 6px 0 0; opacity: .75; max-width: 330px; }
+    .hero .conf { color: var(--muted); font-size: 12px; margin: 4px 0 0; }
+    .hero .buoy { color: var(--muted); font-size: 12px; margin: 6px 0 0; max-width: 330px; }
+    .hero .buoy a { color: inherit; }
     .hero .buoy.warn { color: #f0a55a; opacity: 1; font-weight: 600; background: rgba(240,165,90,.1);
       border: 1px solid rgba(240,165,90,.35); border-radius: 8px; padding: 6px 10px; }
     /* Warnings zone — top of the hero, holds jellyfish now (polluted-sea etc. later) */
@@ -265,7 +266,7 @@
     .tl-nav { width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--border); background: rgba(255,255,255,.04); color: var(--muted);
       font-family: var(--sans); font-size: 12px; line-height: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; position: relative; }
     .tl-nav::after { content: ""; position: absolute; inset: -12px; }   /* 44px effective touch target, visual stays 20px */
-    .tl-nav:disabled { opacity: .25; cursor: default; }
+    .tl-nav:disabled { opacity: .45; cursor: default; }
     .tl-nav:not(:disabled):active { transform: scale(.9); }
     .tl-body { display: flex; flex-direction: column; gap: 2px; }
     .tl-body.tl-next { animation: tlEnterNext .3s cubic-bezier(.2,.8,.3,1) both; }
@@ -306,7 +307,7 @@
     .ind-value small { font-size: 11px; color: var(--muted); font-weight: 500; }
     .ind-bar { position: relative; width: 100%; height: 7px; background: var(--bg-2); border-radius: 999px; direction: ltr; }
     .ind-bar > i { position: absolute; left: 0; top: 0; height: 100%; border-radius: 999px; transition: width .5s; }
-    .ind-cap { font-size: 10px; color: var(--muted); font-family: var(--mono); }
+    .ind-cap { font-size: 11px; color: var(--muted); font-family: var(--mono); }
 
     /* Metrics */
     .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -321,7 +322,7 @@
     .metric.combo .label { justify-content: center; }
     .metric.combo .value { font-size: 15px; font-weight: 700; }
     .metric.combo .compass { font-family: var(--sans); }
-    .wave-note { font-size: 11px; color: var(--muted); margin: 12px 0 0; line-height: 1.5; }
+    .wave-note { font-size: 12px; color: var(--muted); margin: 12px 0 0; line-height: 1.5; }
     .metrics-date { font-size: 12px; color: var(--muted); font-weight: 700; margin-bottom: 10px; }
     .metrics-date:empty { display: none; }
 
@@ -358,7 +359,8 @@
     .btn.ok { border-color: rgba(45,212,191,.5); color: var(--calm); }
     .btn.ghost { background: transparent; }
     .updated { text-align: center; color: var(--muted); font-size: 12px; margin-top: 4px; }
-    .updated .num { color: #6b7a90; }
+    .updated .num { color: var(--muted); }
+    .updated a { color: inherit; }
 
     .state-msg { text-align: center; color: var(--muted); padding: 40px 0; }
     .spinner { width: 34px; height: 34px; border: 3px solid var(--border); border-top-color: var(--calm); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 14px; }
@@ -370,6 +372,9 @@
     .install-tip { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 58px); inset-inline-end: 12px; z-index: 40;
       background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 10px 14px;
       font-size: 13px; box-shadow: 0 8px 24px -8px rgba(0,0,0,.6); cursor: pointer; animation: fadeUp .4s ease both; }
+    .modal-error { color: #ffb4b4; font-size: 13px; margin-top: 8px; }
+    .modal-error:empty { display: none; }
+    [role="button"]:focus-visible { outline: 2px solid var(--calm); outline-offset: 3px; border-radius: 8px; }
     .modal-back { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: none; align-items: center; justify-content: center; z-index: 50; padding: 20px; }
     .modal-back.show { display: flex; }
     .modal { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 22px; width: 100%; max-width: 380px; }
@@ -394,9 +399,9 @@
     </div>
 
     <div class="locations" id="locations"></div>
-    <div class="alert-banner" id="alertBanner"></div>
+    <div class="alert-banner" id="alertBanner" aria-live="polite"></div>
 
-    <div id="errorBox" class="error-box hidden">
+    <div id="errorBox" class="error-box hidden" role="alert">
       <div id="errorText">שגיאה בטעינת הנתונים.</div>
       <button class="btn" onclick="App.refresh()">נסה שוב</button>
     </div>
@@ -449,8 +454,8 @@
       <div class="card">
         <h2>העדפה אישית</h2>
         <div class="slider-row">
-          <div class="top"><span class="lbl">טמפ׳ מים מינימלית לשחייה</span><span class="val"><span id="waterVal" class="num">26</span>°C</span></div>
-          <input type="range" id="waterSlider" min="18" max="31" step="0.1" value="26" />
+          <div class="top"><label class="lbl" for="waterSlider">טמפ׳ מים מינימלית לשחייה</label><span class="val"><span id="waterVal" class="num">26</span>°C</span></div>
+          <input type="range" id="waterSlider" min="18" max="31" step="0.1" value="26" aria-label="טמפרטורת מים מינימלית לשחייה במעלות" />
           <div class="credit">קובע רק את הערת הנוחות ליד טמפ׳ המים — לא משפיע על מדד הפלטה</div>
         </div>
         <button class="btn" id="notifyBtn" onclick="App.enableNotifications()">🔔 הפעל התראות על ים פלטה</button>
@@ -461,16 +466,17 @@
   </div>
 
   <div class="modal-back" id="addModal">
-    <div class="modal">
-      <h3>הוספת מיקום</h3>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="addModalTitle">
+      <h3 id="addModalTitle">הוספת מיקום</h3>
       <p class="hint">בחר מתוך הרשימה, או הזן מיקום מותאם עם קואורדינטות.</p>
-      <div class="field"><label>מיקום מוכן</label><select id="presetSelect"></select></div>
+      <div class="field"><label for="presetSelect">מיקום מוכן</label><select id="presetSelect"></select></div>
       <div class="sep">— או מיקום מותאם —</div>
-      <div class="field"><label>שם</label><input id="customName" type="text" placeholder="למשל: אילת" /></div>
+      <div class="field"><label for="customName">שם</label><input id="customName" type="text" placeholder="למשל: אילת" /></div>
       <div class="row2">
-        <div class="field"><label>קו רוחב (lat)</label><input id="customLat" type="number" step="0.0001" inputmode="decimal" placeholder="29.55" /></div>
-        <div class="field"><label>קו אורך (lon)</label><input id="customLon" type="number" step="0.0001" inputmode="decimal" placeholder="34.95" /></div>
+        <div class="field"><label for="customLat">קו רוחב (lat)</label><input id="customLat" type="number" step="0.0001" inputmode="decimal" placeholder="29.55" /></div>
+        <div class="field"><label for="customLon">קו אורך (lon)</label><input id="customLon" type="number" step="0.0001" inputmode="decimal" placeholder="34.95" /></div>
       </div>
+      <div class="modal-error" id="addModalError" role="alert"></div>
       <div class="modal-actions">
         <button class="btn ok" onclick="App.confirmAdd()">הוסף</button>
         <button class="btn ghost" onclick="App.closeAdd()">ביטול</button>
@@ -479,8 +485,8 @@
   </div>
 
   <div class="modal-back" id="installModal">
-    <div class="modal">
-      <h3>הוספה למסך הבית</h3>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="installModalTitle">
+      <h3 id="installModalTitle">הוספה למסך הבית</h3>
       <div id="installSteps"></div>
       <div class="modal-actions">
         <button class="btn ok" onclick="App.closeInstall()">הבנתי</button>
@@ -940,7 +946,9 @@
         ${skyStars}${moon}
         <div class="hero-content">
           ${warningsHTML()}
-          <div class="hero-score${scoreOpen ? " open" : ""}" style="color:${scCol}" onclick="App.toggleScore()">
+          <div class="hero-score${scoreOpen ? " open" : ""}" style="color:${scCol}" onclick="App.toggleScore()"
+               role="button" tabindex="0" aria-expanded="${scoreOpen}" aria-label="מדד הפלטה — הצג פירוט"
+               onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();App.toggleScore()}">
             <span class="sc-num">${score != null ? (score / 10).toFixed(1) : "—"}</span><span class="sc-max">/10</span>
             <div class="sc-label">מדד הפלטה <span class="sc-chev">${scoreOpen ? "▴" : "▾"}</span></div>
           </div>
@@ -975,7 +983,7 @@
           <span class="sd-icon">${r.icon}</span>
           <span class="sd-label">${r.label}<small>משקל ${r.weight}%</small></span>
           <span class="sd-value num">${r.value != null ? r.value.toFixed(r.dec) + " " + r.unit : "—"}</span>
-          <span class="sd-sub num" style="color:${subScoreColor(r.sub)}">${r.sub >= 0.65 ? "✅" : r.sub >= 0.35 ? "⚠️" : "❗"}</span>
+          <span class="sd-sub num" style="color:${subScoreColor(r.sub)}" role="img" aria-label="${r.sub >= 0.65 ? "מצוין" : r.sub >= 0.35 ? "בינוני" : "בעייתי"}" title="${r.sub >= 0.65 ? "מצוין" : r.sub >= 0.35 ? "בינוני" : "בעייתי"}">${r.sub >= 0.65 ? "✅" : r.sub >= 0.35 ? "⚠️" : "❗"}</span>
         </div>`).join("");
       return `<div class="score-detail" onclick="event.stopPropagation()">${body}</div>`;
     }
@@ -1218,14 +1226,16 @@
     }
     function renderForecast() {
       $("forecast").innerHTML = forecastDays(6).map(d => `
-        <div class="day" id="d-${d.dateStr}" onclick="App.toggleDay('${d.dateStr}')"><div class="name">${hebrewDay(d.dateStr)}<small>${shortDate(d.dateStr)}</small></div><div class="bar"><i style="width:${d.pct}%"></i></div><div class="pct">${d.pct}%</div><span class="chev">▾</span></div>
+        <div class="day" id="d-${d.dateStr}" onclick="App.toggleDay('${d.dateStr}')"
+             role="button" tabindex="0" aria-expanded="false" aria-label="תחזית שעתית ל${hebrewDay(d.dateStr)}"
+             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();App.toggleDay('${d.dateStr}')}"><div class="name">${hebrewDay(d.dateStr)}<small>${shortDate(d.dateStr)}</small></div><div class="bar"><i style="width:${d.pct}%"></i></div><div class="pct">${d.pct}%</div><span class="chev">▾</span></div>
         <div class="day-hours" id="dh-${d.dateStr}"></div>`).join("");
     }
     function toggleDay(ds) {
       const el = $("dh-" + ds), row = $("d-" + ds); if (!el) return;
       const open = el.classList.toggle("open");
       if (open && !el.innerHTML) el.innerHTML = dayHoursHTML(ds);
-      if (row) row.classList.toggle("expanded", open);
+      if (row) { row.classList.toggle("expanded", open); row.setAttribute("aria-expanded", String(open)); }
     }
     // Best contiguous swim-worthy (tier >= Palata) window within one day, by average index.
     // For today, only future hours count — a window that already passed isn't "the next window".
@@ -1479,9 +1489,9 @@
         installPromptEvent = null;
         return;
       }
-      $("installModal").classList.add("show");
+      openModal("installModal");
     }
-    function closeInstall() { $("installModal").classList.remove("show"); }
+    function closeInstall() { closeModal("installModal"); }
 
     // Notifications (now active 24/7 — night tracking is no longer suppressed)
     function refreshNotifyBtn() {
@@ -1592,6 +1602,18 @@
       } catch (e) { console.error(e); if (hourly.length === 0) showError("לא ניתן לטעון נתונים. בדוק חיבור לאינטרנט ונסה שוב."); }
     }
 
+    // Modal focus management: remember the opener, focus into the dialog, restore on close.
+    let modalOpener = null;
+    function openModal(id, focusId) {
+      modalOpener = document.activeElement;
+      $(id).classList.add("show");
+      const f = focusId && $(focusId); if (f) f.focus();
+    }
+    function closeModal(id) {
+      $(id).classList.remove("show");
+      if (modalOpener && modalOpener.focus) modalOpener.focus();
+      modalOpener = null;
+    }
     function openAdd() {
       const have = allLocations(); const opts = Object.entries(PRESETS).filter(([k]) => !have[k]);
       const groups = {};
@@ -1600,14 +1622,15 @@
         Object.entries(groups).map(([g, arr]) =>
           `<optgroup label="${g}">` + arr.map(([k, v]) => `<option value="${k}">${v.name}</option>`).join("") + `</optgroup>`).join("");
       $("customName").value = ""; $("customLat").value = ""; $("customLon").value = "";
-      $("addModal").classList.add("show");
+      $("addModalError").textContent = "";
+      openModal("addModal", "presetSelect");
     }
-    function closeAdd() { $("addModal").classList.remove("show"); }
+    function closeAdd() { closeModal("addModal"); }
     function confirmAdd() {
       const customs = LS.customs, presetKey = $("presetSelect").value;
       if (presetKey && PRESETS[presetKey]) { customs[presetKey] = PRESETS[presetKey]; LS.customs = customs; return finishAdd(presetKey); }
       const name = $("customName").value.trim(), lat = parseFloat($("customLat").value), lon = parseFloat($("customLon").value);
-      if (!name || isNaN(lat) || isNaN(lon)) { alert("נא למלא שם וקואורדינטות תקינות, או לבחור מיקום מהרשימה."); return; }
+      if (!name || isNaN(lat) || isNaN(lon)) { $("addModalError").textContent = "נא למלא שם וקואורדינטות תקינות, או לבחור מיקום מהרשימה."; return; }
       const key = "c" + Date.now(); customs[key] = { name, lat, lon }; LS.customs = customs; finishAdd(key);
     }
     function finishAdd(key) { closeAdd(); LS.loc = key; renderLocations(); hourly = []; heroDay = 0; load(); }
@@ -1615,8 +1638,16 @@
     // 📍 Nearest-beach geolocation: snap to the closest known beach (builtin/preset/custom) when
     // within 40km; otherwise pin an exact "המיקום שלי" point — works for Israel, Sinai and Greece
     // alike since the forecast APIs are global. Requires https (GitHub Pages) or localhost.
+    // Lightweight toast — replaces blocking alert() popups that broke the RTL/dark styling.
+    function toast(msg) {
+      const t = document.createElement("div");
+      t.className = "install-tip"; t.setAttribute("role", "alert"); t.textContent = msg;
+      t.onclick = () => t.remove();
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 6000);
+    }
     function useMyLocation() {
-      if (!navigator.geolocation) { alert("הדפדפן לא תומך באיתור מיקום."); return; }
+      if (!navigator.geolocation) { toast("הדפדפן לא תומך באיתור מיקום."); return; }
       const btn = $("geoBtn"); if (btn) { btn.disabled = true; btn.textContent = "📍 מאתר…"; }
       const restore = () => { const b = $("geoBtn"); if (b) { b.disabled = false; b.textContent = "📍 קרוב אליי"; } };
       navigator.geolocation.getCurrentPosition(pos => {
@@ -1634,7 +1665,7 @@
           const c = LS.customs; c.geo = { name: "המיקום שלי", lat: +la.toFixed(4), lon: +lo.toFixed(4) }; LS.customs = c;
           finishAdd("geo");
         }
-      }, () => { restore(); alert("לא הצלחנו לאתר מיקום — ודא שאישרת גישה למיקום בדפדפן."); },
+      }, () => { restore(); toast("לא הצלחנו לאתר מיקום — ודא שאישרת גישה למיקום בדפדפן."); },
         { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 });
     }
 
@@ -1648,6 +1679,11 @@
       wt.addEventListener("input", () => { waterMin = parseFloat(wt.value); LS.water = waterMin; $("waterVal").textContent = fmtT(waterMin); if (hourly.length) { renderIndicators(); renderWaveDetails(); } });
       $("addModal").addEventListener("click", e => { if (e.target.id === "addModal") closeAdd(); });
       $("installModal").addEventListener("click", e => { if (e.target.id === "installModal") closeInstall(); });
+      document.addEventListener("keydown", e => {
+        if (e.key !== "Escape") return;
+        if ($("addModal").classList.contains("show")) closeAdd();
+        else if ($("installModal").classList.contains("show")) closeInstall();
+      });
       setupInstall();
       // Offline + fast repeat loads. Registration is best-effort: the app works identically
       // without it (e.g. first visit, private windows, very old browsers).
