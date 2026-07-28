@@ -7,14 +7,14 @@
 //     saw this morning" beats a blank screen at the beach).
 //   • Google Fonts: cache-first (immutable files).
 // Bump VERSION on any shell change — activate cleans older caches.
-const VERSION = "v3";
+const VERSION = "v4";
 const SHELL_CACHE = `yp-shell-${VERSION}`;
 const API_CACHE = `yp-api-${VERSION}`;
 const FONT_CACHE = `yp-fonts-${VERSION}`;
 const API_CACHE_MAX = 60;   // the hourly ?v= cache-busters would otherwise grow this forever
 
 const SHELL = [
-  "./", "manifest.json",
+  "./", "manifest.json", "palata.js",
   "icon-192.png", "icon-512.png", "icon-192-maskable.png", "icon-512-maskable.png",
   "brand-badge.png", "apple-touch-icon.png", "favicon.ico", "badge-96.png",
   ...Array.from({ length: 10 }, (_, i) => `img/waves/wave-${i}.png`),

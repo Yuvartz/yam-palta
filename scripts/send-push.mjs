@@ -6,10 +6,13 @@
 // Env (repo secrets): VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, SUBSCRIBERS_CSV_URL
 // Exits quietly when any is missing, so the workflow is safe to ship before setup.
 //
-// ⚠️ SYNC NOTES:
-//  • The scoring math below mirrors docs/index.html (PALATA_WEIGHTS, score curves, heightTierCap).
-//    If you tune the index there, tune it here.
-//  • The copy pool mirrors notifyCopy() in docs/index.html — one voice, two channels.
+// Scoring math + notification copy are imported from docs/palata.js — the single shared
+// definition the page uses too. Tune there, both channels follow.
+
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const Palata = require("../docs/palata.js");
+const { toKnots, notifyCopy, eveningCopy, CALM_MIN, DELUXE_MIN, HISTORY_HOURS } = Palata;
 
 const VAPID_PUBLIC = process.env.VAPID_PUBLIC_KEY;
 const VAPID_PRIVATE = process.env.VAPID_PRIVATE_KEY;
@@ -17,47 +20,15 @@ const CSV_URL = process.env.SUBSCRIBERS_CSV_URL;
 const APP_URL = "https://yuvartz.github.io/yam-palta/";
 
 const DAY_START = 6, DAY_END = 19;   // notify only for daytime windows — nobody swims at 03:00
-const CALM_MIN = 80;                 // "כמעט פלטה" tier or better, same bar as the app
-const DELUXE_MIN = 98;
-
-// ---- Palata Index (mirror of docs/index.html) ----
-const W = { height: 0.35, chop: 0.25, wind: 0.25, history: 0.15 };
-const clamp01 = x => Math.max(0, Math.min(1, x));
-const toKnots = kmh => kmh / 1.852;
-const heightScore = h => h == null ? .5 : clamp01(1 - Math.max(0, h - 0.10) / 1.1);
-const chopScore = c => c == null ? .5 : clamp01(1 - Math.max(0, c - 0.10) / 0.45);
-const windScore = kt => kt == null ? .5 : clamp01(1 - kt / 14);
-const heightCap = h => h == null ? 100 : h > 0.35 ? 79 : h > 0.20 ? 89 : h > 0.10 ? 97 : 100;
 
 function palataIndex(hours, i) {
   const h = hours[i];
-  const wind = h.windKmh != null ? toKnots(h.windKmh) : null;
-  const histSlice = hours.slice(Math.max(0, i - 9), i + 1).map(x => x.windKmh).filter(v => v != null);
+  const wind = toKnots(h.windKmh);
+  const histSlice = hours.slice(Math.max(0, i - (HISTORY_HOURS - 1)), i + 1).map(x => x.windKmh).filter(v => v != null);
   const hist = histSlice.length ? toKnots(histSlice.reduce((a, b) => a + b, 0) / histSlice.length) : wind;
   const chop = h.windWave != null ? h.windWave : h.waveHeight;
-  const sum = heightScore(h.waveHeight) * W.height + chopScore(chop) * W.chop + windScore(wind) * W.wind + windScore(hist) * W.history;
-  return Math.min(Math.round(clamp01(sum) * 100), heightCap(h.waveHeight));
+  return Palata.scoreOf(h.waveHeight, chop, wind, hist);
 }
-
-// ---- Copy pool (mirror of notifyCopy in docs/index.html) ----
-function notifyCopy(deluxe, beach, water, endHour) {
-  const w = water != null ? ` · מים ${Math.round(water)}°` : "";
-  const end = endHour != null ? ` · החלון עד ${String(endHour).padStart(2, "0")}:00` : "";
-  const pool = deluxe ? [
-    `הים חלק כמו מראה${w}. נדיר — רוץ 🪞`,
-    `דלוקס אמיתי${w}${end}. שנייה לפני שכולם מגלים 🤫`,
-    `זה היום שמחכים לו${w}. הכל שטוח, הכל שלך 💎`,
-  ] : [
-    `הים נרגע${w}${end}. עזוב הכל 🐢`,
-    `פלטה עכשיו${w}. הים לא מחכה לנצח 🌊`,
-    `הים התיישר${w}${end}. סגור את המחשב ובוא 🏊`,
-  ];
-  return { title: deluxe ? `💎 פלטה דלוקס ב${beach}!` : `🌊 ים פלטה ב${beach}!`, body: pool[Math.floor(Math.random() * pool.length)] };
-}
-const eveningCopy = (beach, s, e) => ({
-  title: `🌅 מחר פלטה ב${beach}`,
-  body: `צפוי ים רגוע ${String(s).padStart(2, "0")}:00–${String(e).padStart(2, "0")}:00. כוון שעון, הים מחכה.`,
-});
 
 // ---- Helpers ----
 function israelNowHour() {
@@ -154,7 +125,7 @@ async function main() {
     if (daytime && calmNow && !calmPrev) {
       // Transition into calm — the moment worth interrupting someone's day for.
       const win = calmWindow(hours, scores, now.dateStr, now.hour);
-      payload = { ...notifyCopy(scores[nowIdx] >= DELUXE_MIN, b.beach, hours[nowIdx].seaTemp, win ? win.end + 1 : null), tag: `yp-${now.dateStr}`, url: APP_URL };
+      payload = { ...notifyCopy(scores[nowIdx] >= DELUXE_MIN, b.beach, hours[nowIdx].seaTemp, win ? win.end + 1 : null, scores[nowIdx]), tag: `yp-${now.dateStr}`, url: APP_URL };
     } else if (now.hour === 19) {
       // Evening preview: tomorrow's window, so you can plan the morning swim.
       const tomorrow = new Date(now.dateStr + "T12:00:00Z"); tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);

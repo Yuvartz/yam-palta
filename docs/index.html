@@ -88,6 +88,12 @@
     .loc.add { color: var(--calm); border-style: dashed; }
     .loc.geo { color: var(--calm); }
     .loc.geo:disabled { opacity: .6; cursor: default; }
+    .loc-wrap { position: relative; flex: 0 0 auto; display: inline-flex; }
+    .loc-wrap .loc { padding-inline-end: 30px; }
+    .loc-x { position: absolute; inset-inline-end: 6px; top: 50%; transform: translateY(-50%);
+      width: 18px; height: 18px; border-radius: 50%; border: none; background: var(--bg-2); color: var(--muted);
+      font-size: 12px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .loc-x:hover { color: var(--text); background: #3a4a6e; }
 
     .alert-banner { display: flex; gap: 11px; align-items: center; border-radius: var(--radius); padding: 13px 15px; margin-bottom: 16px;
       background: linear-gradient(135deg, rgba(255,212,121,.15), rgba(45,212,191,.10)); border: 1px solid rgba(255,212,121,.45); font-weight: 700; font-size: 14px; animation: fadeUp .4s ease both; }
@@ -136,7 +142,6 @@
     .sd-label small { display: block; color: var(--muted); font-weight: 500; font-size: 11px; }
     .sd-value { font-size: 12px; color: var(--muted); text-align: left; white-space: nowrap; }
     .sd-sub { font-size: 13px; font-weight: 800; text-align: left; }
-    .sd-note { font-size: 11px; color: var(--warn); padding: 8px 2px 4px; border-top: 1px solid var(--border); margin-top: 2px; line-height: 1.5; }
     .hero h1 { font-size: 30px; font-weight: 900; margin: 0 0 6px; transition: color .4s; }
     .hero .sub { color: var(--muted); font-size: 15px; margin: 0; max-width: 330px; }
     .hero .conf { color: var(--muted); font-size: 12px; margin: 4px 0 0; }
@@ -155,7 +160,6 @@
     .hero-warn .hw-chev { font-size: 10px; opacity: .8; }
     .hero-warn.jelly { color: #ff9db0; background: rgba(255,140,180,.12); border-color: rgba(255,140,180,.42); }
     .hero-warn.jelly.high { background: rgba(255,80,120,.18); border-color: rgba(255,80,120,.6); box-shadow: 0 0 16px -4px rgba(255,90,130,.5); }
-    .hero-warn.dirty { color: #c8a26a; background: rgba(200,162,106,.12); border-color: rgba(200,162,106,.42); }
     /* Feedback as a tap-to-open report panel */
     .fb-toggle { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
       background: rgba(45,212,191,.1); border: 1px solid rgba(45,212,191,.4); color: var(--calm);
@@ -256,7 +260,6 @@
     .next-line + .next-line { border-top: 1px solid var(--border); }
     .next-line .when { font-weight: 800; font-size: 16px; }
     .next-line .time { font-family: var(--mono); font-size: 17px; color: var(--calm); font-weight: 700; }
-    .next-line.deluxe .time { color: #ffd479; }
     .next-empty { color: var(--muted); font-size: 14px; padding: 7px 0; }
     .next-empty + .next-empty { border-top: 1px solid var(--border); }
 
@@ -288,26 +291,6 @@
     .tl-score { font-size: 14px; font-weight: 800; text-align: left; white-space: nowrap; }
     .tl-status { font-size: 11.5px; font-weight: 700; text-align: left; white-space: nowrap; }
 
-    /* Indicators — three across */
-    .indicators { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
-    .ind { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 14px 9px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: border-color .3s; }
-    .ind.ok { border-color: rgba(45,212,191,.45); }
-    .ind.warn { border-color: rgba(233,196,106,.45); }
-    .ind.over { border-color: rgba(240,165,90,.45); }
-    .ind-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: var(--card-2); }
-    .ind-icon svg { width: 23px; height: 23px; }
-    .ind.ok .ind-icon { color: var(--calm); background: rgba(45,212,191,.12); }
-    .ind.warn .ind-icon { color: #e9c46a; background: rgba(233,196,106,.12); }
-    .ind.over .ind-icon { color: var(--warn); background: rgba(240,165,90,.12); }
-    .ind-label { font-weight: 700; font-size: 12px; }
-    .ind.ok .ind-label { color: var(--calm); }
-    .ind.warn .ind-label { color: #e9c46a; }
-    .ind.over .ind-label { color: var(--warn); }
-    .ind-value { font-family: var(--mono); font-size: 20px; font-weight: 800; color: var(--text); }
-    .ind-value small { font-size: 11px; color: var(--muted); font-weight: 500; }
-    .ind-bar { position: relative; width: 100%; height: 7px; background: var(--bg-2); border-radius: 999px; direction: ltr; }
-    .ind-bar > i { position: absolute; left: 0; top: 0; height: 100%; border-radius: 999px; transition: width .5s; }
-    .ind-cap { font-size: 11px; color: var(--muted); font-family: var(--mono); }
 
     /* Metrics */
     .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -411,7 +394,6 @@
     <main id="app" class="hidden">
       <section class="hero" id="hero"></section>
       <section id="goodFor"></section>
-      <section class="indicators" id="indicators"></section>
 
       <div class="card feedback-card" id="feedbackCard" style="display:none">
         <button class="fb-toggle" onclick="App.toggleFeedback()">🌊 אתה בים עכשיו? <span class="fb-chev" id="fbChev">▾</span></button>
@@ -494,6 +476,7 @@
     </div>
   </div>
 
+  <script src="palata.js"></script>
   <script>
   const App = (() => {
     "use strict";
@@ -536,10 +519,6 @@
         snapshot: "entry.172162928",    // compact param string (chop/wind/hist/swell/water/wave/time)
       },
     };
-    // Anonymous usage analytics via GoatCounter — dormant until configured. No cookies, no PII,
-    // no user accounts; the dashboard lives at https://<code>.goatcounter.com (owner login only).
-    // To switch on: create a free account at goatcounter.com, pick a site code, paste it below.
-    const ANALYTICS = { goatcounter: "" };   // e.g. "yampalata"
 
     // Real push notifications ("palata alerts to a locked phone") — dormant until configured,
     // same zero-backend pattern as FEEDBACK: the browser's push subscription is submitted to a
@@ -562,26 +541,18 @@
     // pending written permission from info@beachcam.co.il — see EMAIL-beachcam.md in the repo root.
 
     const DAY_START = 6, DAY_END = 19;          // used ONLY for percentage/streak summaries
-    const KMH_PER_KNOT = 1.852;
     const REFRESH_MS = 15 * 60 * 1000;
     const WONDERFUL_SEA = 29;
     const ALERT_PCT = 80;
-    const HISTORY_HOURS = 10;                   // trailing window for the "Wind History" factor (doc says 8-12h)
+    const HISTORY_HOURS = Palata.HISTORY_HOURS; // trailing window for the "Wind History" factor
     const COMPASS = ["צפונית", "צפונית-מזרחית", "מזרחית", "דרומית-מזרחית", "דרומית", "דרומית-מערבית", "מערבית", "צפונית-מערבית"];
     const ARROWS = ["↓", "↙", "←", "↖", "↑", "↗", "→", "↘"];
 
     // Palata Index v2: 4 weighted factors (0-100). Thresholds are the vision doc's own draft
     // assumptions, not final — kept as named, easily-tunable curves rather than scattered magic numbers.
-    const PALATA_WEIGHTS = { height: 0.35, chop: 0.25, wind: 0.25, history: 0.15 };
-    const PALATA_TIERS = [
-      { min: 98, key: "deluxe", emoji: "🪞",  label: "פלטה דלוקס", short: "דלוקס", color: "#ffd479" },
-      { min: 90, key: "palata", emoji: "🌊",  label: "ים פלטה",    short: "פלטה",  color: "#2dd4bf" },
-      { min: 80, key: "almost", emoji: "🐢",  label: "כמעט פלטה",  short: "כמעט",  color: "#5ec9c2" },
-      { min: 60, key: "gentle", emoji: "🏊",  label: "גלי עדין",   short: "עדין",  color: "#e9c46a" },
-      { min: 40, key: "waves",  emoji: "🌬️", label: "יש גלים",    short: "גלים",  color: "#f0a55a" },
-      { min: 20, key: "big",    emoji: "🏄",  label: "גל גדול",    short: "גדול",  color: "#ec7a5a" },
-      { min: 0,  key: "stormy", emoji: "⛈️", label: "וואלאק סוער", short: "סוער",  color: "#f06a6a" },
-    ];
+    // Scoring math + tier table + notification copy live in palata.js (shared with send-push.mjs).
+    const PALATA_WEIGHTS = Palata.WEIGHTS;
+    const PALATA_TIERS = Palata.TIERS;
 
     const HEIGHT_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 15c3.5 0 4-9 8-9s4.5 9 8 9 4-4 4-4"/><path d="M2 20h20" opacity=".4"/></svg>`;
     const CHOP_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l3-4 3 4 3-4 3 4 3-4 3 4 2-2.5"/><path d="M2 19h20" opacity=".4"/></svg>`;
@@ -617,8 +588,7 @@
     const esc = s => s == null ? "" : String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
     const round = (v, d = 1) => v == null ? null : Math.round(v * 10 ** d) / 10 ** d;
     const fmt = v => v == null ? "—" : round(v).toFixed(1);
-    const toKnots = kmh => kmh / KMH_PER_KNOT;
-    const clamp01 = x => Math.max(0, Math.min(1, x));
+    const toKnots = Palata.toKnots, clamp01 = Palata.clamp01;
 
     function israelNow() {
       const s = new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Jerusalem", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }).format(new Date());
@@ -629,16 +599,8 @@
     const chopHeight = h => h.windWave != null ? h.windWave : h.waveHeight;
     const fmtT = v => Number.isInteger(v) ? String(v) : v.toFixed(1);
 
-    // ----- Palata Index v2: pure sea-state, 4 weighted factors (0-100) -----
-    // Per-factor curves follow the vision doc's draft bands (doc explicitly flags these as
-    // assumptions, not final). Each returns a 0-1 sub-score; clamp01 keeps them in range.
-    function chopScoreFn(chop) { return chop == null ? .5 : clamp01(1 - Math.max(0, chop - 0.10) / 0.45); }   // 0-0.10m excellent -> 0.55m+ ~0
-    function windScoreFn(knots) { return knots == null ? .5 : clamp01(1 - knots / 14); }                       // 0kt excellent -> 14kt+ ~0
-    function heightScoreFn(h) { return h == null ? .5 : clamp01(1 - Math.max(0, h - 0.10) / 1.1); }            // total wave height: 0-0.10m glassy -> 1.2m+ ~0 (the actual roughness you feel)
-    // Hard ceiling on the score by total wave height: "palata" means a FLAT sea, so real waves can
-    // never be called palata no matter how calm the wind. Caps sit just under each tier's floor
-    // (deluxe 98 / palata 90 / almost 80), so the gate is strict and unambiguous.
-    function heightTierCap(h) { return h == null ? 100 : h > 0.35 ? 79 : h > 0.20 ? 89 : h > 0.10 ? 97 : 100; }
+    // ----- Palata Index v2 (curves + cap defined once, in palata.js) -----
+    const { chopScoreFn, windScoreFn, heightScoreFn, heightTierCap } = Palata;
 
     // Trailing average wind speed (km/h) ending at hour h — "the sea doesn't flatten immediately."
     // Every hour object is tagged with its own array (tagHours), so hours from other locations'
@@ -674,9 +636,8 @@
       if (score == null) return null;
       return PALATA_TIERS.find(t => score >= t.min) || PALATA_TIERS[PALATA_TIERS.length - 1];
     }
-    const isCalmHour = h => { const s = palataIndex(h); return s != null && s >= 80; };    // "כמעט פלטה" tier or better
-    const isDeluxeHour = h => { const s = palataIndex(h); return s != null && s >= 98; };  // "פלטה דלוקס" tier
-    const isSwimHour = isCalmHour;   // temperature no longer gates — it's shown alongside, not multiplied in
+    const isCalmHour = h => { const s = palataIndex(h); return s != null && s >= Palata.CALM_MIN; };    // "כמעט פלטה" tier or better
+    const isDeluxeHour = h => { const s = palataIndex(h); return s != null && s >= Palata.DELUXE_MIN; };
 
     function subScoreColor(s) { return s >= 0.8 ? "#34d399" : s >= 0.65 ? "#2dd4bf" : s >= 0.45 ? "#e9c46a" : s >= 0.2 ? "#f0a55a" : "#f06a6a"; }
     // Qualitative trust signal from the ensemble spread we already compute (waveLo/Hi, windLo/Hi) —
@@ -800,7 +761,7 @@
         const ds = `${cur.getFullYear()}-${pad(cur.getMonth() + 1)}-${pad(cur.getDate())}`;
         const day = g.get(ds); if (!day) break;
         const dt = day.filter(h => isDaytimeHour(h.hour));
-        if (dt.length === 0 || !dt.every(isSwimHour)) break;
+        if (dt.length === 0 || !dt.every(isCalmHour)) break;
         s++; cur.setDate(cur.getDate() - 1);
       }
       return s;
@@ -816,7 +777,7 @@
     function weekCalmPct(data) {
       const now = israelNow();
       const fut = data.filter(h => h.dateStr >= now.dateStr && isDaytimeHour(h.hour));   // ignore night
-      return fut.length ? Math.round(fut.filter(isSwimHour).length / fut.length * 100) : 0;
+      return fut.length ? Math.round(fut.filter(isCalmHour).length / fut.length * 100) : 0;
     }
     function tempInfo(t, isWater) {
       if (t == null) return { color: "var(--muted)", note: "" };
@@ -884,7 +845,18 @@
     // Rendering
     function renderLocations() {
       const cur = LS.loc, locs = allLocations();
-      $("locations").innerHTML = Object.entries(locs).map(([k, v]) => `<button class="loc ${k === cur ? "active" : ""}" onclick="App.setLocation('${k}')">${esc(v.name)}</button>`).join("") + `<button class="loc geo" id="geoBtn" onclick="App.useMyLocation()">📍 קרוב אליי</button><button class="loc add" onclick="App.openAdd()">＋ הוסף</button>`;
+      $("locations").innerHTML = Object.entries(locs).map(([k, v]) => {
+        const chip = `<button class="loc ${k === cur ? "active" : ""}" onclick="App.setLocation('${k}')">${esc(v.name)}</button>`;
+        // Added beaches (anything not built-in) get a remove ×; the list used to be append-only.
+        return BUILTIN[k] ? chip : `<span class="loc-wrap">${chip}<button class="loc-x" aria-label="הסר את ${esc(v.name)}" title="הסר" onclick="App.removeLocation('${k}')">×</button></span>`;
+      }).join("") + `<button class="loc geo" id="geoBtn" onclick="App.useMyLocation()">📍 קרוב אליי</button><button class="loc add" onclick="App.openAdd()">＋ הוסף</button>`;
+    }
+    function removeLocation(key) {
+      if (BUILTIN[key]) return;
+      const customs = LS.customs; delete customs[key]; LS.customs = customs;
+      delete dataCache[key];
+      if (LS.loc === key) { LS.loc = "telaviv"; hourly = []; heroDay = 0; renderLocations(); load(); }
+      else { renderLocations(); recomputeAlert(); }
     }
     // Real measured wave height from the Hadera buoy (ISRAMAR) — a reality-check against the
     // forecast that drives the score. Only meaningful for Mediterranean spots near the buoy;
@@ -930,7 +902,7 @@
       const stateKey = tier ? tier.key : "neutral";
       const calm = ref ? isCalmHour(ref) : false;   // "כמעט פלטה" or better → turtle + sparkles
       const deluxe = stateKey === "deluxe";
-      const swimReady = ref ? isSwimHour(ref) : false;
+      const swimReady = ref ? isCalmHour(ref) : false;
       const turtle = calm ? `<div class="turtle"><div class="turtle-inner">${TURTLE_ART}</div></div>` : "";
       const sparks = calm ? sparkles(deluxe ? 16 : 7) : "";
       const seajelly = nearbyJelly().length ? `<div class="seajelly"><div class="seajelly-in">${JELLY_ART}</div></div>` : "";
@@ -1162,27 +1134,10 @@
     }
     function renderGoodFor() {
       const el = $("goodFor"); const ref = nearestHourData();
-      if (!ref || !isSwimHour(ref)) { el.innerHTML = ""; return; }
+      if (!ref || !isCalmHour(ref)) { el.innerHTML = ""; return; }
       const deluxe = isDeluxeHour(ref);
       const act = (art, name) => `<div class="act"><div class="scene">${art}</div><div class="name">${name}</div></div>`;
       el.innerHTML = `<div class="card good-card${deluxe ? " deluxe" : ""}"><h2>${deluxe ? "💎 מושלם עכשיו ל…" : "🐢 מצוין עכשיו ל…"}</h2><div class="activities">${act(SWIM_ART, "שחייה")}${act(SNORKEL_ART, "שנירקול")}${act(SUP_ART, "סאפ")}</div></div>`;
-    }
-    function indicatorCard(row) {
-      const cls = row.sub >= 0.65 ? "ok" : row.sub >= 0.35 ? "warn" : "over";
-      const mark = row.sub >= 0.65 ? "✓" : row.sub >= 0.35 ? "⚠︎" : "❗";
-      const fill = Math.max(3, Math.min(100, row.sub * 100));
-      return `<div class="ind ${cls}">
-        <div class="ind-icon">${row.icon}</div>
-        <div class="ind-label">${row.label} ${mark}</div>
-        <div class="ind-value"><span class="num">${row.value != null ? row.value.toFixed(row.dec) : "—"}</span><small> ${row.unit}</small></div>
-        <div class="ind-bar"><i style="width:${fill}%;background:${subScoreColor(row.sub)}"></i></div>
-        <div class="ind-cap">משקל ${row.weight}%</div></div>`;
-    }
-    function renderIndicators() {
-      const el = $("indicators"); const cur = nearestHourData();
-      const rows = palataBreakdown(cur);
-      if (!rows || cur.windKmh == null) { el.innerHTML = ""; return; }
-      el.innerHTML = rows.map(indicatorCard).join("");
     }
     function renderWaveDetails() {
       const el = $("waveDetail"); const cur = nearestHourData();
@@ -1250,7 +1205,7 @@
         curStart = null; curEnd = null; curScores = [];
       };
       for (const h of dt) {
-        if (isSwimHour(h)) { if (!curStart) curStart = h; curEnd = h; curScores.push(palataIndex(h)); }
+        if (isCalmHour(h)) { if (!curStart) curStart = h; curEnd = h; curScores.push(palataIndex(h)); }
         else flush();
       }
       flush();
@@ -1337,7 +1292,6 @@
       // Fire-and-forget: Forms returns an opaque cross-origin response, so we can't read it — that's fine.
       fetch(FEEDBACK.formUrl, { method: "POST", mode: "no-cors", body: fd }).catch(() => {});
       localStorage.setItem(fbKey(), "1");
-      track("feedback-report");
       $("feedbackCard").classList.add("done");
     }
     function toggleJelly() { jellyOpen = !jellyOpen; if (hourly.length) renderHero(); renderJellyReports(); if (jellyOpen) { const l = $("jellyList"); if (l) l.scrollIntoView({ behavior: "smooth", block: "center" }); } }
@@ -1411,7 +1365,7 @@
 
     function renderStreak() { const s = streakCount(), b = $("streak"); if (s >= 1) { b.classList.add("on"); $("streakN").textContent = s; } else b.classList.remove("on"); }
     function renderUpdated() { const t = lastUpdatedAt || israelNow(); $("updated").innerHTML = `עודכן לאחרונה <span class="num">${pad(t.hour)}:${pad(t.minute)}</span> · מקור: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>`; }
-    function renderAll() { lastRenderHour = israelNow().hour; renderHero(); renderGoodFor(); renderIndicators(); renderWaveDetails(); renderMetrics(); renderForecast(); renderNextWindow(); renderStreak(); renderUpdated(); renderJelly(); renderFeedback(); renderClimatology(); }
+    function renderAll() { lastRenderHour = israelNow().hour; renderHero(); renderGoodFor(); renderWaveDetails(); renderMetrics(); renderForecast(); renderNextWindow(); renderStreak(); renderUpdated(); renderJelly(); renderFeedback(); renderClimatology(); }
 
     function hebrewDay(ds) {
       const now = israelNow();
@@ -1467,7 +1421,7 @@
       btn.classList.add("show");
       renderInstallSteps();
       window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installPromptEvent = e; });
-      window.addEventListener("appinstalled", () => { installPromptEvent = null; btn.classList.remove("show"); track("pwa-install"); });
+      window.addEventListener("appinstalled", () => { installPromptEvent = null; btn.classList.remove("show"); });
       // The 📲 top-bar button is easy to miss on touch (its title tooltip never shows), so nudge
       // once, from the second visit on — installing is what unlocks notifications on iOS.
       const visits = (parseInt(localStorage.getItem("yp-visits") || "0", 10) || 0) + 1;
@@ -1510,7 +1464,7 @@
       if (!("Notification" in window)) return;
       try { await Notification.requestPermission(); } catch (e) {}
       refreshNotifyBtn();
-      if (Notification.permission === "granted") { subscribePush(); track("notifications-on"); }   // real push, when configured
+      if (Notification.permission === "granted") { subscribePush(); }   // real push, when configured
     }
     // ---- Web Push subscription (no backend: subscription JSON → Google Form → Sheet) ----
     function urlB64ToU8(s) { const p = "=".repeat((4 - s.length % 4) % 4); const b = atob((s + p).replace(/-/g, "+").replace(/_/g, "/")); return Uint8Array.from(b, c => c.charCodeAt(0)); }
@@ -1533,22 +1487,8 @@
         localStorage.setItem(sig, "1");
       } catch (err) { /* push unsupported/blocked — in-app notifications still work */ }
     }
-    // Notification copy in the app's voice: it URGES you to the water, it doesn't file a report.
-    // Keep in sync with the pool in scripts/send-push.mjs (the server-sent twin of this).
-    function notifyCopy(deluxe, beach, water, endHour, score) {
-      const w = water != null ? ` · מים ${water}°` : "";
-      const end = endHour != null ? ` · החלון עד ${pad(endHour)}:00` : "";
-      const pool = deluxe ? [
-        `הים חלק כמו מראה${w}. נדיר — רוץ 🪞`,
-        `דלוקס אמיתי${w}${end}. שנייה לפני שכולם מגלים 🤫`,
-        `זה היום שמחכים לו${w}. הכל שטוח, הכל שלך 💎`,
-      ] : [
-        `הים נרגע${w}${end}. עזוב הכל 🐢`,
-        `פלטה עכשיו${w}. הים לא מחכה לנצח 🌊`,
-        `מדד ${score != null ? (score / 10).toFixed(1) : "גבוה"}${w}${end}. סגור את המחשב ובוא 🏊`,
-      ];
-      return { title: deluxe ? `💎 פלטה דלוקס ב${beach}!` : `🌊 ים פלטה ב${beach}!`, body: pool[Math.floor(Math.random() * pool.length)] };
-    }
+    // Notification copy lives in palata.js — one voice for the in-app and server-sent channels.
+    const notifyCopy = Palata.notifyCopy;
     // iOS home-screen web apps have no window.Notification constructor — notifications MUST go
     // through the service worker there (and it's the more robust path everywhere else too).
     function showLocalNotification(title, body) {
@@ -1562,7 +1502,7 @@
     }
     function maybeNotify() {
       if (!("Notification" in window) || Notification.permission !== "granted") return;
-      const cur = currentHourData(); const swimNow = cur ? isSwimHour(cur) : false;
+      const cur = currentHourData(); const swimNow = cur ? isCalmHour(cur) : false;
       const wasSwim = sessionStorage.getItem("yp-was-swim") === "1";
       if (swimNow && !wasSwim) {
         const now = israelNow();
@@ -1572,20 +1512,6 @@
         showLocalNotification(c.title, c.body);
       }
       sessionStorage.setItem("yp-was-swim", swimNow ? "1" : "0");
-    }
-
-    // ---- Anonymous analytics (GoatCounter). Fire-and-forget: never blocks or breaks the app. ----
-    function initAnalytics() {
-      if (!ANALYTICS.goatcounter || location.hostname === "localhost") return;   // skip dev
-      const s = document.createElement("script");
-      s.async = true; s.src = "https://gc.zgo.at/count.js";
-      s.dataset.goatcounter = `https://${ANALYTICS.goatcounter}.goatcounter.com/count`;
-      document.head.appendChild(s);
-    }
-    // Named feature events (show up alongside pageviews in the dashboard). Low cardinality only —
-    // beach names are fine, never coordinates or anything user-specific.
-    function track(name) {
-      try { const gc = window.goatcounter; if (gc && gc.count) gc.count({ path: name, event: true }); } catch (e) {}
     }
 
     function showError(msg) { $("loading").classList.add("hidden"); $("app").classList.add("hidden"); $("errorText").textContent = msg; $("errorBox").classList.remove("hidden"); }
@@ -1656,7 +1582,6 @@
         let bestK = null, bestD = Infinity;
         for (const [k, v] of Object.entries(known)) { const d = haversine(la, lo, v.lat, v.lon); if (d < bestD) { bestD = d; bestK = k; } }
         restore();
-        track("geo-locate");
         if (bestK && bestD <= 40) {
           if (!allLocations()[bestK]) { const c = LS.customs; c[bestK] = { ...PRESETS[bestK] }; LS.customs = c; }   // auto-add the preset
           if (LS.loc === bestK) return;   // already on the nearest beach
@@ -1669,14 +1594,14 @@
         { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 });
     }
 
-    function setLocation(key) { if (!allLocations()[key] || key === LS.loc) return; LS.loc = key; sessionStorage.setItem("yp-was-swim", "0"); renderLocations(); hourly = []; heroDay = 0; load(); if (("Notification" in window) && Notification.permission === "granted") subscribePush(); track(`beach/${key}`); }
+    function setLocation(key) { if (!allLocations()[key] || key === LS.loc) return; LS.loc = key; sessionStorage.setItem("yp-was-swim", "0"); renderLocations(); hourly = []; heroDay = 0; load(); if (("Notification" in window) && Notification.permission === "granted") subscribePush(); }
     function init() {
       renderLocations(); refreshNotifyBtn();
       const wt = $("waterSlider");
       wt.value = waterMin; $("waterVal").textContent = fmtT(waterMin);
       // The threshold only feeds tempInfo()'s comfort note, so refresh just the two cards that
       // show it — a full renderAll() here rebuilt the hero (and restarted its animations) per drag-pixel.
-      wt.addEventListener("input", () => { waterMin = parseFloat(wt.value); LS.water = waterMin; $("waterVal").textContent = fmtT(waterMin); if (hourly.length) { renderIndicators(); renderWaveDetails(); } });
+      wt.addEventListener("input", () => { waterMin = parseFloat(wt.value); LS.water = waterMin; $("waterVal").textContent = fmtT(waterMin); if (hourly.length) renderMetrics(); });
       $("addModal").addEventListener("click", e => { if (e.target.id === "addModal") closeAdd(); });
       $("installModal").addEventListener("click", e => { if (e.target.id === "installModal") closeInstall(); });
       document.addEventListener("keydown", e => {
@@ -1688,7 +1613,6 @@
       // Offline + fast repeat loads. Registration is best-effort: the app works identically
       // without it (e.g. first visit, private windows, very old browsers).
       if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(e => console.warn("SW registration failed", e));
-      initAnalytics();
       load();
       // Refresh policy: full data reload every 15 min; a light minute tick in between that only
       // does a full re-render when the Israel hour flips (a full render rebuilds the hero DOM and
@@ -1707,7 +1631,7 @@
       });
     }
 
-    return { init, setLocation, refresh: load, enableNotifications, openAdd, closeAdd, confirmAdd, toggleDay, toggleJelly, toggleScore, installApp, closeInstall, submitFeedback, toggleFeedback, heroDayNav, heroSwipeStart, heroSwipeMove, heroSwipeEnd, useMyLocation };
+    return { init, setLocation, removeLocation, refresh: load, enableNotifications, openAdd, closeAdd, confirmAdd, toggleDay, toggleJelly, toggleScore, installApp, closeInstall, submitFeedback, toggleFeedback, heroDayNav, heroSwipeStart, heroSwipeMove, heroSwipeEnd, useMyLocation };
   })();
 
   document.addEventListener("DOMContentLoaded", App.init);
