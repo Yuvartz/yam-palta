@@ -435,6 +435,7 @@
         <div class="slider-row">
           <div class="top"><span class="lbl">טמפ׳ מים מינימלית לשחייה</span><span class="val"><span id="waterVal" class="num">26</span>°C</span></div>
           <input type="range" id="waterSlider" min="18" max="31" step="0.1" value="26" />
+          <div class="credit">קובע רק את הערת הנוחות ליד טמפ׳ המים — לא משפיע על מדד הפלטה</div>
         </div>
         <button class="btn" id="notifyBtn" onclick="App.enableNotifications()">🔔 הפעל התראות על ים פלטה</button>
       </div>
@@ -581,6 +582,9 @@
     let heroDayAnim = null;   // one-shot "next"/"prev" slide direction, consumed by the next render
     let waterMin = LS.water;   // informational comfort threshold only — no longer gates the Palata Index
     const dataCache = {};
+    let lastUpdatedAt = null;  // Israel time of the last successful load — shown in the footer
+    let lastRenderHour = null; // Israel hour of the last full render — the minute tick re-renders only when this flips
+    let lastLoadTs = 0;        // Date.now() of the last successful load — staleness check on tab re-focus
 
     const $ = id => document.getElementById(id);
     const pad = n => String(n).padStart(2, "0");
@@ -1351,8 +1355,8 @@
     }
 
     function renderStreak() { const s = streakCount(), b = $("streak"); if (s >= 1) { b.classList.add("on"); $("streakN").textContent = s; } else b.classList.remove("on"); }
-    function renderUpdated() { const now = israelNow(); $("updated").innerHTML = `עודכן לאחרונה <span class="num">${pad(now.hour)}:${pad(now.minute)}</span> · מקור: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>`; }
-    function renderAll() { renderHero(); renderGoodFor(); renderIndicators(); renderWaveDetails(); renderMetrics(); renderForecast(); renderNextWindow(); renderStreak(); renderUpdated(); renderJelly(); renderFeedback(); renderClimatology(); }
+    function renderUpdated() { const t = lastUpdatedAt || israelNow(); $("updated").innerHTML = `עודכן לאחרונה <span class="num">${pad(t.hour)}:${pad(t.minute)}</span> · מקור: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>`; }
+    function renderAll() { lastRenderHour = israelNow().hour; renderHero(); renderGoodFor(); renderIndicators(); renderWaveDetails(); renderMetrics(); renderForecast(); renderNextWindow(); renderStreak(); renderUpdated(); renderJelly(); renderFeedback(); renderClimatology(); }
 
     function hebrewDay(ds) {
       const now = israelNow();
@@ -1501,6 +1505,7 @@
         const loc = allLocations()[LS.loc] || BUILTIN.telaviv;
         const { hourly: data, sun } = await fetchLocation(loc);
         hourly = data; dataCache[LS.loc] = data; dailySun = sun;
+        lastUpdatedAt = israelNow(); lastLoadTs = Date.now();
         $("loading").classList.add("hidden"); $("app").classList.remove("hidden");
         renderAll(); maybeNotify(); scanAlerts(); loadJelly(); loadBuoy(); loadClimatology();
       } catch (e) { console.error(e); if (hourly.length === 0) showError("לא ניתן לטעון נתונים. בדוק חיבור לאינטרנט ונסה שוב."); }
@@ -1557,7 +1562,9 @@
       renderLocations(); refreshNotifyBtn();
       const wt = $("waterSlider");
       wt.value = waterMin; $("waterVal").textContent = fmtT(waterMin);
-      wt.addEventListener("input", () => { waterMin = parseFloat(wt.value); LS.water = waterMin; $("waterVal").textContent = fmtT(waterMin); if (hourly.length) { renderAll(); recomputeAlert(); } });
+      // The threshold only feeds tempInfo()'s comfort note, so refresh just the two cards that
+      // show it — a full renderAll() here rebuilt the hero (and restarted its animations) per drag-pixel.
+      wt.addEventListener("input", () => { waterMin = parseFloat(wt.value); LS.water = waterMin; $("waterVal").textContent = fmtT(waterMin); if (hourly.length) { renderIndicators(); renderWaveDetails(); } });
       $("addModal").addEventListener("click", e => { if (e.target.id === "addModal") closeAdd(); });
       $("installModal").addEventListener("click", e => { if (e.target.id === "installModal") closeInstall(); });
       setupInstall();
@@ -1565,7 +1572,22 @@
       // without it (e.g. first visit, private windows, very old browsers).
       if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
       initAnalytics();
-      load(); setInterval(load, REFRESH_MS); setInterval(() => { if (hourly.length) renderAll(); }, 60 * 1000);
+      load();
+      // Refresh policy: full data reload every 15 min; a light minute tick in between that only
+      // does a full re-render when the Israel hour flips (a full render rebuilds the hero DOM and
+      // restarts every wave/turtle/sparkle animation — doing that every minute made the scene jump).
+      // Both are paused while the tab is hidden; on re-focus we reload if stale, else catch up.
+      const minuteTick = () => {
+        if (document.hidden || !hourly.length) return;
+        if (israelNow().hour !== lastRenderHour) { renderAll(); maybeNotify(); }
+        else renderJellyReports();   // cheap: keeps the "לפני X ד׳" labels honest while the list is open
+      };
+      setInterval(() => { if (!document.hidden) load(); }, REFRESH_MS);
+      setInterval(minuteTick, 60 * 1000);
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) return;
+        if (Date.now() - lastLoadTs > REFRESH_MS) load(); else minuteTick();
+      });
     }
 
     return { init, setLocation, refresh: load, enableNotifications, openAdd, closeAdd, confirmAdd, toggleDay, toggleJelly, toggleScore, installApp, closeInstall, submitFeedback, toggleFeedback, heroDayNav, heroSwipeStart, heroSwipeMove, heroSwipeEnd, useMyLocation };
