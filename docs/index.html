@@ -595,7 +595,7 @@
     const allLocations = () => ({ ...BUILTIN, ...LS.customs });
 
     let hourly = [];
-    let jelly = [], jellyUpdated = null, jellyOpen = false, scoreOpen = false, dailySun = {}, buoy = null, fbOpen = false, climatology = {}, heroDay = 0;
+    let jelly = [], jellyOpen = false, scoreOpen = false, dailySun = {}, buoy = null, fbOpen = false, climatology = {}, heroDay = 0;
     const HERO_DAY_MAX = 5;   // today (0) through +5 days — matches the 6-day forecast list below
     let heroDayAnim = null;   // one-shot "next"/"prev" slide direction, consumed by the next render
     let waterMin = LS.water;   // informational comfort threshold only — no longer gates the Palata Index
@@ -635,14 +635,17 @@
     function heightTierCap(h) { return h == null ? 100 : h > 0.35 ? 79 : h > 0.20 ? 89 : h > 0.10 ? 97 : 100; }
 
     // Trailing average wind speed (km/h) ending at hour h — "the sea doesn't flatten immediately."
-    // Identity match (not time match): hours from OTHER locations' scans share the same time grid,
-    // and a time lookup would silently splice the current location's wind history into their score.
+    // Every hour object is tagged with its own array (tagHours), so hours from other locations'
+    // alert scans get THEIR wind history — previously they silently fell back to instantaneous
+    // wind, scoring the banner with different math than the beach you'd then tap.
     function windHistoryAt(h, hours = HISTORY_HOURS) {
-      const idx = hourly.indexOf(h);
+      const arr = h._arr || hourly;
+      const idx = h._i != null ? h._i : arr.indexOf(h);
       if (idx < 0) return h.windKmh;
-      const slice = hourly.slice(Math.max(0, idx - hours + 1), idx + 1).map(x => x.windKmh).filter(v => v != null);
+      const slice = arr.slice(Math.max(0, idx - hours + 1), idx + 1).map(x => x.windKmh).filter(v => v != null);
       return slice.length ? slice.reduce((a, b) => a + b, 0) / slice.length : h.windKmh;
     }
+    function tagHours(arr) { arr.forEach((h, i) => { h._arr = arr; h._i = i; }); return arr; }
 
     function palataBreakdown(h) {
       if (!h) return null;
@@ -653,7 +656,7 @@
         { key: "height", label: "גובה הגל בים", icon: HEIGHT_ICON, value: height, unit: "מ׳", dec: 2, sub: heightScoreFn(height), weight: Math.round(PALATA_WEIGHTS.height * 100) },
         { key: "chop", label: "גלים קצרים מהרוח", icon: CHOP_ICON, value: chop, unit: "מ׳", dec: 2, sub: chopScoreFn(chop), weight: Math.round(PALATA_WEIGHTS.chop * 100) },
         { key: "wind", label: "עוצמת רוח", icon: WIND_ICON, value: wind, unit: "קשר", dec: 1, sub: windScoreFn(wind), weight: Math.round(PALATA_WEIGHTS.wind * 100) },
-        { key: "history", label: "רוח ב-10 השעות האחרונות", icon: HISTORY_ICON, value: hist, unit: "קשר", dec: 1, sub: windScoreFn(hist), weight: Math.round(PALATA_WEIGHTS.history * 100) },
+        { key: "history", label: `רוח ב-${HISTORY_HOURS} השעות האחרונות`, icon: HISTORY_ICON, value: hist, unit: "קשר", dec: 1, sub: windScoreFn(hist), weight: Math.round(PALATA_WEIGHTS.history * 100) },
       ];
     }
     function palataIndex(h) {
@@ -762,22 +765,23 @@
           uv: j != null ? uv.med[j] : null,
         };
       });
-      return { hourly: hourlyOut, sun };
+      return { hourly: tagHours(hourlyOut), sun };
     }
 
     // Light single-model fetch (best_match) for the all-locations weekly alert scan.
     async function fetchSingle(loc) {
       const common = `latitude=${loc.lat}&longitude=${loc.lon}&timezone=Asia%2FJerusalem&forecast_days=7&past_days=7`;
+      const ok = r => { if (!r.ok) throw new Error(`alert-scan fetch failed (${r.status})`); return r.json(); };
       const [marine, weather] = await Promise.all([
-        fetch(`https://marine-api.open-meteo.com/v1/marine?${common}&hourly=wave_height,wind_wave_height,sea_surface_temperature`).then(r => r.json()),
-        fetch(`https://api.open-meteo.com/v1/forecast?${common}&hourly=wind_speed_10m`).then(r => r.json()),
+        fetch(`https://marine-api.open-meteo.com/v1/marine?${common}&hourly=wave_height,wind_wave_height,sea_surface_temperature`).then(ok),
+        fetch(`https://api.open-meteo.com/v1/forecast?${common}&hourly=wind_speed_10m`).then(ok),
       ]);
       const wIdx = {}; weather.hourly.time.forEach((t, i) => { wIdx[t] = i; });
-      return marine.hourly.time.map((t, i) => { const j = wIdx[t]; return {
+      return tagHours(marine.hourly.time.map((t, i) => { const j = wIdx[t]; return {
         time: t, dateStr: t.slice(0, 10), hour: parseInt(t.slice(11, 13), 10),
         waveHeight: marine.hourly.wave_height?.[i] ?? null, windWave: marine.hourly.wind_wave_height?.[i] ?? null,
         seaTemp: marine.hourly.sea_surface_temperature?.[i] ?? null, wavePeriod: null,
-        windKmh: j != null ? weather.hourly.wind_speed_10m[j] : null }; });
+        windKmh: j != null ? weather.hourly.wind_speed_10m[j] : null }; }));
     }
 
 
@@ -1045,7 +1049,17 @@
       const h = parseInt(new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Jerusalem", hour: "2-digit", hour12: false }).format(guess), 10) % 24;
       return new Date(guess.getTime() - h * 3600000);
     }
+    // Memoized per (date, place): the scan below runs ~120 lunar-position solves for a value
+    // that changes once a day, and renderMetrics used to redo it on every render.
+    const moonCache = {};
     function moonRiseSet(dateStr, lat, lon) {
+      const mk = `${dateStr}|${lat.toFixed(3)},${lon.toFixed(3)}`;
+      if (moonCache[mk]) return moonCache[mk];
+      const out = computeMoonRiseSet(dateStr, lat, lon);
+      moonCache[mk] = out;
+      return out;
+    }
+    function computeMoonRiseSet(dateStr, lat, lon) {
       const base = israelMidnightUTC(dateStr).getTime(), threshold = -0.34, stepMin = 12;
       let prevAlt = null, prevT = null, rise = null, set = null;
       for (let m = 0; m <= 24 * 60; m += stepMin) {
@@ -1245,11 +1259,22 @@
     }
     // Jellyfish reports (scraped hourly from meduzot.co.il into data/jellyfish.json)
     function haversine(la1, lo1, la2, lo2) { const R = 6371, r = x => x * Math.PI / 180; const dLa = r(la2 - la1), dLo = r(lo2 - lo1); const x = Math.sin(dLa / 2) ** 2 + Math.cos(r(la1)) * Math.cos(r(la2)) * Math.sin(dLo / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(x)); }
-    function hoursSince(iso) { const t = new Date(iso).getTime(); return isNaN(t) ? Infinity : (Date.now() - t) / 3600000; }
+    // Current UTC offset of Asia/Jerusalem ("+03:00" in summer, "+02:00" in winter) — used to
+    // interpret timezone-less timestamps from the jellyfish scraper as Israel local time.
+    const IL_OFFSET = (() => {
+      try {
+        const p = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Jerusalem", timeZoneName: "longOffset" }).formatToParts(new Date()).find(x => x.type === "timeZoneName");
+        const m = p && p.value.match(/GMT([+-]\d{2}:\d{2})/); return m ? m[1] : "+03:00";
+      } catch (e) { return "+03:00"; }
+    })();
+    // "2026-07-12T08:17" (no zone) used to be parsed in the VIEWER'S timezone, skewing the
+    // "לפני X שעות" labels and the 48h proximity filter for anyone outside Israel.
+    const parseIsraelISO = iso => new Date(/Z$|[+-]\d{2}:?\d{2}$/.test(iso || "") ? iso : iso + IL_OFFSET).getTime();
+    function hoursSince(iso) { if (!iso) return Infinity; const t = parseIsraelISO(iso); return isNaN(t) ? Infinity : (Date.now() - t) / 3600000; }
     function timeAgo(iso) { const h = hoursSince(iso); if (!isFinite(h)) return ""; const m = Math.round(h * 60); if (m < 60) return `לפני ${m} ד׳`; if (h < 24) return `לפני ${Math.round(h)} שע׳`; return `לפני ${Math.round(h / 24)} ימים`; }
     function nearbyJelly() {
       const loc = allLocations()[LS.loc]; if (!loc) return [];
-      return jelly.filter(r => r.lat != null && hoursSince(r.date) <= 48 && haversine(loc.lat, loc.lon, r.lat, r.lon) <= 25).sort((a, b) => new Date(b.date) - new Date(a.date));
+      return jelly.filter(r => r.lat != null && hoursSince(r.date) <= 48 && haversine(loc.lat, loc.lon, r.lat, r.lon) <= 25).sort((a, b) => parseIsraelISO(b.date) - parseIsraelISO(a.date));
     }
     // Severity band from report count within the existing 25km/48h window — a sting-severity
     // field isn't scraped from meduzot.co.il, so this counts sightings rather than guessing toxicity.
@@ -1310,8 +1335,8 @@
       try {
         const res = await fetch("data/jellyfish.json?v=" + Math.floor(Date.now() / 3600000));
         if (!res.ok) return;
-        const j = await res.json(); jelly = j.reports || []; jellyUpdated = j.updated; renderJelly(); if (hourly.length) renderHero();
-      } catch (e) {}
+        const j = await res.json(); jelly = j.reports || []; renderJelly(); if (hourly.length) renderHero();
+      } catch (e) { console.warn("jellyfish feed failed", e); }
     }
     // Real measured wave data from the Hadera buoy, refreshed hourly into data/hadera-waves.json
     // by the buoy GitHub Action (same-origin, no CORS — same pattern as the jellyfish feed).
@@ -1320,7 +1345,7 @@
         const res = await fetch("data/hadera-waves.json?v=" + Math.floor(Date.now() / 3600000));
         if (!res.ok) return;
         buoy = await res.json(); if (hourly.length) renderHero();
-      } catch (e) {}
+      } catch (e) { console.warn("buoy feed failed", e); }
     }
 
     // ---- Historical sea-temperature climatology: average annual peak (warmest) water temp ----
@@ -1335,7 +1360,9 @@
     }
     async function loadClimatology() {
       const key = LS.loc, loc = allLocations()[key]; if (!loc) return;
-      const ck = `yp-clim-${key}`;
+      // Cache by coordinates, not by location key: the "geo" key is reused for every
+      // "near me" pin, so a key-based cache showed Tel Aviv's peak temp in Eilat.
+      const ck = `yp-clim-${loc.lat.toFixed(3)},${loc.lon.toFixed(3)}`;
       try { const c = JSON.parse(localStorage.getItem(ck) || "null");
         if (c && c.v === 1 && Date.now() - c.ts < 30 * 86400000) { climatology[key] = c; renderClimatology(); return; }
       } catch (e) {}
@@ -1359,7 +1386,7 @@
         const ref = new Date(2025, 0, Math.round(doy.reduce((a, b) => a + b, 0) / doy.length));
         const data = { v: 1, ts: Date.now(), avgMax: +avgMax.toFixed(1), day: ref.getDate(), month: ref.getMonth(), years: good.length };
         climatology[key] = data; localStorage.setItem(ck, JSON.stringify(data)); renderClimatology();
-      } catch (e) {}
+      } catch (e) { console.warn("climatology fetch failed", e); }
     }
     function renderClimatology() {
       const card = $("climCard"), body = $("climBody"); if (!card || !body) return;
@@ -1392,8 +1419,15 @@
       const el = $("alertBanner");
       el.innerHTML = (best && best.pct >= ALERT_PCT) ? `<span class="ic">🔥</span><span>שים לב — בשבוע הקרוב צפוי כ-<b>${best.pct}%</b> מהזמן מתאים לשחייה ב<b>${best.name}</b>!</span>` : "";
     }
+    const SCAN_TTL = 60 * 60 * 1000;   // re-scan a beach after an hour — dataCache was forever-stale within a session
+    const scanFetchedAt = {};
     async function scanAlerts() {
-      await Promise.all(Object.entries(allLocations()).map(async ([k, v]) => { if (dataCache[k]) return; try { dataCache[k] = await fetchSingle(v); } catch (e) {} }));
+      await Promise.all(Object.entries(allLocations()).map(async ([k, v]) => {
+        if (dataCache[k] && Date.now() - (scanFetchedAt[k] || 0) < SCAN_TTL && k !== LS.loc) return;
+        if (k === LS.loc) { scanFetchedAt[k] = Date.now(); return; }   // the displayed beach is already freshly loaded
+        try { dataCache[k] = await fetchSingle(v); scanFetchedAt[k] = Date.now(); }
+        catch (e) { console.warn("alert scan failed for", v.name, e); }
+      }));
       recomputeAlert();
     }
 
@@ -1617,7 +1651,7 @@
       setupInstall();
       // Offline + fast repeat loads. Registration is best-effort: the app works identically
       // without it (e.g. first visit, private windows, very old browsers).
-      if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+      if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(e => console.warn("SW registration failed", e));
       initAnalytics();
       load();
       // Refresh policy: full data reload every 15 min; a light minute tick in between that only

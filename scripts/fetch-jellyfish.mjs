@@ -35,12 +35,22 @@ const decode = s => (s || "")
 const clean = s => decode(s).replace(/\s+/g, " ").trim();
 const grab = (block, re) => { const m = block.match(re); return m ? clean(m[1]) : null; };
 
+// Reports are Israel local time — emit an explicit UTC offset so browsers abroad don't
+// reinterpret them in the viewer's timezone (the app also tolerates legacy zone-less values).
+function ilOffset(isoLocal) {
+  const probe = new Date(isoLocal + "Z");
+  const part = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Jerusalem", timeZoneName: "longOffset" })
+    .formatToParts(probe).find(p => p.type === "timeZoneName");
+  const m = part && part.value.match(/GMT([+-]\d{2}:\d{2})/);
+  return m ? m[1] : "+03:00";
+}
 function toISO(dateText, time) {
   const d = (dateText || "").match(/(\d{1,2})\.(\d{1,2})\.(\d{4})/);
   if (!d) return null;
   const t = (time || "").match(/(\d{1,2}):(\d{2})/);
   const pad = n => String(n).padStart(2, "0");
-  return `${d[3]}-${pad(+d[2])}-${pad(+d[1])}T${t ? pad(+t[1]) + ":" + t[2] : "00:00"}`;
+  const local = `${d[3]}-${pad(+d[2])}-${pad(+d[1])}T${t ? pad(+t[1]) + ":" + t[2] : "00:00"}`;
+  return local + ilOffset(local);
 }
 
 function parse(html) {
