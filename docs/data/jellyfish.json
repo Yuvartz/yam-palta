@@ -1,8 +1,40 @@
 {
-  "updated": "2026-07-28T23:50:32.558Z",
+  "updated": "2026-07-29T07:41:41.499Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25691",
+      "reporter": "אמיר פרלברג",
+      "location": "נווה ים, הבונים ודור-נחשולים",
+      "lat": null,
+      "lon": null,
+      "date": "2026-07-29T07:30+03:00",
+      "dateText": "29.07.2026",
+      "time": "07:30",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25691"
+    },
+    {
+      "id": "25690",
+      "reporter": "יוסי",
+      "location": "הרצליה",
+      "lat": 32.166,
+      "lon": 34.796,
+      "date": "2026-07-29T08:26+03:00",
+      "dateText": "29.07.2026",
+      "time": "08:26",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": "2",
+      "species": "חוטית נודדת",
+      "diameter": "11-30",
+      "url": "https://www.meduzot.co.il/observation/25690"
+    },
     {
       "id": "25688",
       "reporter": "אולג מיכאיליצ'נקו",
@@ -1250,38 +1282,6 @@
       "species": "אין מדוזות",
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25587"
-    },
-    {
-      "id": "25586",
-      "reporter": "גבי מובשוביץ",
-      "location": "אשדוד",
-      "lat": 31.79,
-      "lon": 34.63,
-      "date": "2026-07-11T12:55+03:00",
-      "dateText": "11.07.2026",
-      "time": "12:55",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": "חוטית נודדת",
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25586"
-    },
-    {
-      "id": "25584",
-      "reporter": "קינדל",
-      "location": "תל אביב צפון - הירקון, מציצים, הילטון ומרינה תל אביב",
-      "lat": 32.085,
-      "lon": 34.766,
-      "date": "2026-07-11T12:55+03:00",
-      "dateText": "11.07.2026",
-      "time": "12:55",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": "אין מדוזות",
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25584"
     }
   ]
 }
