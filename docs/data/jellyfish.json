@@ -1,8 +1,40 @@
 {
-  "updated": "2026-07-30T07:26:40.101Z",
+  "updated": "2026-07-30T10:12:10.086Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25697",
+      "reporter": "מישמיש בורא",
+      "location": "בת ים וראשון לציון",
+      "lat": 32.015,
+      "lon": 34.743,
+      "date": "2026-07-30T09:00+03:00",
+      "dateText": "30.07.2026",
+      "time": "09:00",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25697"
+    },
+    {
+      "id": "25696",
+      "reporter": "מישמיש בורא",
+      "location": "בת ים וראשון לציון",
+      "lat": 32.015,
+      "lon": 34.743,
+      "date": "2026-07-29T10:30+03:00",
+      "dateText": "29.07.2026",
+      "time": "10:30",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25696"
+    },
     {
       "id": "25695",
       "reporter": "Dor Edelist",
@@ -1250,38 +1282,6 @@
       "species": "חוטית נודדת",
       "diameter": "11-30",
       "url": "https://www.meduzot.co.il/observation/25593"
-    },
-    {
-      "id": "25592",
-      "reporter": "שי מיניס",
-      "location": "פלמחים",
-      "lat": 31.93,
-      "lon": 34.697,
-      "date": "2026-07-07T06:36+03:00",
-      "dateText": "07.07.2026",
-      "time": "06:36",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": "4",
-      "species": "חוטית נודדת",
-      "diameter": "11-30",
-      "url": "https://www.meduzot.co.il/observation/25592"
-    },
-    {
-      "id": "25591",
-      "reporter": "שי מיניס",
-      "location": "פלמחים",
-      "lat": 31.93,
-      "lon": 34.697,
-      "date": "2026-07-09T06:33+03:00",
-      "dateText": "09.07.2026",
-      "time": "06:33",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": "2",
-      "species": "חוטית נודדת",
-      "diameter": "11-30",
-      "url": "https://www.meduzot.co.il/observation/25591"
     }
   ]
 }
