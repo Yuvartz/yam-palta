@@ -1,8 +1,40 @@
 {
-  "updated": "2026-08-01T14:22:28.971Z",
+  "updated": "2026-08-01T18:53:19.180Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25706",
+      "reporter": "Dor Edelist",
+      "location": "חיפה דרום - חוף זמיר, דדו והסטודנטים",
+      "lat": 32.83,
+      "lon": 34.98,
+      "date": "2026-08-01T20:55+03:00",
+      "dateText": "01.08.2026",
+      "time": "20:55",
+      "activity": "גלישת גלים",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25706"
+    },
+    {
+      "id": "25705",
+      "reporter": "Dor Edelist",
+      "location": "תל אביב צפון - הירקון, מציצים, הילטון ומרינה תל אביב",
+      "lat": 32.085,
+      "lon": 34.766,
+      "date": "2026-08-01T20:37+03:00",
+      "dateText": "01.08.2026",
+      "time": "20:37",
+      "activity": "גלישת גלים",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25705"
+    },
     {
       "id": "25704",
       "reporter": "Dor Edelist",
@@ -1250,38 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25611"
-    },
-    {
-      "id": "25607",
-      "reporter": "Dor Edelist",
-      "location": "צפון חוף הכרמל",
-      "lat": 32.835,
-      "lon": 34.956,
-      "date": "2026-07-11T22:14+03:00",
-      "dateText": "11.07.2026",
-      "time": "22:14",
-      "activity": "צלילה חופשית שנירקול",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25607"
-    },
-    {
-      "id": "25606",
-      "reporter": "קוקו",
-      "location": "נתניה צפון - נעורים, חבצלת השרון, בלו-ביי, צאנז",
-      "lat": 32.33,
-      "lon": 34.853,
-      "date": "2026-07-11T09:12+03:00",
-      "dateText": "11.07.2026",
-      "time": "09:12",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": "1",
-      "species": "אין מדוזות",
-      "diameter": "1-5",
-      "url": "https://www.meduzot.co.il/observation/25606"
     }
   ]
 }
