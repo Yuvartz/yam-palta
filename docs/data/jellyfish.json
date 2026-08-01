@@ -1,8 +1,40 @@
 {
-  "updated": "2026-07-31T08:32:25.010Z",
+  "updated": "2026-08-01T11:57:37.311Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25703",
+      "reporter": "מישמיש בורא",
+      "location": "",
+      "lat": null,
+      "lon": null,
+      "date": "2026-08-01T09:30+03:00",
+      "dateText": "01.08.2026",
+      "time": "09:30",
+      "activity": "-",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25703"
+    },
+    {
+      "id": "25702",
+      "reporter": "מישמיש בורא",
+      "location": "בת ים וראשון לציון",
+      "lat": 32.015,
+      "lon": 34.743,
+      "date": "2026-08-01T10:00+03:00",
+      "dateText": "01.08.2026",
+      "time": "10:00",
+      "activity": "-",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25702"
+    },
     {
       "id": "25701",
       "reporter": "amit zukerman",
@@ -1250,38 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25611"
-    },
-    {
-      "id": "25607",
-      "reporter": "Dor Edelist",
-      "location": "צפון חוף הכרמל",
-      "lat": 32.835,
-      "lon": 34.956,
-      "date": "2026-07-11T22:14+03:00",
-      "dateText": "11.07.2026",
-      "time": "22:14",
-      "activity": "צלילה חופשית שנירקול",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25607"
-    },
-    {
-      "id": "25606",
-      "reporter": "קוקו",
-      "location": "נתניה צפון - נעורים, חבצלת השרון, בלו-ביי, צאנז",
-      "lat": 32.33,
-      "lon": 34.853,
-      "date": "2026-07-11T09:12+03:00",
-      "dateText": "11.07.2026",
-      "time": "09:12",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": "1",
-      "species": "אין מדוזות",
-      "diameter": "1-5",
-      "url": "https://www.meduzot.co.il/observation/25606"
     }
   ]
 }
