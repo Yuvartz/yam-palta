@@ -1,8 +1,40 @@
 {
-  "updated": "2026-08-03T12:48:47.734Z",
+  "updated": "2026-08-03T15:37:02.030Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25709",
+      "reporter": "אמיר פרלברג",
+      "location": "נווה ים, הבונים ודור-נחשולים",
+      "lat": null,
+      "lon": null,
+      "date": "2026-08-03T07:30+03:00",
+      "dateText": "03.08.2026",
+      "time": "07:30",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25709"
+    },
+    {
+      "id": "25708",
+      "reporter": "אמיר פרלברג",
+      "location": "תל אביב מרכז - גורדון, בוגרשוב, פרישמן, צ'ארלס קלור",
+      "lat": 32.085,
+      "lon": 34.766,
+      "date": "2026-08-02T07:30+03:00",
+      "dateText": "02.08.2026",
+      "time": "07:30",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25708"
+    },
     {
       "id": "25707",
       "reporter": "אילן לוי",
@@ -1250,38 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25616"
-    },
-    {
-      "id": "25615",
-      "reporter": "אנונימי",
-      "location": "בת ים וראשון לציון",
-      "lat": 32.015,
-      "lon": 34.743,
-      "date": "2026-07-11T10:51+03:00",
-      "dateText": "11.07.2026",
-      "time": "10:51",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": "אין מדוזות",
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25615"
-    },
-    {
-      "id": "25612",
-      "reporter": "רמון ארני",
-      "location": "בת ים וראשון לציון",
-      "lat": 32.015,
-      "lon": 34.743,
-      "date": "2026-07-11T12:01+03:00",
-      "dateText": "11.07.2026",
-      "time": "12:01",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": "אין מדוזות",
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25612"
     }
   ]
 }
