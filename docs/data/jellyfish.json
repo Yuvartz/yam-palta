@@ -1,8 +1,24 @@
 {
-  "updated": "2026-08-03T15:37:02.030Z",
+  "updated": "2026-08-04T11:54:58.023Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25710",
+      "reporter": "Shmuel Onn",
+      "location": "חיפה דרום - חוף זמיר, דדו והסטודנטים",
+      "lat": 32.83,
+      "lon": 34.98,
+      "date": "2026-08-04T07:45+03:00",
+      "dateText": "04.08.2026",
+      "time": "07:45",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25710"
+    },
     {
       "id": "25709",
       "reporter": "אמיר פרלברג",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25617"
-    },
-    {
-      "id": "25616",
-      "reporter": "מאיר עוזרי",
-      "location": "נתניה צפון - נעורים, חבצלת השרון, בלו-ביי, צאנז",
-      "lat": 32.33,
-      "lon": 34.853,
-      "date": "2026-07-12T12:16+03:00",
-      "dateText": "12.07.2026",
-      "time": "12:16",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25616"
     }
   ]
 }
