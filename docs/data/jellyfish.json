@@ -1,8 +1,24 @@
 {
-  "updated": "2026-08-04T11:54:58.023Z",
+  "updated": "2026-08-04T13:46:01.152Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25711",
+      "reporter": "מישמיש בורא",
+      "location": "",
+      "lat": null,
+      "lon": null,
+      "date": "2026-08-04T10:00+03:00",
+      "dateText": "04.08.2026",
+      "time": "10:00",
+      "activity": "-",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25711"
+    },
     {
       "id": "25710",
       "reporter": "Shmuel Onn",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25618"
-    },
-    {
-      "id": "25617",
-      "reporter": "רעות צוק",
-      "location": "נתניה דרום - סירונית, ארגמן, פולג",
-      "lat": 32.33,
-      "lon": 34.853,
-      "date": "2026-07-12T15:26+03:00",
-      "dateText": "12.07.2026",
-      "time": "15:26",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25617"
     }
   ]
 }
