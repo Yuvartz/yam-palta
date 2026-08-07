@@ -1,8 +1,24 @@
 {
-  "updated": "2026-08-07T06:03:51.450Z",
+  "updated": "2026-08-07T08:05:42.873Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25726",
+      "reporter": "רועי פרידמן",
+      "location": "חופי אשקלון והדרום",
+      "lat": 31.67,
+      "lon": 34.556,
+      "date": "2026-08-07T09:48+03:00",
+      "dateText": "07.08.2026",
+      "time": "09:48",
+      "activity": "רחצה",
+      "distance": "0-200",
+      "quantity": "1",
+      "species": "פעמונית נקודה",
+      "diameter": "6-10",
+      "url": "https://www.meduzot.co.il/observation/25726"
+    },
     {
       "id": "25725",
       "reporter": "אמיר פרלברג",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25633"
-    },
-    {
-      "id": "25632",
-      "reporter": "ליאת גלאון",
-      "location": "אשדוד",
-      "lat": 31.79,
-      "lon": 34.63,
-      "date": "2026-07-16T06:00+03:00",
-      "dateText": "16.07.2026",
-      "time": "06:00",
-      "activity": "הליכה על החוף",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25632"
     }
   ]
 }
