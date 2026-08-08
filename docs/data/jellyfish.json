@@ -1,8 +1,24 @@
 {
-  "updated": "2026-08-07T11:37:23.710Z",
+  "updated": "2026-08-08T15:19:01.876Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25738",
+      "reporter": "אמיר פרלברג",
+      "location": "נווה ים, הבונים ודור-נחשולים",
+      "lat": null,
+      "lon": null,
+      "date": "2026-08-08T11:30+03:00",
+      "dateText": "08.08.2026",
+      "time": "11:30",
+      "activity": "צלילה חופשית שנירקול",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25738"
+    },
     {
       "id": "25736",
       "reporter": "מישמיש בורא",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25648"
-    },
-    {
-      "id": "25647",
-      "reporter": "Dor Edelist",
-      "location": "ראש הנקרה - בצת",
-      "lat": null,
-      "lon": null,
-      "date": "2026-07-17T16:19+03:00",
-      "dateText": "17.07.2026",
-      "time": "16:19",
-      "activity": "צלילת מכלים",
-      "distance": "0-200",
-      "quantity": "50",
-      "species": "מסרקנית זהרורית",
-      "diameter": "6-10",
-      "url": "https://www.meduzot.co.il/observation/25647"
     }
   ]
 }
