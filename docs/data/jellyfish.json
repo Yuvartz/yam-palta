@@ -1,8 +1,40 @@
 {
-  "updated": "2026-08-08T15:19:01.876Z",
+  "updated": "2026-08-09T08:29:30.788Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25740",
+      "reporter": "יון פדר",
+      "location": "יפו",
+      "lat": 32.053,
+      "lon": 34.75,
+      "date": "2026-08-09T10:02+03:00",
+      "dateText": "09.08.2026",
+      "time": "10:02",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": "1",
+      "species": "פעמונית נקודה",
+      "diameter": "6-10",
+      "url": "https://www.meduzot.co.il/observation/25740"
+    },
+    {
+      "id": "25739",
+      "reporter": "Dor Edelist",
+      "location": "נווה ים, הבונים ודור-נחשולים",
+      "lat": null,
+      "lon": null,
+      "date": "2026-08-09T09:57+03:00",
+      "dateText": "09.08.2026",
+      "time": "09:57",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25739"
+    },
     {
       "id": "25738",
       "reporter": "אמיר פרלברג",
@@ -1250,38 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25651"
-    },
-    {
-      "id": "25650",
-      "reporter": "שי מיניס",
-      "location": "פלמחים",
-      "lat": 31.93,
-      "lon": 34.697,
-      "date": "2026-07-17T06:10+03:00",
-      "dateText": "17.07.2026",
-      "time": "06:10",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": "1",
-      "species": "פעמונית נקודה",
-      "diameter": "11-30",
-      "url": "https://www.meduzot.co.il/observation/25650"
-    },
-    {
-      "id": "25648",
-      "reporter": "מישמיש בורא",
-      "location": "בת ים וראשון לציון",
-      "lat": 32.015,
-      "lon": 34.743,
-      "date": "2026-07-17T10:00+03:00",
-      "dateText": "17.07.2026",
-      "time": "10:00",
-      "activity": "-",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25648"
     }
   ]
 }
