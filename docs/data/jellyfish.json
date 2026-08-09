@@ -1,8 +1,24 @@
 {
-  "updated": "2026-08-09T08:29:30.788Z",
+  "updated": "2026-08-09T10:22:03.328Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25741",
+      "reporter": "Dor Edelist",
+      "location": "בת גלים",
+      "lat": 32.827,
+      "lon": 34.987,
+      "date": "2026-08-09T12:53+03:00",
+      "dateText": "09.08.2026",
+      "time": "12:53",
+      "activity": "הליכה על החוף",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25741"
+    },
     {
       "id": "25740",
       "reporter": "יון פדר",
@@ -1266,22 +1282,6 @@
       "species": "אין מדוזות",
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25652"
-    },
-    {
-      "id": "25651",
-      "reporter": "שלמה יער-בר",
-      "location": "ראש הנקרה - בצת",
-      "lat": null,
-      "lon": null,
-      "date": "2026-07-18T08:49+03:00",
-      "dateText": "18.07.2026",
-      "time": "08:49",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25651"
     }
   ]
 }
