@@ -357,6 +357,7 @@
       font-size: 13px; box-shadow: 0 8px 24px -8px rgba(0,0,0,.6); cursor: pointer; animation: fadeUp .4s ease both; }
     .modal-error { color: #ffb4b4; font-size: 13px; margin-top: 8px; }
     .modal-error:empty { display: none; }
+    .maps-status { font-size: 12px; color: var(--calm); margin-top: 6px; min-height: 16px; }
     [role="button"]:focus-visible { outline: 2px solid var(--calm); outline-offset: 3px; border-radius: 8px; }
     .modal-back { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: none; align-items: center; justify-content: center; z-index: 50; padding: 20px; }
     .modal-back.show { display: flex; }
@@ -453,6 +454,7 @@
       <p class="hint">בחר מתוך הרשימה, או הזן מיקום מותאם עם קואורדינטות.</p>
       <div class="field"><label for="presetSelect">מיקום מוכן</label><select id="presetSelect"></select></div>
       <div class="sep">— או מיקום מותאם —</div>
+      <div class="field"><label for="mapsLink">קישור מגוגל מפות</label><input id="mapsLink" type="text" inputmode="url" placeholder="הדביקו קישור — נזהה את המקום לבד" /><div id="mapsLinkStatus" class="maps-status"></div></div>
       <div class="field"><label for="customName">שם</label><input id="customName" type="text" placeholder="למשל: אילת" /></div>
       <div class="row2">
         <div class="field"><label for="customLat">קו רוחב (lat)</label><input id="customLat" type="number" step="0.0001" inputmode="decimal" placeholder="29.55" /></div>
@@ -506,6 +508,8 @@
       athens: { name: "אתונה (גליפדה)", lat: 37.8580, lon: 23.7530, region: "יוון" },
       santorini: { name: "סנטוריני (קמארי)", lat: 36.3750, lon: 25.4860, region: "יוון" },
       mykonos: { name: "מיקונוס", lat: 37.4140, lon: 25.3440, region: "יוון" },
+      // חוף קוסטה נבארינו (פלופונס) — נקרא על שם הכפר הקרוב, רומנוס
+      romanos: { name: "רומנוס (פלופונס)", lat: 36.9953, lon: 21.6470, region: "יוון" },
     };
     // User feedback → a Google Form the owner controls (no backend, no new account).
     // Stays HIDDEN until formUrl + entry IDs are filled in. To switch on: create a Google Form
@@ -1562,8 +1566,53 @@
         Object.entries(groups).map(([g, arr]) =>
           `<optgroup label="${g}">` + arr.map(([k, v]) => `<option value="${k}">${v.name}</option>`).join("") + `</optgroup>`).join("");
       $("customName").value = ""; $("customLat").value = ""; $("customLon").value = "";
+      $("mapsLink").value = ""; $("mapsLinkStatus").textContent = "";
       $("addModalError").textContent = "";
       openModal("addModal", "presetSelect");
+    }
+    // ---- Paste-a-Google-Maps-link → coordinates + nearest place name ----
+    // Handles the common shareable formats; short goo.gl links can't be expanded from the
+    // browser (no CORS), so those get a "paste the full address-bar URL" hint instead.
+    function parseMapsCoords(text) {
+      const t = (text || "").trim();
+      const pats = [
+        /[?&]q=(-?\d{1,2}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)/,   // maps?q=lat,lon
+        /!3d(-?\d{1,2}(?:\.\d+)?)!4d(-?\d{1,3}(?:\.\d+)?)/,          // /place/…!3dlat!4dlon (the pin itself)
+        /@(-?\d{1,2}(?:\.\d+)?),(-?\d{1,3}(?:\.\d+)?)/,              // …/@lat,lon,zoom (map centre)
+        /^(-?\d{1,2}(?:\.\d+)?)[,\s]+(-?\d{1,3}(?:\.\d+)?)$/,        // bare "lat, lon"
+      ];
+      for (const re of pats) {
+        const m = t.match(re);
+        if (m) { const lat = +m[1], lon = +m[2]; if (Math.abs(lat) <= 90 && Math.abs(lon) <= 180 && (lat !== 0 || lon !== 0)) return { lat, lon }; }
+      }
+      return null;
+    }
+    async function nearestPlaceName(lat, lon) {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&zoom=16&accept-language=he`);
+      if (!res.ok) return null;
+      const a = (await res.json()).address || {};
+      // Prefer the village/town scale — "the nearest village to the beach", not the county.
+      return a.village || a.town || a.hamlet || a.suburb || a.city || a.municipality || null;
+    }
+    let mapsLinkTimer = null;
+    function handleMapsLink() {
+      const val = $("mapsLink").value, st = $("mapsLinkStatus");
+      clearTimeout(mapsLinkTimer);
+      const c = parseMapsCoords(val);
+      if (!c) {
+        const short = /(?:^|\/\/)(?:maps\.app\.)?goo\.gl\//.test(val.trim());
+        st.textContent = short ? "זה קישור מקוצר — פתחו אותו בדפדפן והעתיקו לכאן את הכתובת המלאה משורת הכתובת"
+          : val.trim() ? "לא זוהו קואורדינטות בקישור" : "";
+        return;
+      }
+      $("customLat").value = c.lat.toFixed(4); $("customLon").value = c.lon.toFixed(4);
+      st.textContent = "📍 זוהו קואורדינטות · מאתר שם מקום…";
+      mapsLinkTimer = setTimeout(async () => {
+        let name = null;
+        try { name = await nearestPlaceName(c.lat, c.lon); } catch (e) { console.warn("reverse geocode failed", e); }
+        if (name && !$("customName").value.trim()) $("customName").value = name;
+        st.textContent = name ? `📍 ${name} — לחצו "הוסף" לסיום` : "📍 קואורדינטות מולאו — תנו שם ולחצו \"הוסף\"";
+      }, 350);
     }
     function closeAdd() { closeModal("addModal"); }
     function confirmAdd() {
@@ -1616,6 +1665,7 @@
       // The threshold only feeds tempInfo()'s comfort note, so refresh just the two cards that
       // show it — a full renderAll() here rebuilt the hero (and restarted its animations) per drag-pixel.
       wt.addEventListener("input", () => { waterMin = parseFloat(wt.value); LS.water = waterMin; $("waterVal").textContent = fmtT(waterMin); if (hourly.length) renderMetrics(); });
+      $("mapsLink").addEventListener("input", handleMapsLink);
       $("addModal").addEventListener("click", e => { if (e.target.id === "addModal") closeAdd(); });
       $("installModal").addEventListener("click", e => { if (e.target.id === "installModal") closeInstall(); });
       document.addEventListener("keydown", e => {
