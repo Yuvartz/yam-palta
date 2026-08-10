@@ -1,8 +1,24 @@
 {
-  "updated": "2026-08-10T09:06:20.717Z",
+  "updated": "2026-08-10T11:43:01.638Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25745",
+      "reporter": "מישמיש בורא",
+      "location": "בת ים וראשון לציון",
+      "lat": 32.015,
+      "lon": 34.743,
+      "date": "2026-08-10T09:00+03:00",
+      "dateText": "10.08.2026",
+      "time": "09:00",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25745"
+    },
     {
       "id": "25744",
       "reporter": "Shmuel Onn",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25656"
-    },
-    {
-      "id": "25655",
-      "reporter": "יהונתן גולדברג",
-      "location": "אשדוד",
-      "lat": 31.79,
-      "lon": 34.63,
-      "date": "2026-07-19T10:00+03:00",
-      "dateText": "19.07.2026",
-      "time": "10:00",
-      "activity": "גלישת גלים",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25655"
     }
   ]
 }
