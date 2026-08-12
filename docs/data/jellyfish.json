@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-12T18:46:22.038Z",
+  "updated": "2026-08-12T19:55:41.739Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
@@ -146,38 +146,6 @@
       "species": "פעמונית נקודה",
       "diameter": "11-30",
       "url": "https://www.meduzot.co.il/observation/25751"
-    },
-    {
-      "id": "25750",
-      "reporter": "Eugenius",
-      "location": "קריית חיים",
-      "lat": null,
-      "lon": null,
-      "date": "2026-08-10T17:58+03:00",
-      "dateText": "10.08.2026",
-      "time": "17:58",
-      "activity": "דיג מהחוף",
-      "distance": "0-200",
-      "quantity": null,
-      "species": "פעמונית נקודה",
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25750"
-    },
-    {
-      "id": "25749",
-      "reporter": "Eugenius",
-      "location": "קריית חיים",
-      "lat": null,
-      "lon": null,
-      "date": "2026-08-10T17:57+03:00",
-      "dateText": "10.08.2026",
-      "time": "17:57",
-      "activity": "דיג מהחוף",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25749"
     },
     {
       "id": "25748",
@@ -1282,6 +1250,38 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25672"
+    },
+    {
+      "id": "25671",
+      "reporter": "טלי טריינין",
+      "location": "ראש הנקרה - בצת",
+      "lat": null,
+      "lon": null,
+      "date": "2026-07-23T10:00+03:00",
+      "dateText": "23.07.2026",
+      "time": "10:00",
+      "activity": "הליכה על החוף",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25671"
+    },
+    {
+      "id": "25670",
+      "reporter": "עופר",
+      "location": "בת גלים",
+      "lat": 32.827,
+      "lon": 34.987,
+      "date": "2026-07-22T22:49+03:00",
+      "dateText": "22.07.2026",
+      "time": "22:49",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25670"
     }
   ]
 }
