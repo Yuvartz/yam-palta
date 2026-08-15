@@ -1,8 +1,24 @@
 {
-  "updated": "2026-08-15T07:21:18.314Z",
+  "updated": "2026-08-15T14:11:56.271Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25772",
+      "reporter": "הילה דרור",
+      "location": "געש, ארסוף",
+      "lat": null,
+      "lon": null,
+      "date": "2026-08-08T09:01+03:00",
+      "dateText": "08.08.2026",
+      "time": "09:01",
+      "activity": "רחצה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25772"
+    },
     {
       "id": "25771",
       "reporter": "אמיר פרלברג",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25679"
-    },
-    {
-      "id": "25678",
-      "reporter": "Dor Edelist",
-      "location": "קיסריה ושדות ים",
-      "lat": 32.5,
-      "lon": 34.89,
-      "date": "2026-07-25T18:47+03:00",
-      "dateText": "25.07.2026",
-      "time": "18:47",
-      "activity": "הליכה על החוף",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25678"
     }
   ]
 }
