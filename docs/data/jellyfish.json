@@ -1,8 +1,24 @@
 {
-  "updated": "2026-08-16T17:10:58.389Z",
+  "updated": "2026-08-17T10:20:55.669Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25778",
+      "reporter": "אמיר פרלברג",
+      "location": "נווה ים, הבונים ודור-נחשולים",
+      "lat": null,
+      "lon": null,
+      "date": "2026-08-17T07:30+03:00",
+      "dateText": "17.08.2026",
+      "time": "07:30",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25778"
+    },
     {
       "id": "25777",
       "reporter": "שי מיניס",
@@ -1266,22 +1282,6 @@
       "species": "אין מדוזות",
       "diameter": "1-5",
       "url": "https://www.meduzot.co.il/observation/25685"
-    },
-    {
-      "id": "25684",
-      "reporter": "Dor Edelist",
-      "location": "מכמורת, בית ינאי, נעורים",
-      "lat": 32.408,
-      "lon": 34.866,
-      "date": "2026-07-27T17:53+03:00",
-      "dateText": "27.07.2026",
-      "time": "17:53",
-      "activity": "הליכה על החוף",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25684"
     }
   ]
 }
