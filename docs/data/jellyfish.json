@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-19T11:15:12.264Z",
+  "updated": "2026-08-19T14:22:41.442Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
@@ -18,22 +18,6 @@
       "species": "אין מדוזות",
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25783"
-    },
-    {
-      "id": "25782",
-      "reporter": "Noga Buyum",
-      "location": "פלמחים",
-      "lat": 31.93,
-      "lon": 34.697,
-      "date": "2026-08-18T18:04+03:00",
-      "dateText": "18.08.2026",
-      "time": "18:04",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": "37",
-      "species": "חוטית נודדת",
-      "diameter": "60+",
-      "url": "https://www.meduzot.co.il/observation/25782"
     },
     {
       "id": "25781",
@@ -1282,6 +1266,22 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25692"
+    },
+    {
+      "id": "25691",
+      "reporter": "אמיר פרלברג",
+      "location": "נווה ים, הבונים ודור-נחשולים",
+      "lat": null,
+      "lon": null,
+      "date": "2026-07-29T07:30+03:00",
+      "dateText": "29.07.2026",
+      "time": "07:30",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25691"
     }
   ]
 }
