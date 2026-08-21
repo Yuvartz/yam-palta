@@ -1,8 +1,24 @@
 {
-  "updated": "2026-08-20T15:23:16.454Z",
+  "updated": "2026-08-21T06:27:02.534Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25786",
+      "reporter": "שלמה יער-בר",
+      "location": "ראש הנקרה - בצת",
+      "lat": null,
+      "lon": null,
+      "date": "2026-08-21T08:43+03:00",
+      "dateText": "21.08.2026",
+      "time": "08:43",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25786"
+    },
     {
       "id": "25785",
       "reporter": "Dor Edelist",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25694"
-    },
-    {
-      "id": "25693",
-      "reporter": "טלי טריינין",
-      "location": "פלמחים",
-      "lat": 31.93,
-      "lon": 34.697,
-      "date": "2026-07-29T14:08+03:00",
-      "dateText": "29.07.2026",
-      "time": "14:08",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": "1-5",
-      "species": "פעמונית נקודה",
-      "diameter": "11-30",
-      "url": "https://www.meduzot.co.il/observation/25693"
     }
   ]
 }
