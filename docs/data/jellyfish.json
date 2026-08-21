@@ -1,8 +1,24 @@
 {
-  "updated": "2026-08-21T10:18:56.288Z",
+  "updated": "2026-08-21T16:19:45.130Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25788",
+      "reporter": "אופק אבנון",
+      "location": "תל אביב צפון - חוף הצוק ותל ברוך",
+      "lat": 32.085,
+      "lon": 34.766,
+      "date": "2026-08-21T18:42+03:00",
+      "dateText": "21.08.2026",
+      "time": "18:42",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25788"
+    },
     {
       "id": "25787",
       "reporter": "מישמיש בורא",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25696"
-    },
-    {
-      "id": "25695",
-      "reporter": "Dor Edelist",
-      "location": "פלמחים",
-      "lat": 31.93,
-      "lon": 34.697,
-      "date": "2026-07-30T08:38+03:00",
-      "dateText": "30.07.2026",
-      "time": "08:38",
-      "activity": "הליכה על החוף",
-      "distance": "0-200",
-      "quantity": "1",
-      "species": "פעמונית נקודה",
-      "diameter": "11-30",
-      "url": "https://www.meduzot.co.il/observation/25695"
     }
   ]
 }
