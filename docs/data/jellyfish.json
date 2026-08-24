@@ -1,8 +1,24 @@
 {
-  "updated": "2026-08-24T06:35:01.532Z",
+  "updated": "2026-08-24T10:27:07.055Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25796",
+      "reporter": "יון פדר",
+      "location": "יפו",
+      "lat": 32.053,
+      "lon": 34.75,
+      "date": "2026-08-24T13:06+03:00",
+      "dateText": "24.08.2026",
+      "time": "13:06",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25796"
+    },
     {
       "id": "25795",
       "reporter": "אמיר פרלברג",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25706"
-    },
-    {
-      "id": "25705",
-      "reporter": "Dor Edelist",
-      "location": "תל אביב צפון - הירקון, מציצים, הילטון ומרינה תל אביב",
-      "lat": 32.085,
-      "lon": 34.766,
-      "date": "2026-08-01T20:37+03:00",
-      "dateText": "01.08.2026",
-      "time": "20:37",
-      "activity": "גלישת גלים",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25705"
     }
   ]
 }
