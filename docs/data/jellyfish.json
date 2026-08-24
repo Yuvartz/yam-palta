@@ -1,8 +1,40 @@
 {
-  "updated": "2026-08-24T14:31:41.389Z",
+  "updated": "2026-08-24T18:23:37.471Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25805",
+      "reporter": "מיה אלסר",
+      "location": "ראש הנקרה - בצת",
+      "lat": null,
+      "lon": null,
+      "date": "2026-08-24T18:30+03:00",
+      "dateText": "24.08.2026",
+      "time": "18:30",
+      "activity": "צלילה חופשית שנירקול",
+      "distance": "200- 1 ק\"מ",
+      "quantity": "50",
+      "species": "מסרקנית זהרורית",
+      "diameter": "1-5",
+      "url": "https://www.meduzot.co.il/observation/25805"
+    },
+    {
+      "id": "25804",
+      "reporter": "Dor Edelist",
+      "location": "תל אביב צפון - הירקון, מציצים, הילטון ומרינה תל אביב",
+      "lat": 32.085,
+      "lon": 34.766,
+      "date": "2026-08-24T20:36+03:00",
+      "dateText": "24.08.2026",
+      "time": "20:36",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25804"
+    },
     {
       "id": "25803",
       "reporter": "עינת סיטבון",
@@ -1250,38 +1282,6 @@
       "species": "חוטית נודדת",
       "diameter": "11-30",
       "url": "https://www.meduzot.co.il/observation/25715"
-    },
-    {
-      "id": "25714",
-      "reporter": "שי מיניס",
-      "location": "פלמחים",
-      "lat": 31.93,
-      "lon": 34.697,
-      "date": "2026-08-05T06:58+03:00",
-      "dateText": "05.08.2026",
-      "time": "06:58",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": "2",
-      "species": "פעמונית נקודה",
-      "diameter": "11-30",
-      "url": "https://www.meduzot.co.il/observation/25714"
-    },
-    {
-      "id": "25713",
-      "reporter": "אמיר פרלברג",
-      "location": "נווה ים, הבונים ודור-נחשולים",
-      "lat": null,
-      "lon": null,
-      "date": "2026-08-05T08:30+03:00",
-      "dateText": "05.08.2026",
-      "time": "08:30",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": "1000000",
-      "species": "מסרקנית זהרורית",
-      "diameter": "1-5",
-      "url": "https://www.meduzot.co.il/observation/25713"
     }
   ]
 }
