@@ -1,8 +1,24 @@
 {
-  "updated": "2026-08-26T16:09:14.970Z",
+  "updated": "2026-08-27T13:18:24.689Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25813",
+      "reporter": "אמיר פרלברג",
+      "location": "נווה ים, הבונים ודור-נחשולים",
+      "lat": null,
+      "lon": null,
+      "date": "2026-08-27T07:30+03:00",
+      "dateText": "27.08.2026",
+      "time": "07:30",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": "3",
+      "species": "מסרקנית זהרורית",
+      "diameter": "1-5",
+      "url": "https://www.meduzot.co.il/observation/25813"
+    },
     {
       "id": "25812",
       "reporter": "עדיאל עדוי",
@@ -1266,22 +1282,6 @@
       "species": "פעמונית נקודה",
       "diameter": "6-10",
       "url": "https://www.meduzot.co.il/observation/25726"
-    },
-    {
-      "id": "25725",
-      "reporter": "אמיר פרלברג",
-      "location": "נווה ים, הבונים ודור-נחשולים",
-      "lat": null,
-      "lon": null,
-      "date": "2026-08-07T07:30+03:00",
-      "dateText": "07.08.2026",
-      "time": "07:30",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25725"
     }
   ]
 }
