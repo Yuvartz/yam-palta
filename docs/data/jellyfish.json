@@ -1,8 +1,40 @@
 {
-  "updated": "2026-08-27T13:18:24.689Z",
+  "updated": "2026-08-28T07:48:56.152Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25815",
+      "reporter": "שלמה יער-בר",
+      "location": "ראש הנקרה - בצת",
+      "lat": null,
+      "lon": null,
+      "date": "2026-08-28T10:25+03:00",
+      "dateText": "28.08.2026",
+      "time": "10:25",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25815"
+    },
+    {
+      "id": "25814",
+      "reporter": "טל",
+      "location": "ניצנים",
+      "lat": 31.72,
+      "lon": 34.59,
+      "date": "2026-08-28T06:59+03:00",
+      "dateText": "28.08.2026",
+      "time": "06:59",
+      "activity": "הליכה על החוף",
+      "distance": "0-200",
+      "quantity": "1",
+      "species": "חוטית נודדת",
+      "diameter": "60+",
+      "url": "https://www.meduzot.co.il/observation/25814"
+    },
     {
       "id": "25813",
       "reporter": "אמיר פרלברג",
@@ -1250,38 +1282,6 @@
       "species": "חוטית נודדת",
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25728"
-    },
-    {
-      "id": "25727",
-      "reporter": "אנונימי",
-      "location": "הרצליה",
-      "lat": 32.166,
-      "lon": 34.796,
-      "date": "2026-08-07T06:10+03:00",
-      "dateText": "07.08.2026",
-      "time": "06:10",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": "8",
-      "species": "חוטית נודדת",
-      "diameter": "6-10",
-      "url": "https://www.meduzot.co.il/observation/25727"
-    },
-    {
-      "id": "25726",
-      "reporter": "רועי פרידמן",
-      "location": "חופי אשקלון והדרום",
-      "lat": 31.67,
-      "lon": 34.556,
-      "date": "2026-08-07T09:48+03:00",
-      "dateText": "07.08.2026",
-      "time": "09:48",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": "1",
-      "species": "פעמונית נקודה",
-      "diameter": "6-10",
-      "url": "https://www.meduzot.co.il/observation/25726"
     }
   ]
 }
