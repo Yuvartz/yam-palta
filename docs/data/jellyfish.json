@@ -1,8 +1,40 @@
 {
-  "updated": "2026-08-30T12:25:38.352Z",
+  "updated": "2026-08-30T17:03:43.350Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25840",
+      "reporter": "Mia",
+      "location": "ניצנים",
+      "lat": 31.72,
+      "lon": 34.59,
+      "date": "2026-08-30T18:32+03:00",
+      "dateText": "30.08.2026",
+      "time": "18:32",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25840"
+    },
+    {
+      "id": "25839",
+      "reporter": "Dor Edelist",
+      "location": "בת גלים",
+      "lat": 32.827,
+      "lon": 34.987,
+      "date": "2026-08-30T17:45+03:00",
+      "dateText": "30.08.2026",
+      "time": "17:45",
+      "activity": "הליכה על החוף",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25839"
+    },
     {
       "id": "25838",
       "reporter": "הילה דרור",
@@ -1250,38 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25745"
-    },
-    {
-      "id": "25744",
-      "reporter": "Shmuel Onn",
-      "location": "חיפה דרום - חוף זמיר, דדו והסטודנטים",
-      "lat": 32.83,
-      "lon": 34.98,
-      "date": "2026-08-10T07:15+03:00",
-      "dateText": "10.08.2026",
-      "time": "07:15",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25744"
-    },
-    {
-      "id": "25743",
-      "reporter": "אמיר פרלברג",
-      "location": "נווה ים, הבונים ודור-נחשולים",
-      "lat": null,
-      "lon": null,
-      "date": "2026-08-10T08:00+03:00",
-      "dateText": "10.08.2026",
-      "time": "08:00",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": "100000",
-      "species": "מסרקנית זהרורית",
-      "diameter": "1-5",
-      "url": "https://www.meduzot.co.il/observation/25743"
     }
   ]
 }
