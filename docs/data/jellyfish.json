@@ -1,8 +1,24 @@
 {
-  "updated": "2026-09-01T05:51:05.976Z",
+  "updated": "2026-09-01T18:58:45.604Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25841",
+      "reporter": "Or Bergel",
+      "location": "תל אביב צפון - חוף הצוק ותל ברוך",
+      "lat": 32.085,
+      "lon": 34.766,
+      "date": "2026-09-01T19:14+03:00",
+      "dateText": "01.09.2026",
+      "time": "19:14",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": "1-5",
+      "species": "חוטית נודדת",
+      "diameter": "6-10",
+      "url": "https://www.meduzot.co.il/observation/25841"
+    },
     {
       "id": "25840",
       "reporter": "Mia",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25736"
-    },
-    {
-      "id": "25735",
-      "reporter": "אמיר פרלברג",
-      "location": "נווה ים, הבונים ודור-נחשולים",
-      "lat": null,
-      "lon": null,
-      "date": "2026-08-07T11:00+03:00",
-      "dateText": "07.08.2026",
-      "time": "11:00",
-      "activity": "צלילה חופשית שנירקול",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25735"
     }
   ]
 }
