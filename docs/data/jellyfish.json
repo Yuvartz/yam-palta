@@ -1,8 +1,24 @@
 {
-  "updated": "2026-09-04T18:41:14.838Z",
+  "updated": "2026-09-04T21:08:53.307Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25853",
+      "reporter": "tania loutaty",
+      "location": "אשדוד",
+      "lat": 31.79,
+      "lon": 34.63,
+      "date": "2026-09-04T17:01+03:00",
+      "dateText": "04.09.2026",
+      "time": "17:01",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": "1-5",
+      "species": "פעמונית נקודה",
+      "diameter": "11-30",
+      "url": "https://www.meduzot.co.il/observation/25853"
+    },
     {
       "id": "25852",
       "reporter": "אריאל דמידוב",
@@ -1266,22 +1282,6 @@
       "species": "פעמונית נקודה",
       "diameter": "11-30",
       "url": "https://www.meduzot.co.il/observation/25751"
-    },
-    {
-      "id": "25748",
-      "reporter": "Dor Edelist",
-      "location": "ראש הנקרה - בצת",
-      "lat": null,
-      "lon": null,
-      "date": "2026-08-10T17:15+03:00",
-      "dateText": "10.08.2026",
-      "time": "17:15",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": "6-50",
-      "species": "מסרקנית זהרורית",
-      "diameter": "6-10",
-      "url": "https://www.meduzot.co.il/observation/25748"
     }
   ]
 }
