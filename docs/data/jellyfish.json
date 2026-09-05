@@ -1,8 +1,24 @@
 {
-  "updated": "2026-09-05T11:01:52.862Z",
+  "updated": "2026-09-05T14:11:22.667Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25858",
+      "reporter": "עדן פילוסוף",
+      "location": "בת ים וראשון לציון",
+      "lat": 32.015,
+      "lon": 34.743,
+      "date": "2026-09-05T13:03+03:00",
+      "dateText": "05.09.2026",
+      "time": "13:03",
+      "activity": "רחצה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25858"
+    },
     {
       "id": "25857",
       "reporter": "ניב וכטנברג",
@@ -1266,22 +1282,6 @@
       "species": "מסרקנית זהרורית",
       "diameter": "1-5",
       "url": "https://www.meduzot.co.il/observation/25756"
-    },
-    {
-      "id": "25755",
-      "reporter": "טל שמרת",
-      "location": "אולגה וגדור",
-      "lat": 32.45,
-      "lon": 34.88,
-      "date": "2026-08-11T08:23+03:00",
-      "dateText": "11.08.2026",
-      "time": "08:23",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": "1000",
-      "species": "מסרקנית זהרורית",
-      "diameter": "1-5",
-      "url": "https://www.meduzot.co.il/observation/25755"
     }
   ]
 }
