@@ -1,8 +1,24 @@
 {
-  "updated": "2026-09-06T05:17:15.160Z",
+  "updated": "2026-09-06T16:33:45.487Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25866",
+      "reporter": "Dor Edelist",
+      "location": "",
+      "lat": null,
+      "lon": null,
+      "date": "2026-09-06T19:18+03:00",
+      "dateText": "06.09.2026",
+      "time": "19:18",
+      "activity": "הליכה על החוף",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25866"
+    },
     {
       "id": "25865",
       "reporter": "אילן קרוגליאק",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25766"
-    },
-    {
-      "id": "25761",
-      "reporter": "אלון אנגרט",
-      "location": "בת ים וראשון לציון",
-      "lat": 32.015,
-      "lon": 34.743,
-      "date": "2026-08-10T17:11+03:00",
-      "dateText": "10.08.2026",
-      "time": "17:11",
-      "activity": "גלישת רוח קייט",
-      "distance": "200- 1 ק\"מ",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25761"
     }
   ]
 }
