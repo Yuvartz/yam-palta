@@ -1,8 +1,40 @@
 {
-  "updated": "2026-09-09T18:08:42.955Z",
+  "updated": "2026-09-09T21:21:45.715Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25874",
+      "reporter": "שי מיניס",
+      "location": "תל אביב צפון - חוף הצוק ותל ברוך",
+      "lat": 32.085,
+      "lon": 34.766,
+      "date": "2026-09-07T06:23+03:00",
+      "dateText": "07.09.2026",
+      "time": "06:23",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": "1",
+      "species": "חוטית נודדת",
+      "diameter": "11-30",
+      "url": "https://www.meduzot.co.il/observation/25874"
+    },
+    {
+      "id": "25873",
+      "reporter": "שי מיניס",
+      "location": "פלמחים",
+      "lat": 31.93,
+      "lon": 34.697,
+      "date": "2026-09-09T07:23+03:00",
+      "dateText": "09.09.2026",
+      "time": "07:23",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": "4",
+      "species": "חוטית נודדת",
+      "diameter": "11-30",
+      "url": "https://www.meduzot.co.il/observation/25873"
+    },
     {
       "id": "25872",
       "reporter": "יוסי ולר",
@@ -1250,38 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25775"
-    },
-    {
-      "id": "25774",
-      "reporter": "נעה נפתלי",
-      "location": "חופי אשקלון והדרום",
-      "lat": 31.67,
-      "lon": 34.556,
-      "date": "2026-08-16T00:15+03:00",
-      "dateText": "16.08.2026",
-      "time": "00:15",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25774"
-    },
-    {
-      "id": "25773",
-      "reporter": "הילה דרור",
-      "location": "געש, ארסוף",
-      "lat": null,
-      "lon": null,
-      "date": "2026-08-01T09:11+03:00",
-      "dateText": "01.08.2026",
-      "time": "09:11",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25773"
     }
   ]
 }
