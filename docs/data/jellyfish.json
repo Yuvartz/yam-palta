@@ -1,8 +1,24 @@
 {
-  "updated": "2026-09-09T10:21:00.932Z",
+  "updated": "2026-09-09T14:53:39.167Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25870",
+      "reporter": "חבצלת מורסיאנו",
+      "location": "אשדוד",
+      "lat": 31.79,
+      "lon": 34.63,
+      "date": "2026-09-05T15:34+03:00",
+      "dateText": "05.09.2026",
+      "time": "15:34",
+      "activity": "רחצה",
+      "distance": "0-200",
+      "quantity": "1",
+      "species": "אחר, לא מזוהה",
+      "diameter": "1-5",
+      "url": "https://www.meduzot.co.il/observation/25870"
+    },
     {
       "id": "25869",
       "reporter": "מישמיש בורא",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25771"
-    },
-    {
-      "id": "25770",
-      "reporter": "Dor Edelist",
-      "location": "מעגן מיכאל וג'אסר א זרקא",
-      "lat": null,
-      "lon": null,
-      "date": "2026-08-15T00:11+03:00",
-      "dateText": "15.08.2026",
-      "time": "00:11",
-      "activity": "צלילה חופשית שנירקול",
-      "distance": "200- 1 ק\"מ",
-      "quantity": "1-5",
-      "species": "חוטית נודדת",
-      "diameter": "1-5",
-      "url": "https://www.meduzot.co.il/observation/25770"
     }
   ]
 }
