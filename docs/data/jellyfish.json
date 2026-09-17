@@ -1,8 +1,24 @@
 {
-  "updated": "2026-09-17T17:50:31.042Z",
+  "updated": "2026-09-17T20:43:39.212Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25910",
+      "reporter": "שיר יצחק",
+      "location": "תל אביב צפון - חוף הצוק ותל ברוך",
+      "lat": 32.085,
+      "lon": 34.766,
+      "date": "2026-09-17T14:38+03:00",
+      "dateText": "17.09.2026",
+      "time": "14:38",
+      "activity": "רחצה",
+      "distance": "0-200",
+      "quantity": "1",
+      "species": "חוטית נודדת",
+      "diameter": "1-5",
+      "url": "https://www.meduzot.co.il/observation/25910"
+    },
     {
       "id": "25909",
       "reporter": "יוסי ולר",
@@ -1266,22 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25816"
-    },
-    {
-      "id": "25815",
-      "reporter": "שלמה יער-בר",
-      "location": "ראש הנקרה - בצת",
-      "lat": null,
-      "lon": null,
-      "date": "2026-08-28T10:25+03:00",
-      "dateText": "28.08.2026",
-      "time": "10:25",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25815"
     }
   ]
 }
