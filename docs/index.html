@@ -456,21 +456,6 @@
     #app > :nth-child(5) { animation-delay: .2s; } #app > :nth-child(6) { animation-delay: .25s; } #app > :nth-child(7) { animation-delay: .3s; }
     @media (prefers-reduced-motion: reduce) { #app > .card, #app > section, .wrap { animation: none; } }
 
-    /* ---- "Where is it flattest right now" — compare every saved beach at a glance ---- */
-    .compare { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px; margin: 0 -2px; -webkit-mask-image: linear-gradient(90deg, transparent, #000 12px, #000 calc(100% - 12px), transparent); mask-image: linear-gradient(90deg, transparent, #000 12px, #000 calc(100% - 12px), transparent); }
-    .compare::-webkit-scrollbar { display: none; }
-    .cmp { flex: 0 0 auto; min-width: 96px; text-align: center; padding: 10px 10px 9px; border-radius: 14px; background: linear-gradient(180deg, #1e283c66, transparent), var(--card-2); border: 1px solid var(--hairline); cursor: pointer;
-      font-family: var(--sans); color: var(--text); transition: transform .18s var(--ease), border-color .18s var(--ease), box-shadow .18s var(--ease); }
-    .cmp:hover { transform: translateY(-2px); border-color: #33436a; }
-    .cmp:active { transform: scale(.96); }
-    .cmp.active { border-color: rgba(45,212,191,.5); box-shadow: 0 0 14px -8px var(--calm-glow); }
-    .cmp.best { border-color: color-mix(in srgb, var(--c, var(--calm)) 60%, transparent); box-shadow: 0 0 18px -8px color-mix(in srgb, var(--c, var(--calm)) 70%, transparent); }
-    .cmp .cmp-name { font-size: 12px; font-weight: 700; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
-    .cmp .cmp-score { font-family: var(--mono); font-size: 22px; font-weight: 800; line-height: 1.15; margin: 3px 0 1px; }
-    .cmp .cmp-tier { font-size: 11px; font-weight: 800; }
-    .cmp .cmp-crown { font-size: 11px; display: block; height: 14px; line-height: 14px; }
-    .cmp-note { font-size: 12px; color: var(--muted); margin: 10px 0 0; }
-
     /* ---- Week heatmap: 6 days × daylight hours, colour = tier ---- */
     .heat { display: grid; grid-template-columns: 52px 1fr; gap: 6px 8px; align-items: center; }
     .heat-day { font-size: 12.5px; font-weight: 700; white-space: nowrap; }
@@ -565,11 +550,6 @@
       <section class="hero" id="hero"></section>
       <section id="goodFor"></section>
 
-      <div class="card" id="compareCard" style="display:none">
-        <h2>איפה הכי פלטה עכשיו</h2>
-        <div class="compare" id="compare"></div>
-        <p class="cmp-note" id="compareNote"></p>
-      </div>
 
       <div class="card feedback-card" id="feedbackCard" style="display:none">
         <button class="fb-toggle" onclick="App.toggleFeedback()">🌊 אתה בים עכשיו? <span class="fb-chev" id="fbChev">▾</span></button>
@@ -1668,33 +1648,7 @@
     }
     // renderHero() already draws the jellyfish chip — only the report list is rendered again here
     // (renderJelly() used to rebuild the hero a second time, restarting every wave animation).
-    function renderAll() { lastRenderHour = israelNow().hour; renderHero(); renderGoodFor(); renderCompare(); renderWaveDetails(); renderMetrics(); renderSST(); renderHeat(); renderForecast(); renderNextWindow(); renderStreak(); renderUpdated(); renderJellyReports(); renderFeedback(); renderClimatology(); }
-
-    // ---- "Where is it flattest right now": every saved beach, scored for the current hour ----
-    // Reuses the data the weekly alert scan already fetched (dataCache) — zero extra requests.
-    function currentHourOf(data) { const now = israelNow(); const k = `${now.dateStr}T${pad(now.hour)}`; return data.find(h => h.time.slice(0, 13) === k) || data.find(h => h.time.slice(0, 13) >= k) || null; }
-    function renderCompare() {
-      const card = $("compareCard"), el = $("compare"); if (!card || !el) return;
-      const rows = [];
-      for (const [k, v] of Object.entries(allLocations())) {
-        const data = k === LS.loc ? hourly : dataCache[k]; if (!data || !data.length) continue;
-        const h = currentHourOf(data), s = h ? palataIndex(h) : null; if (s == null) continue;
-        rows.push({ k, name: v.name, score: s, tier: palataTier(s), water: h.seaTemp });
-      }
-      if (rows.length < 2) { card.style.display = "none"; return; }
-      rows.sort((a, b) => b.score - a.score);
-      card.style.display = "";
-      el.innerHTML = rows.map((r, i) => `
-        <button class="cmp${r.k === LS.loc ? " active" : ""}${i === 0 ? " best" : ""}" style="--c:${r.tier.color}" onclick="App.setLocation('${r.k}')" aria-label="${esc(r.name)} — מדד ${(r.score / 10).toFixed(1)}">
-          <span class="cmp-crown">${i === 0 ? "👑" : ""}</span>
-          <div class="cmp-name">${esc(r.name)}</div>
-          <div class="cmp-score num" style="color:${r.tier.color}">${(r.score / 10).toFixed(1)}</div>
-          <div class="cmp-tier" style="color:${r.tier.color}">${r.tier.emoji} ${r.tier.short}</div>
-        </button>`).join("");
-      const best = rows[0], cur = rows.find(r => r.k === LS.loc);
-      $("compareNote").textContent = best.k === LS.loc ? `${best.name} הוא החוף הכי רגוע מבין החופים שלך עכשיו.`
-        : cur ? `ב${best.name} רגוע יותר מ${cur.name} עכשיו (${(best.score / 10).toFixed(1)} מול ${(cur.score / 10).toFixed(1)}) · לחצו כדי לעבור.` : "";
-    }
+    function renderAll() { lastRenderHour = israelNow().hour; renderHero(); renderGoodFor(); renderWaveDetails(); renderMetrics(); renderSST(); renderHeat(); renderForecast(); renderNextWindow(); renderStreak(); renderUpdated(); renderJellyReports(); renderFeedback(); renderClimatology(); }
 
     // ---- Week heatmap: one coloured cell per daylight hour, six days ----
     const HEAT_HOURS = Array.from({ length: DAY_END - DAY_START + 1 }, (_, i) => DAY_START + i);   // 06..19
@@ -1774,7 +1728,6 @@
       for (const [k, v] of Object.entries(allLocations())) { const data = dataCache[k]; if (!data) continue; const pct = weekCalmPct(data); if (!best || pct > best.pct) best = { name: v.name, pct }; }
       const el = $("alertBanner");
       el.innerHTML = (best && best.pct >= ALERT_PCT) ? `<span class="ic">🔥</span><span>שים לב — בשבוע הקרוב צפוי כ-<b>${best.pct}%</b> מהזמן מתאים לשחייה ב<b>${esc(best.name)}</b>!</span>` : "";
-      renderCompare();   // the scan just refreshed the other beaches' data
     }
     const SCAN_TTL = 60 * 60 * 1000;   // re-scan a beach after an hour — dataCache was forever-stale within a session
     const scanFetchedAt = {};
