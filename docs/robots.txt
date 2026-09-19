@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://yuvartz.github.io/yam-palta/sitemap.xml

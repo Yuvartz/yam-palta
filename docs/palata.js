@@ -25,10 +25,20 @@
   // called palata no matter how calm the wind. Caps sit just under each tier's floor.
   // Missing height caps below the calm bar too: we won't declare a sea swim-flat without
   // actually knowing the wave height (wind+chop alone could otherwise reach 83).
-  const heightTierCap = h => h == null ? 79 : h > 0.35 ? 79 : h > 0.20 ? 89 : h > 0.10 ? 97 : 100;
+  // Extended down the scale too: a 2 m smooth swell with no wind used to score 65 ("גלי עדין") —
+  // real waves can never be called gentle just because the air is still.
+  const heightTierCap = h => h == null ? 79
+    : h > 2.2 ? 19 : h > 1.5 ? 29 : h > 1.0 ? 39 : h > 0.7 ? 59
+    : h > 0.35 ? 79 : h > 0.20 ? 89 : h > 0.10 ? 97 : 100;
 
   // Core score from raw factor values (waveHeight m, chop m, wind kt, windHistory kt).
+  // Returns null (no verdict) when wave height or current wind is unknown — a missing factor used
+  // to score as a neutral 0.5, which let "no data" reach כמעט פלטה and fire notifications.
+  // Missing chop falls back to total height; missing history falls back to the current wind.
   function scoreOf(waveHeight, chop, windKt, histKt) {
+    if (waveHeight == null || windKt == null || !isFinite(waveHeight) || !isFinite(windKt)) return null;
+    if (chop == null) chop = waveHeight;
+    if (histKt == null) histKt = windKt;
     const sum = heightScoreFn(waveHeight) * WEIGHTS.height + chopScoreFn(chop) * WEIGHTS.chop
       + windScoreFn(windKt) * WEIGHTS.wind + windScoreFn(histKt) * WEIGHTS.history;
     return Math.min(Math.round(clamp01(sum) * 100), heightTierCap(waveHeight));
