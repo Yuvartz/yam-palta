@@ -62,8 +62,8 @@ const tierOf = s => Palata.TIERS.find(t => s >= t.min) || Palata.TIERS[Palata.TI
 
 function page(b, cur, days, now, others) {
   const t = cur && cur.score != null ? tierOf(cur.score) : null;
-  const title = `גובה גלים ומצב הים ב${b.name} היום — מדד הפלטה ${cur && cur.score != null ? (cur.score / 10).toFixed(1) : ""} | ים פלטה`;
-  const desc = `האם הים ב${b.name} שטוח לשחייה, סאפ ושנירקול? ${t ? `עכשיו: ${t.label} (${(cur.score / 10).toFixed(1)}/10), גל ${cur.waveHeight?.toFixed(1)} מ׳${cur.seaTemp != null ? `, מים ${Math.round(cur.seaTemp)}°` : ""}.` : ""} תחזית ל-3 ימים עם השעות הרגועות, מתעדכנת כל 3 שעות.`;
+  const title = `מצב הים ב${b.name} היום — יש פלטה? מדד ${cur && cur.score != null ? (cur.score / 10).toFixed(1) : "—"} | ים פלטה`;
+  const desc = `מחפשים ים שטוח ב${b.name}? ${t ? `עכשיו ${t.label} (${(cur.score / 10).toFixed(1)}/10), גל ${cur.waveHeight?.toFixed(1)} מ׳${cur.seaTemp != null ? `, מים ${Math.round(cur.seaTemp)}°` : ""}. ` : ""}גובה גלים, רוח ומדד הפלטה עם תחזית ל-3 ימים והשעות הרגועות. לשחייה, סאפ או סתם ציפה.`;
   const rows = days.map(d => `<tr><td>${d.ds === now.dateStr ? "היום" : dayName(d.ds)} <small>${d.ds.slice(8, 10)}.${+d.ds.slice(5, 7)}</small></td><td>${d.pct}%</td><td>${d.peak ? `${(d.peak.score / 10).toFixed(1)} ב-${pad(d.peak.hour)}:00` : "—"}</td><td>${d.run ? `<span dir="ltr">${pad(d.run.s)}:00–${pad(d.run.e + 1)}:00</span>` : "אין"}</td><td style="white-space:nowrap">${d.minH != null ? `<span dir="ltr">${d.minH.toFixed(1)}–${d.maxH.toFixed(1)}</span> מ׳` : "—"}</td><td>${d.water != null ? `${Math.round(d.water)}°` : "—"}</td></tr>`).join("");
   const links = others.map(o => `<a href="/${o.slug}/">${o.name}</a>`).join(" · ");
   const ld = { "@context": "https://schema.org", "@type": "WebPage", name: title, description: desc, url: `${SITE}/${b.slug}/`, inLanguage: "he", isPartOf: { "@type": "WebApplication", name: "ים פלטה", url: SITE + "/" }, dateModified: new Date().toISOString(), about: { "@type": "Beach", name: `חוף ${b.name}`, geo: { "@type": "GeoCoordinates", latitude: b.lat, longitude: b.lon } } };
@@ -75,10 +75,12 @@ function page(b, cur, days, now, others) {
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}" />
 <link rel="canonical" href="${SITE}/${b.slug}/" />
-<meta property="og:title" content="${esc(title)}" /><meta property="og:description" content="${esc(desc)}" /><meta property="og:url" content="${SITE}/${b.slug}/" /><meta property="og:image" content="${SITE}/og-image.png" /><meta property="og:type" content="website" /><meta property="og:locale" content="he_IL" />
+<meta property="og:title" content="${esc(title)}" /><meta property="og:description" content="${esc(desc)}" /><meta property="og:url" content="${SITE}/${b.slug}/" /><meta property="og:image" content="${SITE}/og-image.png" /><meta property="og:type" content="website" /><meta property="og:locale" content="he_IL" /><meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" /><meta property="og:site_name" content="ים פלטה" />
+<meta name="twitter:card" content="summary_large_image" /><meta name="twitter:title" content="${esc(title)}" /><meta name="twitter:description" content="${esc(desc)}" /><meta name="twitter:image" content="${SITE}/og-image.png" />
 <meta name="theme-color" content="#0a0e16" />
 <link rel="icon" href="/favicon.ico" /><link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <script type="application/ld+json">${JSON.stringify(ld)}</script>
+<script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "ים פלטה", item: SITE + "/" }, { "@type": "ListItem", position: 2, name: b.name, item: `${SITE}/${b.slug}/` }] })}</script>
 <style>
 :root{--bg:#0a0e16;--card:#141b2a;--text:#e6edf6;--muted:#8a98ad;--calm:#2dd4bf;--gold:#ffd479}
 *{box-sizing:border-box}body{margin:0;font-family:Heebo,system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;padding:20px 16px 40px}
@@ -92,7 +94,8 @@ a{color:var(--calm)}.links{font-size:14px;color:var(--muted)}.foot{color:var(--m
 </head>
 <body><div class="wrap">
 <p class="meta"><a href="/">ים פלטה</a> › ${esc(b.name)}</p>
-<h1>מצב הים ב${esc(b.name)} היום: גובה גלים, טמפ׳ מים והשעות הרגועות</h1>
+<h1>הים ב${esc(b.name)} היום: מחכים לפלטה?</h1>
+<p class="meta">גובה גלים, טמפ׳ מים והשעות הרגועות, למי שמעדיפים בלי גלים.</p>
 <div class="hero">
   <div class="meta">מדד הפלטה עכשיו · ${esc(b.name)} · עודכן ${now.text}</div>
   ${t ? `<div class="score" style="color:${t.color}">${(cur.score / 10).toFixed(1)}<span style="font-size:20px;color:var(--muted)">/10</span></div><div class="tier" style="color:${t.color}">${t.emoji} ${t.label}</div>` : `<div class="tier">אין נתונים לשעה זו</div>`}
@@ -103,7 +106,7 @@ a{color:var(--calm)}.links{font-size:14px;color:var(--muted)}.foot{color:var(--m
 <table><thead><tr><th>יום</th><th>% שעות פלטה</th><th>שיא</th><th>חלון רגוע</th><th>גובה גל</th><th>מים</th></tr></thead><tbody>${rows}</tbody></table>
 <p class="meta">"% שעות פלטה" = חלק משעות האור שבהן מדד הפלטה 8.0 ומעלה (ים שטוח או כמעט שטוח). זו לא הסתברות. "חלון רגוע" = הרצף הארוך ביותר של שעות כאלה.</p>
 <h2>מה זה מדד הפלטה?</h2>
-<p>ציון מ-0 (סוער) עד 10 (חלק כמו מראה) שמשקלל ארבעה גורמים: גובה הגל הכולל, גלים קצרים שנוצרים מהרוח המקומית, עוצמת הרוח עכשיו, והרוח ב-10 השעות האחרונות (הים לא נרגע מיד). מעל גובה גל מסוים יש תקרה קשיחה: ים עם גלים אמיתיים לא ייקרא "פלטה" גם אם הרוח שקטה. הנתונים הם אנסמבל של מודלים ימיים ואטמוספריים (Météo-France, ECMWF, DWD) דרך Open-Meteo, ובחופי המרכז מוצגת לצדם מדידה אמיתית ממצוף חדרה של חקר ימים ואגמים.</p>
+<p>הגולשים מחפשים גלים. המדד שלנו מחפש כמה שפחות: מ-0 לסוער עד 10 לים מראה. הוא משקלל גובה גל, גלי רוח, רוח עכשיו והרוח בעשר השעות האחרונות. גלים גבוהים מגבילים את הציון גם כשהרוח נחה. התחזית היא אנסמבל מודלים (Open-Meteo); בחופי המרכז מוצגת לצדה מדידה ממצוף חדרה.</p>
 <h2>עוד חופים</h2>
 <p class="links">${links}</p>
 <p class="foot">המידע הוא תחזית ולא תחליף לשיקול דעת, לדגלי המציל ולתנאים בשטח. מקורות: <a href="https://open-meteo.com/">Open-Meteo</a> (CC-BY 4.0) · <a href="https://isramar.ocean.org.il/">ISRAMAR</a> · <a href="https://www.meduzot.co.il/">מדוזות בים</a>. © ים פלטה · <a href="/">yamplata.com</a></p>

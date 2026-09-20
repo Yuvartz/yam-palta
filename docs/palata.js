@@ -49,9 +49,9 @@
     { min: 98, key: "deluxe", emoji: "🪞",  label: "פלטה דלוקס", short: "דלוקס", color: "#ffd479" },
     { min: 90, key: "palata", emoji: "🌊",  label: "ים פלטה",    short: "פלטה",  color: "#2dd4bf" },
     { min: 80, key: "almost", emoji: "🐢",  label: "כמעט פלטה",  short: "כמעט",  color: "#8ee3c8" },
-    { min: 60, key: "gentle", emoji: "🏊",  label: "גלי עדין",   short: "עדין",  color: "#e9c46a" },
+    { min: 60, key: "gentle", emoji: "🏊",  label: "גלים קלים",  short: "קלים",  color: "#e9c46a" },
     { min: 40, key: "waves",  emoji: "🌬️", label: "יש גלים",    short: "גלים",  color: "#f0a55a" },
-    { min: 20, key: "big",    emoji: "🏄",  label: "גל גדול",    short: "גדול",  color: "#ec7a5a" },
+    { min: 20, key: "big",    emoji: "🏄",  label: "גלים גדולים", short: "גדולים",  color: "#ec7a5a" },
     { min: 0,  key: "stormy", emoji: "⛈️", label: "וואלאק סוער", short: "סוער",  color: "#f06a6a" },
   ];
   const CALM_MIN = 80;     // "כמעט פלטה" tier or better — the swim/notify bar everywhere
@@ -61,23 +61,24 @@
   function notifyCopy(deluxe, beach, water, endHour, score) {
     const w = water != null ? ` · מים ${Math.round(water)}°` : "";
     const end = endHour != null ? ` · החלון עד ${pad(endHour)}:00` : "";
+    // Voice: the anti-surf app — inviting, cheeky about surfers, never a safety promise.
     const pool = deluxe ? [
-      `הים חלק כמו מראה${w}. נדיר — רוץ 🪞`,
-      `דלוקס אמיתי${w}${end}. שנייה לפני שכולם מגלים 🤫`,
-      `זה היום שמחכים לו${w}. הכל שטוח, הכל שלך 💎`,
+      `ב${beach} התחזית: ים מראה${w}${end}. הגלשן נח, המשקפת מתעוררת`,
+      `ב${beach} פלטה דלוקס${w}${end}. הקפה יכול לבוא בכוס לדרך`,
+      `ב${beach} הים כמעט שכח לעשות גלים${w}${end}. אנחנו לא מתלוננים`,
     ] : [
-      `הים נרגע${w}${end}. עזוב הכל 🐢`,
-      `פלטה עכשיו${w}. הים לא מחכה לנצח 🌊`,
-      `מדד ${score != null ? (score / 10).toFixed(1) : "גבוה"}${w}${end}. סגור את המחשב ובוא 🏊`,
+      `ב${beach} הים נרגע${w}${end}. המשקפת כבר בתיק?`,
+      `ב${beach} מתקרבים לפלטה${w}${end}. זמן למצוא את המגבת`,
+      `ב${beach} פחות גלים, יותר חשק לים${w}${end}. באים?`,
     ];
     // Honest tiering: 80-89 is "כמעט פלטה", not full palata — the title says which one it is.
-    const title = deluxe ? `💎 פלטה דלוקס ב${beach}!`
-      : (score != null && score < 90) ? `🐢 כמעט פלטה ב${beach}!` : `🌊 ים פלטה ב${beach}!`;
+    const title = deluxe ? `${beach}: פלטה דלוקס`
+      : (score != null && score < 90) ? `${beach}: כמעט פלטה` : `${beach}: ים פלטה`;
     return { title, body: pool[Math.floor(Math.random() * pool.length)] };
   }
   const eveningCopy = (beach, s, e) => ({
-    title: `🌅 מחר פלטה ב${beach}`,
-    body: `צפוי ים רגוע ⁦${pad(s)}:00–${pad(e)}:00⁩. כוון שעון, הים מחכה.`,   // LRI…PDI: the range stays LTR inside RTL notification text
+    title: `${beach}: מחר בבוקר?`,
+    body: `ב${beach} צפוי ים רגוע ⁦${pad(s)}:00–${pad(e)}:00⁩. נכין מגבת לבוקר?`,   // LRI…PDI: the range stays LTR inside RTL notification text
   });
 
   return {
