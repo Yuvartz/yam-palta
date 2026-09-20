@@ -59,6 +59,22 @@ async function fetchForecast(lat, lon) {
 async function handleFetch(req, env) {
   const url = new URL(req.url), { ok: originOk, headers } = cors(req, env);
   if (req.method === "OPTIONS") return new Response(null, { status: originOk ? 204 : 403, headers });
+  // GET /expand?u=<short maps link> → { url } after following redirects. Browsers cannot expand
+  // maps.app.goo.gl links themselves (no CORS), and that is what the Google Maps app shares.
+  if (url.pathname === "/expand" && req.method === "GET") {
+    if (!originOk) return json({ error: "origin not allowed" }, 403);
+    let target; try { target = new URL(url.searchParams.get("u") || ""); } catch (e) { return json({ error: "bad url" }, 400, headers); }
+    const okHost = /^(maps\.app\.goo\.gl|goo\.gl|g\.co|maps\.google\.com|www\.google\.com|google\.com|maps\.apple\.com|waze\.com|www\.waze\.com|ul\.waze\.com)$/.test(target.hostname);
+    if (target.protocol !== "https:" || !okHost) return json({ error: "host not allowed" }, 400, headers);
+    let cur = target.toString();
+    for (let hop = 0; hop < 6; hop++) {
+      const r = await fetch(cur, { redirect: "manual", headers: { "user-agent": "Mozilla/5.0 (compatible; YamPalata/1.0)" } });
+      const loc = r.headers.get("location");
+      if (r.status >= 300 && r.status < 400 && loc) { cur = new URL(loc, cur).toString(); continue; }
+      break;
+    }
+    return json({ url: cur }, 200, headers);
+  }
   if (url.pathname === "/health") {
     const list = await env.SUBS.list({ prefix: "sub:", limit: 1000 });
     return json({ ok: true, subscribers: list.keys.length, configured: !!(env.VAPID_PRIVATE_KEY && env.VAPID_SUBJECT) }, 200, headers);
