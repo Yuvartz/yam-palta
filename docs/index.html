@@ -593,9 +593,19 @@
       .brand .wordmark { font-size: 18px; letter-spacing: 2px; }
       .brand-logo { width: 26px; height: 26px; }
     }
+    /* First-launch intro: the brand film in a rounded "sunrise card" on the dark sea, tap to skip */
+    .intro { position: fixed; inset: 0; z-index: 90; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px;
+      background: radial-gradient(900px 600px at 50% 30%, rgba(255,212,121,.10), transparent 60%), var(--bg); cursor: pointer; transition: opacity .55s var(--ease); }
+    .intro.out { opacity: 0; pointer-events: none; }
+    .intro[hidden] { display: none; }   /* the class's display:flex would otherwise beat the hidden attribute */
+    .intro video, .intro img { width: min(78vw, 340px); aspect-ratio: 1; border-radius: 28px; display: block; box-shadow: 0 30px 80px -30px rgba(255,212,121,.35), 0 0 0 1px rgba(255,255,255,.06); background: #fbe9c2; }
+    .intro .intro-skip { color: var(--muted); font-size: 13px; font-weight: 700; background: rgba(255,255,255,.05); border: 1px solid var(--hairline); border-radius: 999px; padding: 8px 16px; font-family: var(--sans); cursor: pointer; }
+    .intro .intro-tag { color: var(--muted); font-size: 12px; letter-spacing: .3px; }
+
     /* Camera: photo + verdict stamp */
     .cam-modal .modal { max-width: 420px; padding: 16px; }
-    .cam-preview { width: 100%; border-radius: 14px; display: block; background: #000; }
+    .cam-preview { width: 100%; height: auto; border-radius: 14px; display: block; background: #000; touch-action: none; cursor: grab; }
+    .cam-preview:active { cursor: grabbing; }
     .cam-status { color: var(--muted); font-size: 13px; text-align: center; padding: 18px 0; }
     .cam-actions { display: flex; gap: 10px; margin-top: 12px; } .cam-actions .btn { margin-top: 0; }
     .cam-hint { font-size: 12px; color: var(--muted); margin: 10px 0 0; text-align: center; }
@@ -755,6 +765,14 @@
     </div>
   </div>
 
+  <div class="intro" id="intro" hidden role="dialog" aria-label="סרטון פתיחה — הקישו לדילוג">
+    <video id="introVideo" muted playsinline preload="auto" poster="video/intro-poster.jpg">
+      <source src="video/intro-480.webm" type="video/webm" />
+      <source src="video/intro-480.mp4" type="video/mp4" />
+    </video>
+    <button class="intro-skip" type="button" onclick="App.skipIntro()">דלג</button>
+    <span class="intro-tag">מתי הים באמת רגוע?</span>
+  </div>
   <div class="switch-bar" id="switchBar" aria-hidden="true"></div>
   <input type="file" id="camInput" accept="image/*" capture="environment" hidden aria-hidden="true" />
   <div class="modal-back cam-modal" id="camModal">
@@ -1497,10 +1515,14 @@
       const parallax = Math.asin(1 / pos.dist) / ARAD;
       return altGeo - parallax * Math.cos(altGeo * ARAD);
     }
+    // Israel local midnight as a UTC instant. The old version read the offset at UTC midnight, which
+    // is the wrong side of a DST switch (2026-03-27 resolved to 23:00 the day before, 2026-10-25 to
+    // 01:00). Israel is always UTC+2 or UTC+3, so try both and keep the one that really lands on 00:00.
     function israelMidnightUTC(dateStr) {
-      const guess = new Date(dateStr + "T00:00:00Z");
-      const h = parseInt(new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Jerusalem", hour: "2-digit", hour12: false }).format(guess), 10) % 24;
-      return new Date(guess.getTime() - h * 3600000);
+      const utc0 = Date.parse(dateStr + "T00:00:00Z");
+      const fmt = new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Jerusalem", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", hour12: false });
+      for (const off of [3, 2]) { const t = new Date(utc0 - off * 3600000); if (fmt.format(t).startsWith(dateStr + " 00")) return t; }
+      return new Date(utc0 - 2 * 3600000);
     }
     // Memoized per (date, place): the scan below runs ~120 lunar-position solves for a value
     // that changes once a day, and renderMetrics used to redo it on every render.
@@ -1597,7 +1619,7 @@
     function heroDayNav(dir) {
       const next = Math.max(0, Math.min(HERO_DAY_MAX, heroDay + dir));
       if (next === heroDay) return;
-      heroDay = next; heroDayAnim = dir > 0 ? "next" : "prev"; Sound.whoosh();
+      heroDay = next; heroDayAnim = dir > 0 ? "next" : "prev"; Sound.whoosh(); Track.event("day-nav", `+${next}`);
       // Swap ONLY the timeline: a full renderHero() rebuilds the wave layers and every drifting
       // figure, so the whole sea visibly restarts on each day flip. Precision > brute force.
       const tl = $("heroTimeline");
@@ -1827,7 +1849,7 @@
       // Forms returns an opaque cross-origin response so we can't read it, but a rejected fetch
       // means it never left the device — only mark "done" when the request actually resolved.
       // Capture the identity NOW — the user may switch beach while the POST is in flight.
-      const key = fbKey();
+      const key = fbKey(); Track.event("feedback", tierKey);
       $("fbButtons").querySelectorAll("button").forEach(b => { b.disabled = true; });
       fetch(FEEDBACK.formUrl, { method: "POST", mode: "no-cors", body: fd })
         .then(() => { localStorage.setItem(key, "1"); if (fbKey() === key) $("feedbackCard").classList.add("done"); })
@@ -2144,7 +2166,7 @@
       document.addEventListener("visibilitychange", () => { if (document.hidden) ambientStop(); else if (on && hourly.length) ambientSync(); });
       return { get on() { return on; }, setOn, tick, chime, whoosh, verdict, ambientSync };
     })();
-    function toggleSound() { Sound.setOn(!Sound.on); }
+    function toggleSound() { Sound.setOn(!Sound.on); Track.event("sound", Sound.on ? "on" : "off"); }
 
     // ---------- Share: native sheet where available, clipboard elsewhere ----------
     function shareText() {
@@ -2162,7 +2184,7 @@
       return u.toString();
     }
     async function share() {
-      Sound.tick();
+      Sound.tick(); Track.event("share");
       const text = shareText(), url = shareUrl();
       if (navigator.share) { try { await navigator.share({ title: "ים פלטה", text, url }); return; } catch (e) { if (e && e.name === "AbortError") return; } }
       try { await navigator.clipboard.writeText(`${text}\n${url}`); toast("📋 הועתק — אפשר להדביק בוואטסאפ", true); }
@@ -2176,13 +2198,59 @@
       history.replaceState(null, "", location.pathname);   // keep the address bar clean after applying
     }
 
+    // ---------- Usage analytics: GoatCounter (no cookies, no PII, one script) ----------
+    // Dormant until ANALYTICS.code is set (the GoatCounter site code, e.g. "yampalata" for
+    // https://yampalata.goatcounter.com). Pageviews are automatic; events answer the owner's
+    // questions: how many installed, what people do, how often they come back.
+    const ANALYTICS = { code: "" };
+    const Track = (() => {
+      let loaded = false, queue = [];
+      function ensure() {
+        if (loaded || !ANALYTICS.code) return;
+        loaded = true;
+        window.goatcounter = { no_onload: false, allow_local: false };
+        const s = document.createElement("script"); s.async = true; s.dataset.goatcounter = `https://${ANALYTICS.code}.goatcounter.com/count`; s.src = "https://gc.zgo.at/count.js";
+        s.onload = () => { queue.forEach(send); queue = []; };
+        document.head.appendChild(s);
+      }
+      function send(ev) { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count(ev); else queue.push(ev); }
+      // event(name, detail): recorded as a "page" named event:<name> with the detail as its title.
+      function event(name, detail = "") { if (!ANALYTICS.code) return; ensure(); send({ path: `event:${name}`, title: detail ? `${name} · ${detail}` : name, event: true }); }
+      function launch() {
+        if (!ANALYTICS.code) return; ensure();
+        const mode = isStandaloneMode() ? "installed" : "browser";
+        const visits = parseInt(localStorage.getItem("yp-visits") || "0", 10) || 0;
+        const bucket = visits <= 1 ? "first" : visits <= 5 ? "returning-early" : "regular";   // no user id — a coarse bucket is enough
+        event("launch", `${mode} · ${bucket}`);
+        if (mode === "installed") { const d = israelNow().dateStr; if (localStorage.getItem("yp-inst-day") !== d) { localStorage.setItem("yp-inst-day", d); event("installed-daily-active"); } }
+      }
+      return { event, launch };
+    })();
+
+    // ---------- First-launch intro (the brand film), once per device + once more when installed ----------
+    function maybeIntro() {
+      const el = $("intro"), v = $("introVideo"); if (!el || !v) return;
+      const key = isStandaloneMode() ? "yp-intro-installed" : "yp-intro";
+      if (localStorage.getItem(key) === "1" || REDUCED.matches || new URLSearchParams(location.search).has("b")) return;
+      localStorage.setItem(key, "1");
+      el.hidden = false; document.body.classList.add("modal-open");
+      let done = false;
+      const end = () => { if (done) return; done = true; el.classList.add("out"); document.body.classList.remove("modal-open"); setTimeout(() => { el.hidden = true; try { v.pause(); } catch (e) {} }, 600); };
+      v.addEventListener("ended", end); v.addEventListener("error", end);
+      el.addEventListener("click", end);
+      setTimeout(end, 7000);   // never trap anyone, even if the video stalls
+      const p = v.play(); if (p && p.catch) p.catch(end);   // autoplay refused → straight into the app
+      Track.event("intro-shown");
+    }
+    function skipIntro() { const el = $("intro"); if (el && !el.hidden) el.click(); }
+
     // ---------- Camera: photograph the sea, stamp the verdict where you stand ----------
     // Flow: native camera (file input with capture) → geolocate → nearest known beach within 40 km
     // (its live index; fetched if it isn't the displayed one) → canvas composite → share/save.
     // Falls back to the displayed beach when location is denied/unavailable, and says so.
     let camBlob = null, camFile = null;
-    function openCamera() { Sound.tick(); const inp = $("camInput"); if (!inp) return; inp.value = ""; inp.click(); }
-    function closeCamera() { closeModal("camModal"); camBlob = null; if (camFile) { URL.revokeObjectURL(camFile); camFile = null; } }
+    function openCamera() { Sound.tick(); Track.event("camera-open"); const inp = $("camInput"); if (!inp) return; inp.value = ""; inp.click(); }
+    function closeCamera() { closeModal("camModal"); camBlob = null; camState = null; camDrag = null; if (camFile) { URL.revokeObjectURL(camFile); camFile = null; } }
     function geoOnce(ms = 8000) {
       return new Promise(res => {
         if (!navigator.geolocation) return res(null);
@@ -2208,46 +2276,89 @@
     function loadImage(file) {
       return new Promise((res, rej) => { const img = new Image(); img.onload = () => res(img); img.onerror = rej; img.src = URL.createObjectURL(file); camFile = img.src; });
     }
-    async function composePhoto(img, place) {
-      const MAX = 1600, ratio = Math.min(1, MAX / Math.max(img.naturalWidth, img.naturalHeight));
-      const W = Math.round(img.naturalWidth * ratio), H = Math.round(img.naturalHeight * ratio);
-      const c = document.createElement("canvas"); c.width = W; c.height = H; const x = c.getContext("2d");
-      x.drawImage(img, 0, 0, W, H);
-      const s = place.h ? palataIndex(place.h) : null, t = s != null ? palataTier(s) : null;
-      const base = Math.max(W, H) / 1600;   // scale typography with the photo
-      // bottom veil
-      const g = x.createLinearGradient(0, H * 0.55, 0, H); g.addColorStop(0, "rgba(10,14,22,0)"); g.addColorStop(1, "rgba(10,14,22,.86)");
-      x.fillStyle = g; x.fillRect(0, H * 0.55, W, H * 0.45);
-      try { await document.fonts.load(`800 ${Math.round(150 * base)}px Heebo`); await document.fonts.load(`700 ${Math.round(50 * base)}px 'JetBrains Mono'`); } catch (e) {}
-      x.direction = "rtl"; x.textAlign = "right"; x.textBaseline = "alphabetic";
-      const pad = 56 * base, right = W - pad; let y = H - pad;
-      // beach + time
-      const now = israelNow();
-      x.fillStyle = "rgba(230,237,246,.85)"; x.font = `500 ${Math.round(34 * base)}px Heebo, Arial, sans-serif`;
-      x.fillText(`${place.name}${place.located ? "" : " (לפי החוף שנבחר)"} · ${shortDate(now.dateStr)} · ${pad2(now.hour)}:${pad2(now.minute)}`, right, y);
-      y -= 52 * base;
-      // verdict
-      x.fillStyle = t ? t.color : "#e6edf6"; x.font = `900 ${Math.round(86 * base)}px Heebo, Arial, sans-serif`;
-      x.fillText(t ? `${t.emoji} ${t.label}` : "אין נתוני ים לרגע זה", right, y);
-      y -= 100 * base;
-      // score
-      if (s != null) {
-        x.font = `800 ${Math.round(170 * base)}px 'JetBrains Mono', Consolas, monospace`; x.fillStyle = t.color;
-        x.shadowColor = t.color; x.shadowBlur = 40 * base;
-        x.direction = "ltr"; x.textAlign = "right";
-        x.fillText((s / 10).toFixed(1), right - 110 * base, y);
-        x.shadowBlur = 0; x.font = `700 ${Math.round(54 * base)}px 'JetBrains Mono', Consolas, monospace`; x.fillStyle = "rgba(230,237,246,.7)";
-        x.textAlign = "left"; x.fillText("/10", right - 100 * base, y);
-        x.direction = "rtl"; x.textAlign = "right";
-        if (place.h && place.h.seaTemp != null) { x.font = `500 ${Math.round(36 * base)}px Heebo, Arial, sans-serif`; x.fillStyle = "rgba(230,237,246,.8)"; x.fillText(`מים ${round(place.h.seaTemp)}°`, right - 420 * base, y); }
-      }
-      // wordmark bottom-left
-      x.direction = "ltr"; x.textAlign = "left"; x.font = `800 ${Math.round(30 * base)}px 'JetBrains Mono', Consolas, monospace`; x.fillStyle = "#2dd4bf";
-      x.fillText("YAM PALATA", pad, H - pad);
-      x.font = `500 ${Math.round(20 * base)}px Heebo, Arial, sans-serif`; x.fillStyle = "rgba(230,237,246,.55)";
-      x.fillText("yuvartz.github.io/yam-palta", pad, H - pad + 30 * base);
-      return new Promise(res => c.toBlob(res, "image/jpeg", 0.9));
+    // ---- Stamp renderer: one glass card, draggable anywhere on the photo ----
+    // camState.anchor = the card's bottom-right corner in normalized photo coords (0–1).
+    let camState = null, camRaf = 0;
+    function cardMetrics(W, H) {
+      const base = Math.max(W, H) / 1600;
+      return { base, w: Math.min(W - 40 * base, 640 * base), h: 440 * base, pad: 34 * base, margin: 40 * base };
     }
+    function renderStamp(x, W, H, st) {
+      const { img, place, sticker, badge, anchor } = st;
+      const s = place.h ? palataIndex(place.h) : null, t = s != null ? palataTier(s) : null, col = t ? t.color : "#e6edf6";
+      const m = cardMetrics(W, H), base = m.base;
+      x.clearRect(0, 0, W, H); x.drawImage(img, 0, 0, W, H);
+      // card position (clamped inside the photo)
+      const cx = Math.max(m.margin, Math.min(W - m.margin, anchor.x * W)) - m.w, cy = Math.max(m.margin, Math.min(H - m.margin, anchor.y * H)) - m.h;
+      const X = Math.max(m.margin, cx), Y = Math.max(m.margin, cy), r = 30 * base;
+      // glass: soft shadow, dark translucent fill, hairline
+      x.save(); x.shadowColor = "rgba(0,0,0,.45)"; x.shadowBlur = 40 * base; x.shadowOffsetY = 12 * base;
+      x.beginPath(); x.roundRect(X, Y, m.w, m.h, r); x.fillStyle = "rgba(10,14,22,.66)"; x.fill(); x.restore();
+      x.beginPath(); x.roundRect(X, Y, m.w, m.h, r); x.strokeStyle = "rgba(255,255,255,.14)"; x.lineWidth = 1.5 * base; x.stroke();
+      // accent bar (the app's h2 marker): teal→green pill on the right edge
+      const g = x.createLinearGradient(0, Y + m.pad, 0, Y + m.pad + 60 * base); g.addColorStop(0, "#2dd4bf"); g.addColorStop(1, "#34d399");
+      x.beginPath(); x.roundRect(X + m.w - m.pad - 6 * base, Y + m.pad, 6 * base, 60 * base, 3 * base); x.fillStyle = g; x.fill();
+      const right = X + m.w - m.pad - 22 * base;
+      x.textBaseline = "alphabetic"; x.direction = "rtl"; x.textAlign = "right";
+      // caption — app teal with the same glow the score gets
+      let y = Y + m.pad + 30 * base;
+      x.font = `800 ${Math.round(30 * base)}px Heebo, Arial, sans-serif`; x.fillStyle = "#2dd4bf";
+      x.shadowColor = "rgba(45,212,191,.85)"; x.shadowBlur = 22 * base; x.fillText("מדד הפלטה", right, y); x.shadowBlur = 0;
+      // score row
+      y += 150 * base;
+      if (s != null) {
+        x.direction = "ltr"; x.textAlign = "right";
+        x.font = `700 ${Math.round(44 * base)}px 'JetBrains Mono', Consolas, monospace`; const w10 = x.measureText("/10").width;
+        x.font = `800 ${Math.round(150 * base)}px 'JetBrains Mono', Consolas, monospace`; const num = (s / 10).toFixed(1), wNum = x.measureText(num).width;
+        x.fillStyle = col; x.shadowColor = col; x.shadowBlur = 36 * base; x.fillText(num, right - w10 - 10 * base, y); x.shadowBlur = 0;
+        x.font = `700 ${Math.round(44 * base)}px 'JetBrains Mono', Consolas, monospace`; x.fillStyle = "rgba(230,237,246,.7)"; x.fillText("/10", right, y);
+        if (sticker) { const sz = 140 * base; x.drawImage(sticker, right - w10 - 10 * base - wNum - 30 * base - sz, y - sz + 16 * base, sz, sz); }
+      } else {
+        x.font = `800 ${Math.round(56 * base)}px Heebo, Arial, sans-serif`; x.fillStyle = "rgba(230,237,246,.85)"; x.fillText("אין נתוני ים לרגע זה", right, y - 40 * base);
+      }
+      // verdict
+      y += 76 * base; x.direction = "rtl"; x.textAlign = "right";
+      x.font = `900 ${Math.round(64 * base)}px Heebo, Arial, sans-serif`; x.fillStyle = col; x.fillText(t ? t.label : "", right, y);
+      // meta
+      y += 46 * base;
+      const now = israelNow();
+      const meta = [place.name + (place.located ? "" : " (לפי החוף שנבחר)"), `${shortDate(now.dateStr)} · ${pad2(now.hour)}:${pad2(now.minute)}`];
+      if (place.h && place.h.seaTemp != null) meta.push(`מים ${round(place.h.seaTemp)}°`);
+      // fit the meta line inside the card (long beach names / the no-GPS note)
+      const metaTxt = meta.join("  ·  "), maxW = m.w - 2 * m.pad - 22 * base;
+      let fs = 27 * base; x.font = `500 ${Math.round(fs)}px Heebo, Arial, sans-serif`;
+      const mw = x.measureText(metaTxt).width; if (mw > maxW) { fs = Math.max(19 * base, fs * maxW / mw); x.font = `500 ${Math.round(fs)}px Heebo, Arial, sans-serif`; }
+      x.fillStyle = "rgba(230,237,246,.78)"; x.fillText(metaTxt, right, y);
+      // brand row (LTR, left side of the card)
+      const by = Y + m.h - m.pad, bsz = 40 * base, bx = X + m.pad;
+      x.direction = "ltr"; x.textAlign = "left";
+      if (badge) { x.save(); x.beginPath(); x.arc(bx + bsz / 2, by - bsz / 2 + 4 * base, bsz / 2, 0, Math.PI * 2); x.clip(); x.drawImage(badge, bx, by - bsz + 4 * base, bsz, bsz); x.restore(); }
+      x.font = `800 ${Math.round(24 * base)}px 'JetBrains Mono', Consolas, monospace`; x.fillStyle = "#2dd4bf"; x.fillText("YAM PALATA", bx + bsz + 12 * base, by - 14 * base);
+      x.font = `500 ${Math.round(17 * base)}px Heebo, Arial, sans-serif`; x.fillStyle = "rgba(230,237,246,.5)"; x.fillText("yuvartz.github.io/yam-palta", bx + bsz + 12 * base, by + 8 * base);
+    }
+    function photoDims(img) { const MAX = 1600, ratio = Math.min(1, MAX / Math.max(img.naturalWidth, img.naturalHeight)); return { W: Math.round(img.naturalWidth * ratio), H: Math.round(img.naturalHeight * ratio) }; }
+    function drawPreview() {
+      const c = $("camCanvas"); if (!c || !camState) return;
+      renderStamp(c.getContext("2d"), c.width, c.height, camState);
+    }
+    function composeBlob() {
+      return new Promise(res => { const c = $("camCanvas"); if (!c) return res(null); c.toBlob(res, "image/jpeg", 0.9); });
+    }
+    async function finalizeStamp() {
+      camBlob = await composeBlob(); if (!camBlob) return;
+      if (camFile) URL.revokeObjectURL(camFile);
+      camFile = URL.createObjectURL(camBlob); $("camSave").href = camFile; $("camShare").disabled = false;
+    }
+    // Drag the card: pointer delta (CSS px) → photo px → normalized anchor; live redraw, blob on release.
+    let camDrag = null;
+    function camPointerDown(e) { if (!camState) return; const c = e.currentTarget; c.setPointerCapture(e.pointerId); camDrag = { x: e.clientX, y: e.clientY, ax: camState.anchor.x, ay: camState.anchor.y, scale: c.width / c.clientWidth }; }
+    function camPointerMove(e) {
+      if (!camDrag || !camState) return;
+      const c = e.currentTarget, dx = (e.clientX - camDrag.x) * camDrag.scale, dy = (e.clientY - camDrag.y) * camDrag.scale;
+      camState.anchor.x = Math.max(0, Math.min(1, camDrag.ax + dx / c.width)); camState.anchor.y = Math.max(0, Math.min(1, camDrag.ay + dy / c.height));
+      if (!camRaf) camRaf = requestAnimationFrame(() => { camRaf = 0; drawPreview(); });
+    }
+    function camPointerUp() { if (!camDrag) return; camDrag = null; finalizeStamp(); }
     const pad2 = pad;
     async function handleCameraFile(file) {
       if (!file) return;
@@ -2255,13 +2366,20 @@
       $("camBody").innerHTML = `<div class="cam-status"><div class="spinner"></div>מאתר איפה אתה ומצרף את המדד…</div>`;
       $("camHint").textContent = ""; $("camShare").disabled = true; $("camSave").removeAttribute("href");
       try {
+        const loadI = src => new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
         const [img, place] = await Promise.all([loadImage(file), placeForPhoto()]);
-        camBlob = await composePhoto(img, place);
-        const url = URL.createObjectURL(camBlob);
-        $("camBody").innerHTML = `<img class="cam-preview" src="${url}" alt="התמונה שלך עם מדד הפלטה" />`;
-        $("camSave").href = url; $("camShare").disabled = false;
-        $("camHint").textContent = place.located ? (place.h ? `זוהה: ${place.name} · המדד לשעה הנוכחית שם` : `זוהה מיקום, אך אין חוף מוכר ב-40 ק״מ — התמונה ללא מדד`) : "לא התקבל מיקום — הוטבע המדד של החוף שנבחר באפליקציה";
-        Sound.chime(false);
+        const s = place.h ? palataIndex(place.h) : null, t = s != null ? palataTier(s) : null;
+        try { await Promise.all([document.fonts.load("900 40px Heebo"), document.fonts.load("800 40px 'JetBrains Mono'")]); } catch (e) {}
+        const [sticker, badge] = await Promise.all([t && TIER_IMG.has(t.key) ? loadI(`img/tiers/${t.key}.png`) : null, loadI("brand-badge.png")]);
+        const { W, H } = photoDims(img);
+        camState = { img, place, sticker, badge, anchor: { x: 1 - 40 / W, y: 1 - 40 / H } };   // default: bottom-right
+        $("camBody").innerHTML = `<canvas id="camCanvas" class="cam-preview" width="${W}" height="${H}" role="img" aria-label="התמונה שלך עם מדד הפלטה — גררו את הכרטיס למקום הרצוי"></canvas>`;
+        const c = $("camCanvas");
+        c.addEventListener("pointerdown", camPointerDown); c.addEventListener("pointermove", camPointerMove);
+        c.addEventListener("pointerup", camPointerUp); c.addEventListener("pointercancel", camPointerUp);
+        drawPreview(); await finalizeStamp();
+        $("camHint").textContent = (place.located ? (place.h ? `זוהה: ${place.name} · המדד לשעה הנוכחית שם` : `זוהה מיקום, אך אין חוף מוכר ב-40 ק״מ — התמונה ללא מדד`) : "לא התקבל מיקום — הוטבע המדד של החוף שנבחר באפליקציה") + " · גררו את הכרטיס למקום שתרצו";
+        Sound.chime(false); Track.event("camera-photo", place.located ? "gps" : "no-gps");
       } catch (e) {
         console.warn("camera compose failed", e);
         $("camBody").innerHTML = `<div class="cam-status">לא הצלחנו לעבד את התמונה. נסו שוב.</div>`;
@@ -2313,7 +2431,7 @@
       btn.classList.add("show");
       renderInstallSteps();
       window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installPromptEvent = e; });
-      window.addEventListener("appinstalled", () => { installPromptEvent = null; btn.classList.remove("show"); });
+      window.addEventListener("appinstalled", () => { installPromptEvent = null; btn.classList.remove("show"); Track.event("app-installed"); });
       // The 📲 top-bar button is easy to miss on touch (its title tooltip never shows), so nudge
       // once, from the second visit on — installing is what unlocks notifications on iOS.
       const visits = (parseInt(localStorage.getItem("yp-visits") || "0", 10) || 0) + 1;
@@ -2330,6 +2448,7 @@
       }
     }
     async function installApp() {
+      Track.event("install-tap", installPromptEvent ? "prompt" : "instructions");
       if (installPromptEvent) {
         installPromptEvent.prompt();
         try { await installPromptEvent.userChoice; } catch (e) {}
@@ -2361,7 +2480,7 @@
     async function enableNotifications() {
       if (!("Notification" in window)) return;
       try { await Notification.requestPermission(); } catch (e) {}
-      refreshNotifyBtn();
+      refreshNotifyBtn(); Track.event("notifications", Notification.permission);
       if (Notification.permission === "granted") { subscribePush(); }   // real push, when configured
     }
     // ---- Web Push subscription (no backend: subscription JSON → Google Form → Sheet) ----
@@ -2496,12 +2615,17 @@
       }
       return null;
     }
+    // Nominatim's public policy: ≤1 request/second per app, and cache what you already asked.
+    let nomLast = 0; const nomCache = {};
     async function nearestPlaceName(lat, lon) {
+      const key = `${lat.toFixed(3)},${lon.toFixed(3)}`; if (key in nomCache) return nomCache[key];
+      const wait = Math.max(0, nomLast + 1100 - Date.now()); nomLast = Date.now() + wait;
+      if (wait) await new Promise(r => setTimeout(r, wait));
       const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&zoom=16&accept-language=he`);
       if (!res.ok) return null;
       const a = (await res.json()).address || {};
       // Prefer the village/town scale — "the nearest village to the beach", not the county.
-      return a.village || a.town || a.hamlet || a.suburb || a.city || a.municipality || null;
+      return (nomCache[key] = a.village || a.town || a.hamlet || a.suburb || a.city || a.municipality || null);
     }
     let mapsLinkTimer = null;
     function handleMapsLink() {
@@ -2572,7 +2696,7 @@
     let switchFrom = null;
     function setLocation(key) {
       if (!allLocations()[key] || key === LS.loc) return;
-      Sound.tick(); switchFrom = hourly.length ? LS.loc : null;
+      Sound.tick(); switchFrom = hourly.length ? LS.loc : null; Track.event("beach", BUILTIN[key] || PRESETS[key] ? key : "custom");
       LS.loc = key; sessionStorage.setItem("yp-was-swim", "0"); renderLocations(); heroDay = 0; scoreOpen = false; jellyOpen = false;
       if (switchFrom) { $("app").classList.add("switching"); $("switchBar").classList.add("on"); }
       else hourly = [];
@@ -2604,6 +2728,7 @@
         else if ($("camModal").classList.contains("show")) closeCamera();
       });
       setupInstall();
+      maybeIntro(); Track.launch();
       // Offline + fast repeat loads. Registration is best-effort: the app works identically
       // without it (e.g. first visit, private windows, very old browsers).
       if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(e => console.warn("SW registration failed", e));
@@ -2626,7 +2751,7 @@
       });
     }
 
-    return { init, setLocation, removeLocation, refresh: load, enableNotifications, openAdd, closeAdd, confirmAdd, toggleDay, toggleJelly, toggleScore, installApp, closeInstall, submitFeedback, toggleFeedback, heroDayNav, heroSwipeStart, heroSwipeMove, heroSwipeEnd, useMyLocation, toggleSound, share, openCamera, closeCamera, cameraShare, testNotification };
+    return { init, setLocation, removeLocation, refresh: load, enableNotifications, openAdd, closeAdd, confirmAdd, toggleDay, toggleJelly, toggleScore, installApp, closeInstall, submitFeedback, toggleFeedback, heroDayNav, heroSwipeStart, heroSwipeMove, heroSwipeEnd, useMyLocation, toggleSound, share, openCamera, closeCamera, cameraShare, testNotification, skipIntro };
   })();
 
   document.addEventListener("DOMContentLoaded", App.init);
