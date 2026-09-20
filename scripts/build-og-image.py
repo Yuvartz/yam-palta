@@ -65,7 +65,7 @@ rtext(200, t1, title_font, (230, 237, 246))
 rtext(290, t2, sub_font, (45, 212, 191))
 rtext(350, t3, ImageFont.truetype(FONT_R, 30), (170, 184, 206))
 # url
-d.text((80, 570), "yuvartz.github.io/yam-palta", font=tag_font, fill=(10, 14, 22))
+d.text((80, 570), "yamplata.com", font=tag_font, fill=(10, 14, 22))
 
 img.save(OUT, optimize=True)
 print("wrote", OUT, img.size)

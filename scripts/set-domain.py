@@ -13,12 +13,13 @@ edits = {
     "docs/index.html": [(OLD_URL, NEW_URL), (OLD_HOST_PATH, NEW_HOST)],
     "docs/sitemap.xml": [(OLD_URL, NEW_URL)],
     "docs/robots.txt": [(OLD_URL, NEW_URL)],
-    "scripts/send-push.mjs": [(OLD_URL, NEW_URL)],
     "scripts/build-og-image.py": [(OLD_HOST_PATH, NEW_HOST)],
     "README.md": [(OLD_URL, NEW_URL)],
 }
 for rel, pairs in edits.items():
-    p = os.path.join(root, rel); s = io.open(p, encoding="utf-8").read(); n = 0
+    p = os.path.join(root, rel)
+    if not os.path.exists(p): print(f"{rel}: missing, skipped"); continue
+    s = io.open(p, encoding="utf-8").read(); n = 0
     for a, b in pairs: n += s.count(a); s = s.replace(a, b)
     io.open(p, "w", encoding="utf-8", newline="\n").write(s); print(f"{rel}: {n} replacement(s)")
 io.open(os.path.join(root, "docs", "CNAME"), "w", newline="\n").write(new + "\n"); print("docs/CNAME written")

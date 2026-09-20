@@ -6,7 +6,7 @@
   <title>ים פלטה — מתי הים באמת רגוע? מדד שחייה לחופי ישראל</title>
   <meta name="description" content="ים פלטה: מדד 0–10 שאומר אם הים שטוח ורגוע לשחייה, סאפ ושנירקול — עכשיו ובשבוע הקרוב. תחזית גלים, רוח, טמפ׳ מים, מצוף חדרה ודיווחי מדוזות לכל חוף בישראל, סיני ויוון." />
   <meta name="keywords" content="ים פלטה, ים שטוח, תחזית ים, גלים, שחייה בים, סאפ, שנירקול, טמפרטורת מים, מדוזות, תל אביב, חוף" />
-  <link rel="canonical" href="https://yuvartz.github.io/yam-palta/" />
+  <link rel="canonical" href="https://yamplata.com/" />
   <meta name="color-scheme" content="dark" />
 
   <meta property="og:site_name" content="ים פלטה" />
@@ -14,17 +14,17 @@
   <meta property="og:title" content="ים פלטה — מתי הים באמת רגוע?" />
   <meta property="og:description" content="מדד 0–10 שאומר אם הים שטוח מספיק לשחייה, סאפ ושנירקול — עכשיו ובשבוע הקרוב, לכל חוף בישראל." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://yuvartz.github.io/yam-palta/" />
-  <meta property="og:image" content="https://yuvartz.github.io/yam-palta/og-image.png" />
+  <meta property="og:url" content="https://yamplata.com/" />
+  <meta property="og:image" content="https://yamplata.com/og-image.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="ים פלטה — מדד הפלטה: האם הים רגוע לשחייה" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="ים פלטה — מתי הים באמת רגוע?" />
   <meta name="twitter:description" content="מדד 0–10 שאומר אם הים שטוח מספיק לשחייה, סאפ ושנירקול — עכשיו ובשבוע הקרוב." />
-  <meta name="twitter:image" content="https://yuvartz.github.io/yam-palta/og-image.png" />
+  <meta name="twitter:image" content="https://yamplata.com/og-image.png" />
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"WebApplication","name":"ים פלטה","alternateName":"Yam Palata","url":"https://yuvartz.github.io/yam-palta/","applicationCategory":"WeatherApplication","operatingSystem":"Any","inLanguage":"he","description":"מדד 0–10 שאומר אם הים רגוע מספיק לשחייה, סאפ ושנירקול לאורך חופי ישראל, סיני ויוון.","offers":{"@type":"Offer","price":"0","priceCurrency":"ILS"}}
+  {"@context":"https://schema.org","@type":"WebApplication","name":"ים פלטה","alternateName":"Yam Palata","url":"https://yamplata.com/","applicationCategory":"WeatherApplication","operatingSystem":"Any","inLanguage":"he","description":"מדד 0–10 שאומר אם הים רגוע מספיק לשחייה, סאפ ושנירקול לאורך חופי ישראל, סיני ויוון.","offers":{"@type":"Offer","price":"0","priceCurrency":"ILS"}}
   </script>
 
   <link rel="manifest" href="manifest.json" />
@@ -811,7 +811,7 @@
     </div>
   </div>
 
-  <script src="palata.js?v=15"></script>  <!-- query = build: fresh HTML never runs a stale cached palata.js -->
+  <script src="palata.js?v=16"></script>  <!-- query = build: fresh HTML never runs a stale cached palata.js -->
   <script>
   const App = (() => {
     "use strict";
@@ -2397,7 +2397,7 @@
       x.direction = "ltr"; x.textAlign = "left";
       if (badge) { x.save(); x.beginPath(); x.arc(bx + bsz / 2, by - bsz / 2 + 4 * base, bsz / 2, 0, Math.PI * 2); x.clip(); x.drawImage(badge, bx, by - bsz + 4 * base, bsz, bsz); x.restore(); }
       x.font = `800 ${Math.round(24 * base)}px 'JetBrains Mono', Consolas, monospace`; x.fillStyle = "#2dd4bf"; x.fillText("YAM PALATA", bx + bsz + 12 * base, by - 14 * base);
-      x.font = `500 ${Math.round(17 * base)}px Heebo, Arial, sans-serif`; x.fillStyle = "rgba(230,237,246,.5)"; x.fillText("yuvartz.github.io/yam-palta", bx + bsz + 12 * base, by + 8 * base);
+      x.font = `500 ${Math.round(17 * base)}px Heebo, Arial, sans-serif`; x.fillStyle = "rgba(230,237,246,.5)"; x.fillText("yamplata.com", bx + bsz + 12 * base, by + 8 * base);
     }
     function photoDims(img) {
       const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;   // HTMLImageElement or ImageBitmap
@@ -2436,7 +2436,7 @@
     }
     const pad2 = pad;
     // Environment line for error reports: build, OS, file facts.
-    const BUILD = "v15";
+    const BUILD = "v16";
     function camEnv(file, extra) {
       const ua = navigator.userAgent, ios = ua.match(/OS (\d+)_(\d+)/), sfv = ua.match(/Version\/(\d+(?:\.\d+)?)/);
       const os = ios ? `iOS ${ios[1]}.${ios[2]}` : /Android/.test(ua) ? "Android" : "desktop";

@@ -17,7 +17,7 @@
    (Proxy OFF חשוב: GitHub מנפיק את תעודת ה-HTTPS בעצמו ולא יצליח דרך הפרוקסי.)
 3. **תגיד לי "הדומיין נרשם"** — אני מריץ `python scripts/set-domain.py yamplata.com` (מחליף את כל 12 המקומות, כותב `docs/CNAME`, מייצר מחדש את תמונת השיתוף), מקמט ודוחף.
 4. GitHub → הריפו `Yuvartz/yam-palta` → **Settings → Pages**: ב-Custom domain כתוב `yamplata.com` → Save. חכה עד שה-✓ DNS check successful מופיע (דקות עד שעה), ואז סמן **Enforce HTTPS**.
-5. בדיקה: `https://yamplata.com` נפתח, `https://yuvartz.github.io/yam-palta/` מפנה אליו אוטומטית, `https://www.yamplata.com` מפנה גם.
+5. בדיקה: `https://yamplata.com` נפתח, `https://yamplata.com/` מפנה אליו אוטומטית, `https://www.yamplata.com` מפנה גם.
 6. אחרי המעבר: להתקין מחדש את האפליקציה בטלפון (הכתובת החדשה = אפליקציה חדשה מבחינת הטלפון).
 
 ## שלב 2 — סטטיסטיקה: GoatCounter (5 דקות, חינם)
