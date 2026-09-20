@@ -41,3 +41,13 @@
 
 ## סדר מומלץ
 דומיין (היום) → GoatCounter (היום) → התראות Push (לפי סקירת אסטרא) → Play.
+
+## שלב 5 — Google Search Console (10 דקות, פעם אחת)
+
+1. https://search.google.com/search-console → Add property → בחר **Domain** (לא URL prefix) → `yamplata.com` → Continue.
+2. גוגל יציג רשומת **TXT** לאימות (מתחילה ב-`google-site-verification=`). העתק אותה.
+3. Cloudflare → yamplata.com → DNS → Records → Add record: Type **TXT** · Name **@** · Content = הערך שהעתקת → Save.
+4. חזור ל-Search Console → **Verify**. אם נכשל, חכה 2–3 דקות ונסה שוב (DNS).
+5. אחרי האימות: בתפריט **Sitemaps** → הזן `sitemap.xml` → Submit. (הוא כבר כולל את דף הבית ו-10 עמודי חופים.)
+6. **URL Inspection** → הזן `https://yamplata.com/tel-aviv/` → Request indexing. חזור על זה ל-3–4 עמודים. זה מאיץ את הכניסה לאינדקס מימים לשעות.
+7. אחרי שבוע: **Performance** מראה על אילו שאילתות הופענו ("גובה גלים תל אביב", "מצב הים היום" וכו׳) — משם מכוונים את התוכן.

@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemap.org/schemas/sitemap/0.9">
-  <url><loc>https://yamplata.com/</loc><changefreq>hourly</changefreq><priority>1.0</priority></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://yamplata.com/</loc><changefreq>hourly</changefreq><priority>1.0</priority><lastmod>2026-09-20</lastmod></url>
+  <url><loc>https://yamplata.com/tel-aviv/</loc><changefreq>hourly</changefreq><priority>0.8</priority><lastmod>2026-09-20</lastmod></url>
+  <url><loc>https://yamplata.com/herzliya/</loc><changefreq>hourly</changefreq><priority>0.8</priority><lastmod>2026-09-20</lastmod></url>
+  <url><loc>https://yamplata.com/netanya/</loc><changefreq>hourly</changefreq><priority>0.8</priority><lastmod>2026-09-20</lastmod></url>
+  <url><loc>https://yamplata.com/caesarea/</loc><changefreq>hourly</changefreq><priority>0.8</priority><lastmod>2026-09-20</lastmod></url>
+  <url><loc>https://yamplata.com/haifa/</loc><changefreq>hourly</changefreq><priority>0.8</priority><lastmod>2026-09-20</lastmod></url>
+  <url><loc>https://yamplata.com/akko/</loc><changefreq>hourly</changefreq><priority>0.8</priority><lastmod>2026-09-20</lastmod></url>
+  <url><loc>https://yamplata.com/bat-yam/</loc><changefreq>hourly</changefreq><priority>0.8</priority><lastmod>2026-09-20</lastmod></url>
+  <url><loc>https://yamplata.com/ashdod/</loc><changefreq>hourly</changefreq><priority>0.8</priority><lastmod>2026-09-20</lastmod></url>
+  <url><loc>https://yamplata.com/ashkelon/</loc><changefreq>hourly</changefreq><priority>0.8</priority><lastmod>2026-09-20</lastmod></url>
+  <url><loc>https://yamplata.com/eilat/</loc><changefreq>hourly</changefreq><priority>0.8</priority><lastmod>2026-09-20</lastmod></url>
 </urlset>
