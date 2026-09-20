@@ -28,7 +28,7 @@ jobs:
         run: |
           git config user.name "yam-plata-bot"
           git config user.email "bot@yamplata.com"
-          git add docs/*/index.html docs/sitemap.xml
+          git add docs/*/index.html docs/en docs/sitemap.xml
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git commit -m "seo: refresh beach pages [skip ci]"
           git pull --rebase origin master
