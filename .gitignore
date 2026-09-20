@@ -29,3 +29,4 @@ yarn-error.log*
 workers/push/node_modules/
 workers/push/.wrangler/
 workers/push/.dev.vars
+workers/push/.vapid-private.txt
