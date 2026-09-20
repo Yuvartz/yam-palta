@@ -30,3 +30,8 @@ workers/push/node_modules/
 workers/push/.wrangler/
 workers/push/.dev.vars
 workers/push/.vapid-private.txt
+
+# video generator (tools/video)
+tools/video/node_modules/
+tools/video/out/
+tools/video/frames/

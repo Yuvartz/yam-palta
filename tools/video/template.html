@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<title>YAM PLATA story</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet" />
+<style>
+  /* 1080×1920 canvas. Everything is positioned deterministically by seek(t): no CSS animations, so every
+     frame is reproducible and the render can be resumed/re-shot at any t. Colours = the app's palette. */
+  :root { --bg: #0a0e16; --card: #141b2a; --text: #e6edf6; --muted: #8a98ad; --calm: #2dd4bf; --gold: #ffd479; --pink: #f6a5c0; --purple: #b79cff; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); color: var(--text); font-family: Heebo, system-ui, sans-serif; }
+  .num { font-family: "JetBrains Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; }
+  /* living sea background: two soft gradient blobs + bottom dunes, same mood as the app hero */
+  .glow { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .55; }
+  .glow.a { width: 900px; height: 900px; left: -250px; top: -200px; background: radial-gradient(circle, rgba(45,212,191,.35), transparent 65%); }
+  .glow.b { width: 800px; height: 800px; right: -300px; top: 700px; background: radial-gradient(circle, rgba(183,156,255,.28), transparent 65%); }
+  .dunes { position: absolute; left: 0; right: 0; bottom: 0; height: 420px; }
+  .safe { position: absolute; left: 72px; right: 72px; top: 180px; bottom: 260px; }
+  .brand { position: absolute; top: 96px; left: 72px; right: 72px; display: flex; align-items: center; justify-content: space-between; direction: ltr; }
+  .brand .word { font-family: "JetBrains Mono", monospace; font-weight: 800; font-size: 44px; letter-spacing: 6px; color: #e6edf6; }
+  .brand img { width: 96px; height: 96px; border-radius: 22px; box-shadow: 0 10px 40px rgba(255,212,121,.25); }
+  .scene { position: absolute; left: 0; right: 0; top: 0; opacity: 0; will-change: transform, opacity; }
+  #s1 { top: 340px; } #s2 { top: 40px; } #s3 { top: 200px; } #s4 { top: 300px; }
+  h1 { font-size: 118px; font-weight: 900; line-height: 1.08; letter-spacing: -1px; }
+  h1 .q { display: block; color: var(--gold); }
+  .date { margin-top: 34px; font-size: 46px; color: var(--muted); font-weight: 500; }
+  .pill { display: inline-block; margin-top: 40px; padding: 14px 34px; border-radius: 999px; border: 2px solid rgba(45,212,191,.45); background: rgba(45,212,191,.08); color: var(--calm); font-size: 38px; font-weight: 800; }
+  .rows { display: flex; flex-direction: column; gap: 34px; }
+  .row { display: flex; align-items: center; gap: 34px; background: linear-gradient(180deg, rgba(20,27,42,.92), rgba(20,27,42,.72)); border: 1px solid rgba(148,178,255,.12); border-radius: 40px; padding: 34px 40px; opacity: 0; box-shadow: 0 30px 80px rgba(0,0,0,.35); }
+  .row .score { min-width: 250px; text-align: center; }
+  .row .score b { display: block; font-size: 128px; font-weight: 800; line-height: 1; letter-spacing: -3px; }
+  .row .score small { display: block; font-size: 30px; color: var(--muted); font-weight: 500; margin-top: 6px; }
+  .row .txt { flex: 1; }
+  .row .name { font-size: 62px; font-weight: 900; line-height: 1.1; }
+  .row .meta { margin-top: 12px; font-size: 40px; color: var(--muted); }
+  .row .meta b { color: var(--text); font-weight: 800; }
+  .row .tier { margin-top: 12px; font-size: 44px; font-weight: 800; display: flex; align-items: center; gap: 16px; }
+  .row img { width: 150px; height: 150px; object-fit: contain; filter: drop-shadow(0 12px 24px rgba(0,0,0,.5)); }
+  .rank { position: absolute; top: -18px; right: 36px; background: var(--gold); color: #1a1406; font-weight: 900; font-size: 30px; padding: 6px 18px; border-radius: 999px; }
+  .row { position: relative; }
+  .rows-title { font-size: 58px; font-weight: 900; margin-bottom: 40px; }
+  .rows-title span { color: var(--calm); }
+  .week { background: linear-gradient(180deg, rgba(20,27,42,.95), rgba(20,27,42,.75)); border: 1px solid rgba(148,178,255,.12); border-radius: 44px; padding: 48px 44px 40px; box-shadow: 0 30px 80px rgba(0,0,0,.35); }
+  .week h2 { font-size: 60px; font-weight: 900; }
+  .week h2 span { color: var(--calm); }
+  .week .sub { margin-top: 10px; font-size: 36px; color: var(--muted); }
+  .bars { margin-top: 44px; height: 560px; display: flex; align-items: flex-end; gap: 12px; direction: rtl; position: relative; }
+  .bar { flex: 1; border-radius: 16px 16px 8px 8px; position: relative; transform-origin: bottom; }
+  .bar .v { position: absolute; top: -50px; left: 0; right: 0; text-align: center; font-size: 30px; font-weight: 800; }
+  .bar .hh { position: absolute; bottom: -48px; left: 0; right: 0; text-align: center; font-size: 26px; color: var(--muted); }
+  .bar.best::after { content: "◆"; position: absolute; top: -100px; left: 0; right: 0; text-align: center; color: var(--gold); font-size: 34px; }
+  .thr { position: absolute; left: 0; right: 0; border-top: 3px dashed rgba(45,212,191,.5); }
+  .thr span { position: absolute; left: 0; top: -42px; font-size: 28px; color: var(--calm); font-weight: 800; background: rgba(20,27,42,.9); padding: 2px 10px; border-radius: 8px; }
+  .legend { margin-top: 90px; font-size: 32px; color: var(--muted); display: flex; justify-content: space-between; }
+  .outro { text-align: center; }
+  .tag { font-size: 84px; font-weight: 900; line-height: 1.2; }
+  .tag .l1 { color: var(--pink); }
+  .tag .l2 { color: var(--purple); }
+  .tag2 { margin-top: 30px; font-size: 62px; font-weight: 800; color: var(--text); }
+  .logo { margin: 70px auto 0; width: 300px; height: 300px; border-radius: 68px; box-shadow: 0 30px 90px rgba(255,212,121,.35); display: block; }
+  .site { margin-top: 44px; font-family: "JetBrains Mono", monospace; font-size: 54px; font-weight: 800; letter-spacing: 3px; color: var(--calm); direction: ltr; }
+  .source { position: absolute; left: 72px; right: 72px; bottom: 120px; text-align: center; font-size: 28px; color: var(--muted); line-height: 1.5; }
+  .source b { color: #aab8ce; font-weight: 700; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="glow a"></div><div class="glow b"></div>
+  <svg class="dunes" viewBox="0 0 1080 420" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 200 C 180 120, 320 300, 540 210 S 900 120, 1080 220 L1080 420 L0 420Z" fill="rgba(255,212,121,.10)"/>
+    <path d="M0 290 C 200 220, 380 360, 560 290 S 880 230, 1080 300 L1080 420 L0 420Z" fill="rgba(255,212,121,.16)"/>
+    <path d="M0 360 C 240 310, 420 400, 620 350 S 900 320, 1080 370 L1080 420 L0 420Z" fill="rgba(255,212,121,.22)"/>
+  </svg>
+  <div class="brand"><img id="brandTile" src="../../docs/img/ui/logo-tile.png" alt="" /><span class="word">YAM PLATA</span></div>
+  <div class="safe">
+    <section class="scene" id="s1">
+      <h1 id="h1a">מחר בבוקר:</h1>
+      <h1><span class="q" id="h1b">יש פלטה?</span></h1>
+      <div class="date" id="dateLine"></div>
+      <div class="pill" id="pill"></div>
+    </section>
+    <section class="scene" id="s2">
+      <div class="rows-title" id="rowsTitle"></div>
+      <div class="rows" id="rows"></div>
+    </section>
+    <section class="scene" id="s3">
+      <div class="week">
+        <h2 id="weekTitle"></h2>
+        <div class="sub" id="weekSub"></div>
+        <div class="bars" id="bars"></div>
+        <div class="legend"><span>◆ השעה הכי שטוחה</span><span>קו מקווקו = סף פלטה 8.0</span></div>
+      </div>
+    </section>
+    <section class="scene outro" id="s4">
+      <div class="tag"><span class="l1">הם מחפשים גלים.</span><br><span class="l2">אנחנו מחפשים פלטה.</span></div>
+      <div class="tag2">פחות גלים. יותר ים.</div>
+      <img class="logo" src="../../docs/img/ui/logo-tile.png" alt="" />
+      <div class="site">yamplata.com</div>
+    </section>
+  </div>
+  <div class="source" id="source"></div>
+</div>
+<script>
+  // ---- app-identical colour ramp (OKLab mix between the tier anchors) ----
+  const ANCHORS = [[0, "#f06a6a"], [20, "#ec7a5a"], [40, "#f0a55a"], [60, "#e9c46a"], [80, "#8ee3c8"], [90, "#2dd4bf"], [98, "#ffd479"], [100, "#ffd479"]];
+  function scoreColor(s) {
+    if (s == null) return "#8a98ad";
+    const v = Math.max(0, Math.min(100, s));
+    for (let i = 0; i < ANCHORS.length - 1; i++) {
+      const [a, ca] = ANCHORS[i], [b, cb] = ANCHORS[i + 1];
+      if (v <= b) { if (v === a) return ca; if (v === b) return cb; const t = (v - a) / (b - a); return `color-mix(in oklab, ${ca} ${Math.round((1 - t) * 100)}%, ${cb} ${Math.round(t * 100)}%)`; }
+    }
+    return "#ffd479";
+  }
+  const ease = x => 1 - Math.pow(1 - Math.max(0, Math.min(1, x)), 3);   // cubic out
+  const fmt = s => (s / 10).toFixed(1);
+  let D = null, T = 12;
+
+  // Fills the DOM once; seek(t) then only moves/fades.
+  window.render = function (data) {
+    D = data; T = data.duration || 12;
+    document.getElementById("h1a").textContent = data.title1;
+    document.getElementById("h1b").textContent = data.title2;
+    document.getElementById("dateLine").textContent = data.dateLine;
+    document.getElementById("pill").textContent = data.pillText;
+    document.getElementById("rowsTitle").innerHTML = data.rowsTitle;
+    document.getElementById("rows").innerHTML = data.beaches.map((b, i) => `
+      <div class="row" data-i="${i}">
+        ${i === 0 ? `<span class="rank">הכי שטוח</span>` : ""}
+        <div class="score" style="color:${scoreColor(b.score)}"><b class="num">${fmt(b.score)}</b><small>מתוך 10</small></div>
+        <div class="txt">
+          <div class="name">${b.name}</div>
+          <div class="meta">ב-<b class="num">${b.hour}</b>${b.water != null ? ` · מים <b class="num">${Math.round(b.water)}°</b>` : ""}${b.wave != null ? ` · גל <b class="num">${b.wave.toFixed(1)}</b> מ׳` : ""}</div>
+          <div class="tier" style="color:${scoreColor(b.score)}">${b.tierLabel}</div>
+        </div>
+        <img src="../../docs/img/tiers/${b.tierKey}.png" alt="" />
+      </div>`).join("");
+    document.getElementById("weekTitle").innerHTML = data.week.title;
+    document.getElementById("weekSub").textContent = data.week.sub;
+    const bars = data.week.bars;
+    const maxH = 480, minH = 26, LO = 30; const hOf = sc => sc == null ? minH : Math.round(minH + (maxH - minH) * Math.max(0, Math.min(1, (sc - LO) / (100 - LO))));
+    const best = bars.reduce((a, b) => (b.score != null && (a == null || b.score > a.score) ? b : a), null);
+    document.getElementById("bars").innerHTML = `<div class="thr" style="bottom:${hOf(80)}px"><span>8.0</span></div>` + bars.map(b => {
+      const h = hOf(b.score);
+      return `<div class="bar${best && b === best ? " best" : ""}" data-h="${h}" style="height:${h}px;background:${scoreColor(b.score)};opacity:${b.score == null ? .25 : 1}">
+        ${b.score != null && (b === best || b.hour % 3 === 0) ? `<span class="v" style="color:${scoreColor(b.score)}">${fmt(b.score)}</span>` : ""}
+        <span class="hh num">${String(b.hour).padStart(2, "0")}</span></div>`;
+    }).join("");
+    document.getElementById("source").innerHTML = data.sourceLine;
+    return document.fonts.ready.then(() => true);
+  };
+
+  // Scene windows (seconds). in = fade/slide in, hold, out.
+  function win(t, a, b, fadeIn = 0.5, fadeOut = 0.4) {
+    if (t < a || t > b) return 0;
+    if (t < a + fadeIn) return ease((t - a) / fadeIn);
+    if (t > b - fadeOut) return 1 - ease((t - (b - fadeOut)) / fadeOut);
+    return 1;
+  }
+  const set = (el, o, dy = 0, sc = 1) => { el.style.opacity = o; el.style.transform = `translateY(${dy}px) scale(${sc})`; };
+
+  window.seek = function (t) {
+    const k = T / 12;   // scale the 12-s script to the requested duration
+    const s1 = [0, 2.6 * k], s2 = [2.3 * k, 7.6 * k], s3 = [7.3 * k, 10.3 * k], s4 = [10.0 * k, T + 1];
+    const o1 = win(t, ...s1); set(document.getElementById("s1"), o1, (1 - o1) * 40, 0.98 + 0.02 * o1);
+    const o2 = win(t, ...s2); const S2 = document.getElementById("s2"); set(S2, o2, 0);
+    document.querySelectorAll("#rows .row").forEach((r, i) => { const a = s2[0] + 0.25 + i * 0.55 * k; const o = win(t, a, s2[1] + 1, 0.55, 0.01); set(r, Math.min(o, o2 > 0 ? 1 : 0), (1 - o) * 60, 0.96 + 0.04 * o); });
+    const o3 = win(t, ...s3); set(document.getElementById("s3"), o3, (1 - o3) * 30);
+    document.querySelectorAll("#bars .bar").forEach((b, i) => { const a = s3[0] + 0.2 + i * 0.05 * k; const g = ease((t - a) / 0.6); b.style.transform = `scaleY(${Math.max(0.02, g)})`; b.querySelector(".v") && (b.querySelector(".v").style.opacity = g); });
+    const o4 = win(t, ...s4, 0.7, 0.01); set(document.getElementById("s4"), o4, (1 - o4) * 30, 0.97 + 0.03 * o4);
+    // subtle breathing of the glows so the background never looks frozen
+    document.querySelector(".glow.a").style.transform = `translate(${Math.sin(t * 0.6) * 30}px, ${Math.cos(t * 0.5) * 20}px)`;
+    document.querySelector(".glow.b").style.transform = `translate(${Math.cos(t * 0.45) * 30}px, ${Math.sin(t * 0.55) * 25}px)`;
+    return true;
+  };
+</script>
+</body>
+</html>
