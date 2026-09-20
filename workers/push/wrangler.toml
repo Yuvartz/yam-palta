@@ -1,4 +1,4 @@
-# Yam Palata push backend — Cloudflare Worker (free tier is plenty).
+# Yam Plata push backend — Cloudflare Worker (free tier is plenty).
 # One-time setup (see ../../SETUP-PUSH.md):
 #   npm install
 #   npx wrangler login

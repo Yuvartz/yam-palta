@@ -1,5 +1,5 @@
 # One-off: regenerate docs/ app icons, iOS splash screens and the notification badge
-# from the Yam Palata logo artwork. Source PNG lives outside the repo (provided directly
+# from the Yam Plata logo artwork. Source PNG lives outside the repo (provided directly
 # by the user); re-run from the repo root: python scripts/build-app-icons.py
 import math
 from pathlib import Path
@@ -87,7 +87,7 @@ def splash(sw, sh, path):
     d = ImageDraw.Draw(canvas)
     try: f = ImageFont.truetype("C:/Windows/Fonts/consolab.ttf", int(sw * 0.052))
     except Exception: f = ImageFont.load_default()
-    txt = "YAM PALATA"; tw = d.textlength(txt, font=f)
+    txt = "YAM PLATA"; tw = d.textlength(txt, font=f)
     d.text(((sw - tw) / 2, int(sh * 0.455 + side / 2) + int(sw * 0.07)), txt, font=f, fill=(45, 212, 191))
     canvas.convert("RGB").save(path, optimize=True)
 for sw, sh in SPLASH:

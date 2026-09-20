@@ -1,4 +1,4 @@
-// Yam Palata service worker — offline shell + last-known data.
+// Yam Plata service worker — offline shell + last-known data.
 // Strategy:
 //   • App shell (this page, icons, wave sprites): precached at install, cache-first afterwards.
 //     Essentials (page, palata.js, manifest) MUST land or the install fails; images are best-effort.
@@ -11,7 +11,7 @@
 //   • Google Fonts: cache-first (immutable files).
 // Bump VERSION on any shell change — activate cleans older yp-* caches (only ours: Cache Storage
 // is shared by every project on this GitHub Pages origin).
-const VERSION = "v27";
+const VERSION = "v28";
 const PREFIX = "yp-";
 const SHELL_CACHE = `${PREFIX}shell-${VERSION}`;
 const API_CACHE = `${PREFIX}api-${VERSION}`;

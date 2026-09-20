@@ -1,4 +1,4 @@
-// Yam Palata push backend (Cloudflare Worker).
+// Yam Plata push backend (Cloudflare Worker).
 //   fetch:     POST /subscribe   { subscription, beach:{key,name,lat,lon} }  → 200 {ok, id}
 //              POST /unsubscribe { endpoint }                                → 200 {ok}
 //              POST /test        { endpoint }                                → sends a real push now

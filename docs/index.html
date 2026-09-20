@@ -24,7 +24,7 @@
   <meta name="twitter:description" content="מדד 0–10 שאומר אם הים שטוח מספיק לשחייה, סאפ ושנירקול — עכשיו ובשבוע הקרוב." />
   <meta name="twitter:image" content="https://yamplata.com/og-image.png" />
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"WebApplication","name":"ים פלטה","alternateName":"Yam Palata","url":"https://yamplata.com/","applicationCategory":"WeatherApplication","operatingSystem":"Any","inLanguage":"he","description":"מדד 0–10 שאומר אם הים רגוע מספיק לשחייה, סאפ ושנירקול לאורך חופי ישראל, סיני ויוון.","offers":{"@type":"Offer","price":"0","priceCurrency":"ILS"}}
+  {"@context":"https://schema.org","@type":"WebApplication","name":"ים פלטה","alternateName":"Yam Plata","url":"https://yamplata.com/","applicationCategory":"WeatherApplication","operatingSystem":"Any","inLanguage":"he","description":"מדד 0–10 שאומר אם הים רגוע מספיק לשחייה, סאפ ושנירקול לאורך חופי ישראל, סיני ויוון.","offers":{"@type":"Offer","price":"0","priceCurrency":"ILS"}}
   </script>
 
   <link rel="manifest" href="manifest.json" />
@@ -34,7 +34,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="YAM PALATA" />
+  <meta name="apple-mobile-web-app-title" content="YAM PLATA" />
 
   <!-- iOS launch screens (dark, logo-centred) — without these a cold launch flashes white. -->
   <link rel="apple-touch-startup-image" media="screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/splash-640x1136.png" />
@@ -724,7 +724,7 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="brand"><img class="brand-logo" src="brand-badge.png" alt="" /><span class="wordmark">YAM PALATA</span></div>
+      <div class="brand"><img class="brand-logo" src="brand-badge.png" alt="" /><span class="wordmark">YAM PLATA</span></div>
       <div class="topbar-left">
         <div class="streak" id="streak"><span class="ic" data-ic="flame"></span><span class="n" id="streakN">0</span><span>ימים רצופים</span></div>
         <button class="icon-btn" id="camBtn" onclick="App.openCamera()" title="צלם את הים" aria-label="צלם את הים והטבע את המדד על התמונה"><span class="ic" data-ic="camera" style="font-size:18px"></span></button>
@@ -901,7 +901,7 @@
     </div>
   </div>
 
-  <script src="palata.js?v=27"></script>  <!-- query = build: fresh HTML never runs a stale cached palata.js -->
+  <script src="palata.js?v=28"></script>  <!-- query = build: fresh HTML never runs a stale cached palata.js -->
   <script>
   const App = (() => {
     "use strict";
@@ -2540,7 +2540,7 @@
       const by = Y + m.h - m.pad, bsz = 40 * base, bx = X + m.pad;
       x.direction = "ltr"; x.textAlign = "left";
       if (badge) { x.save(); x.beginPath(); x.arc(bx + bsz / 2, by - bsz / 2 + 4 * base, bsz / 2, 0, Math.PI * 2); x.clip(); x.drawImage(badge, bx, by - bsz + 4 * base, bsz, bsz); x.restore(); }
-      x.font = `800 ${Math.round(24 * base)}px 'JetBrains Mono', Consolas, monospace`; x.fillStyle = "#2dd4bf"; x.fillText("YAM PALATA", bx + bsz + 12 * base, by - 14 * base);
+      x.font = `800 ${Math.round(24 * base)}px 'JetBrains Mono', Consolas, monospace`; x.fillStyle = "#2dd4bf"; x.fillText("YAM PLATA", bx + bsz + 12 * base, by - 14 * base);
       x.font = `500 ${Math.round(17 * base)}px Heebo, Arial, sans-serif`; x.fillStyle = "rgba(230,237,246,.5)"; x.fillText("yamplata.com", bx + bsz + 12 * base, by + 8 * base);
     }
     function photoDims(img) {
@@ -2580,7 +2580,7 @@
     }
     const pad2 = pad;
     // Environment line for error reports: build, OS, file facts.
-    const BUILD = "v27";
+    const BUILD = "v28";
     function camEnv(file, extra) {
       const ua = navigator.userAgent, ios = ua.match(/OS (\d+)_(\d+)/), sfv = ua.match(/Version\/(\d+(?:\.\d+)?)/);
       const os = ios ? `iOS ${ios[1]}.${ios[2]}` : /Android/.test(ua) ? "Android" : "desktop";
