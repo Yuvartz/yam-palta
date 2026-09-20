@@ -23,9 +23,9 @@
 ## שלב 2 — סטטיסטיקה: GoatCounter (5 דקות, חינם)
 
 **איפה:** https://www.goatcounter.com/signup
-1. Code: `yamplata` · Domain: `yamplata.com` (או `yuvartz.github.io` אם עדיין לפני הדומיין; אפשר לשנות אחר כך ב-Settings) · Timezone: `Asia/Jerusalem`.
+1. Code: `yuvartz` · Domain: `yamplata.com` (או `yuvartz.github.io` אם עדיין לפני הדומיין; אפשר לשנות אחר כך ב-Settings) · Timezone: `Asia/Jerusalem`.
 2. אשר את המייל.
-3. **תגיד לי את הקוד** — אני מציב `ANALYTICS.code = "yamplata"` ודוחף. מאותו רגע הלוח ב-`https://yamplata.goatcounter.com`.
+3. **תגיד לי את הקוד** — אני מציב `ANALYTICS.code = "yuvartz"` ודוחף. מאותו רגע הלוח ב-`https://yuvartz.goatcounter.com`.
 4. מה תראה ואיך זה עונה על "כמה יוזרים / כמה התקינו / מה עושים": ראה `analytics-setup.md`.
 5. אופציונלי: Settings → "Public dashboard" אם רוצים שהמספרים יהיו גלויים.
 
