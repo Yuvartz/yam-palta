@@ -53,16 +53,46 @@ def wave_badge(size, path):
 
 wave_badge(96, "docs/badge-96.png")
 
-# iOS launch screens: solid dark background + centred logo (~38% of the short edge).
-# Sizes must match the <link rel="apple-touch-startup-image"> media queries in index.html.
+# iOS launch screens: dark sea background with a soft glow, the logo as a ROUNDED tile (the source
+# art has white corners that used to show as an ugly square), and a small wordmark. The page's
+# first-launch intro starts from exactly this composition and grows it to full screen, so the
+# native splash → web intro hand-off feels like one animation.
+from PIL import ImageFilter, ImageFont
 SPLASH = [(640, 1136), (750, 1334), (828, 1792), (1125, 2436), (1170, 2532), (1179, 2556),
           (1206, 2622), (1242, 2688), (1284, 2778), (1290, 2796), (1320, 2868)]
 Path("docs/splash").mkdir(parents=True, exist_ok=True)
-for sw, sh in SPLASH:
+def rounded_logo(side):
+    art = logo.resize((side, side), Image.LANCZOS).convert("RGBA")
+    mask = Image.new("L", (side, side), 0)
+    ImageDraw.Draw(mask).rounded_rectangle((0, 0, side - 1, side - 1), radius=int(side * 0.225), fill=255)
+    art.putalpha(mask)
+    return art
+def splash(sw, sh, path):
     canvas = Image.new("RGB", (sw, sh), BG)
-    side = int(min(sw, sh) * 0.38)
-    art = logo.resize((side, side), Image.LANCZOS)
-    canvas.paste(art, ((sw - side) // 2, (sh - side) // 2))
-    canvas.save(f"docs/splash/splash-{sw}x{sh}.png", optimize=True)
+    # ambient glows like the app background
+    glow = Image.new("RGB", (sw, sh), BG); g = ImageDraw.Draw(glow)
+    g.ellipse((sw * 0.15, sh * 0.28, sw * 0.85, sh * 0.62), fill=(48, 44, 30))
+    g.ellipse((sw * 0.55, sh * 0.62, sw * 1.25, sh * 1.05), fill=(22, 30, 48))
+    glow = glow.filter(ImageFilter.GaussianBlur(int(sw * 0.16)))
+    canvas = Image.blend(canvas, glow, 0.85)
+    side = int(sw * 0.42)
+    art = rounded_logo(side)
+    # soft shadow under the tile
+    sh_img = Image.new("RGBA", (sw, sh), (0, 0, 0, 0))
+    ImageDraw.Draw(sh_img).rounded_rectangle(((sw - side) // 2, int(sh * 0.455 - side / 2) + int(side * 0.06), (sw + side) // 2, int(sh * 0.455 + side / 2) + int(side * 0.06)), radius=int(side * 0.225), fill=(0, 0, 0, 150))
+    sh_img = sh_img.filter(ImageFilter.GaussianBlur(int(side * 0.08)))
+    canvas = Image.alpha_composite(canvas.convert("RGBA"), sh_img)
+    canvas.paste(art, ((sw - side) // 2, int(sh * 0.455 - side / 2)), art)
+    # wordmark
+    d = ImageDraw.Draw(canvas)
+    try: f = ImageFont.truetype("C:/Windows/Fonts/consolab.ttf", int(sw * 0.052))
+    except Exception: f = ImageFont.load_default()
+    txt = "YAM PALATA"; tw = d.textlength(txt, font=f)
+    d.text(((sw - tw) / 2, int(sh * 0.455 + side / 2) + int(sw * 0.07)), txt, font=f, fill=(45, 212, 191))
+    canvas.convert("RGB").save(path, optimize=True)
+for sw, sh in SPLASH:
+    splash(sw, sh, f"docs/splash/splash-{sw}x{sh}.png")
+# the same tile for the web intro's first frame
+rounded_logo(512).save("docs/img/ui/logo-tile.png", optimize=True)
 
 print("done")

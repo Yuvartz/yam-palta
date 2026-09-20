@@ -631,11 +631,23 @@
     /* First-launch intro: the brand film in a rounded "sunrise card" on the dark sea, tap to skip */
     /* Full-screen: the film's own cream sky fills the whole display, the square film sits centred
        at full width, so it reads as one continuous scene rather than a card on a dark page. */
+    /* Two phases. "seed": the exact composition of the iOS splash (dark sea, rounded logo tile at
+       42% width, centre at 45.5% height) so the native launch image and the web intro are one frame.
+       Then the tile grows to the full width while the cream sky fades in and the film takes over. */
     .intro { position: fixed; inset: 0; z-index: 90; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 0;
       background: radial-gradient(120% 70% at 50% 38%, #fff3d2 0%, #fbe9c2 55%, #f3d9a6 100%); cursor: pointer; transition: opacity .6s var(--ease); }
+    .intro::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background: radial-gradient(70% 34% at 50% 45%, rgba(48,44,30,.85), transparent 70%), radial-gradient(70% 43% at 90% 84%, rgba(22,30,48,.9), transparent 70%), var(--bg);
+      opacity: 1; transition: opacity .7s var(--ease) .15s; }
+    .intro.grow::before { opacity: 0; }
     .intro.out { opacity: 0; pointer-events: none; }
     .intro[hidden] { display: none; }   /* the class's display:flex would otherwise beat the hidden attribute */
-    .intro video, .intro img { width: min(100vw, 100vh, 640px); aspect-ratio: 1; display: block; background: #fbe9c2; object-fit: cover; }
+    .intro video { position: relative; z-index: 1; width: min(100vw, 100vh, 640px); aspect-ratio: 1; display: block; background: #fbe9c2; object-fit: cover; opacity: 0; transition: opacity .45s var(--ease) .35s; }
+    .intro.grow video { opacity: 1; }
+    .intro .intro-logo { position: absolute; z-index: 2; left: 50%; top: 45.5%; width: 42vw; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 22.5%;
+      box-shadow: 0 24px 60px -20px rgba(0,0,0,.7); transition: transform .8s cubic-bezier(.2,.8,.2,1), opacity .5s var(--ease) .4s, border-radius .8s var(--ease); }
+    .intro.grow .intro-logo { transform: translate(-50%, calc(-50% + var(--intro-dy, 0px))) scale(var(--intro-scale, 2.4)); border-radius: 6%; opacity: 0; }
+    @media (prefers-reduced-motion: reduce) { .intro::before, .intro video, .intro .intro-logo { transition: none; } }
     .intro .intro-skip { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 14px); inset-inline-start: 14px; color: #6b5a2e; font-size: 13px; font-weight: 700; background: rgba(255,255,255,.55); border: 1px solid rgba(107,90,46,.2); border-radius: 999px; padding: 8px 16px; font-family: var(--sans); cursor: pointer; opacity: 0; animation: fadeUp .4s var(--ease) 1.2s both; }
     .intro .intro-tag { position: absolute; bottom: calc(env(safe-area-inset-bottom, 0px) + 26px); color: #6b5a2e; font-size: 14px; font-weight: 700; letter-spacing: .3px; opacity: 0; animation: fadeUp .5s var(--ease) 3.6s both; }
     @media (prefers-reduced-motion: reduce) { .intro .intro-skip, .intro .intro-tag { animation: none; opacity: 1; } }
@@ -829,6 +841,7 @@
   </div>
 
   <div class="intro" id="intro" hidden role="dialog" aria-label="סרטון פתיחה — הקישו לדילוג">
+    <img class="intro-logo" id="introLogo" src="img/ui/logo-tile.png" alt="" decoding="async" />
     <video id="introVideo" muted playsinline preload="auto" poster="video/intro-poster.jpg">
       <source src="video/intro-480.webm" type="video/webm" />
       <source src="video/intro-480.mp4" type="video/mp4" />
@@ -886,7 +899,7 @@
     </div>
   </div>
 
-  <script src="palata.js?v=25"></script>  <!-- query = build: fresh HTML never runs a stale cached palata.js -->
+  <script src="palata.js?v=26"></script>  <!-- query = build: fresh HTML never runs a stale cached palata.js -->
   <script>
   const App = (() => {
     "use strict";
@@ -1456,7 +1469,7 @@
       hero.innerHTML = `
         ${skyStars}${moon}
         <div class="hero-content${reveal ? " enter" : ""}">
-          <div class="hero-score${scoreOpen ? " open" : ""}${reveal ? " pop" : ""}" style="color:${scCol};${seaMotionVars(ref, score)}" onclick="App.toggleScore()"
+          <div class="hero-score${scoreOpen ? " open" : ""}${reveal ? " pop" : ""}" style="color:${score != null ? scoreColor(score) : scCol};${seaMotionVars(ref, score)}" onclick="App.toggleScore()"
                role="button" tabindex="0" aria-expanded="${scoreOpen}" aria-label="מדד הפלטה — הצג פירוט"
                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();App.toggleScore()}">
             <div class="sc-title"><span class="sc-title-txt"><span class="w1">מדד ה</span><span class="w2">פלטה</span></span></div>
@@ -1703,7 +1716,7 @@
           <span class="tl-h">${pad(hr)}:00</span>
           <span class="tl-wave" title="${h ? `סוול ${h.swell != null ? h.swell.toFixed(2) : "—"} מ׳ כל ${h.swellPeriod ? round(h.swellPeriod) : "—"} שנ׳ · גלי רוח ${chop != null ? chop.toFixed(2) : "—"} מ׳` : ""}">${miniWave(h, col)}</span>
           <span class="tl-height num">${height != null ? height.toFixed(2) + " מ׳" : "—"}</span>
-          <span class="tl-score num" style="color:${col}">${idx != null ? (idx / 10).toFixed(1) : "—"}</span>
+          <span class="tl-score num" style="color:${idx != null ? scoreColor(idx) : col}">${idx != null ? (idx / 10).toFixed(1) : "—"}</span>
           <span class="tl-status" style="color:${col}">${lbl}</span>
         </div>`;
       }).join("");
@@ -2372,6 +2385,11 @@
       if (localStorage.getItem(key) === "1" || REDUCED.matches || new URLSearchParams(location.search).has("b")) return;
       localStorage.setItem(key, "1");
       el.hidden = false; document.body.classList.add("modal-open");
+      // Seed frame = the iOS splash. Grow the tile until it matches the film's box, then reveal the film.
+      const vw = window.innerWidth, vh = window.innerHeight, filmSide = Math.min(vw, vh, 640), tileSide = vw * 0.42;
+      el.style.setProperty("--intro-scale", (filmSide / tileSide).toFixed(3));
+      el.style.setProperty("--intro-dy", `${(vh / 2 - vh * 0.455).toFixed(1)}px`);   // tile centre → screen centre
+      requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("grow")));
       let done = false, started = false;
       const end = () => { if (done) return; done = true; el.classList.add("out"); document.body.classList.remove("modal-open"); setTimeout(() => { el.hidden = true; try { v.pause(); } catch (e) {} }, 600); };
       v.addEventListener("ended", end); v.addEventListener("error", end);
@@ -2560,7 +2578,7 @@
     }
     const pad2 = pad;
     // Environment line for error reports: build, OS, file facts.
-    const BUILD = "v25";
+    const BUILD = "v26";
     function camEnv(file, extra) {
       const ua = navigator.userAgent, ios = ua.match(/OS (\d+)_(\d+)/), sfv = ua.match(/Version\/(\d+(?:\.\d+)?)/);
       const os = ios ? `iOS ${ios[1]}.${ios[2]}` : /Android/.test(ua) ? "Android" : "desktop";
