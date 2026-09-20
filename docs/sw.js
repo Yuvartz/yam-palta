@@ -11,7 +11,7 @@
 //   • Google Fonts: cache-first (immutable files).
 // Bump VERSION on any shell change — activate cleans older yp-* caches (only ours: Cache Storage
 // is shared by every project on this GitHub Pages origin).
-const VERSION = "v19";
+const VERSION = "v20";
 const PREFIX = "yp-";
 const SHELL_CACHE = `${PREFIX}shell-${VERSION}`;
 const API_CACHE = `${PREFIX}api-${VERSION}`;
@@ -23,6 +23,7 @@ const SHELL_OPTIONAL = [
   "icon-192.png", "icon-512.png", "icon-192-maskable.png", "icon-512-maskable.png",
   "brand-badge.png", "apple-touch-icon.png", "favicon.ico", "badge-96.png",
   ...["deluxe", "palata", "almost", "gentle", "waves", "big", "stormy"].map(k => `img/tiers/${k}.png`),
+  "img/ui/install.png",
 ];   // wave sprites are no longer used by the page (procedural SVG now) — not precached
 
 self.addEventListener("install", e => {
