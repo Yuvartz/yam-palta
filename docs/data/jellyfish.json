@@ -1,8 +1,40 @@
 {
-  "updated": "2026-09-20T13:17:45.082Z",
+  "updated": "2026-09-20T19:57:06.750Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25924",
+      "reporter": "אמיר פרלברג",
+      "location": "תל אביב מרכז - גורדון, בוגרשוב, פרישמן, צ'ארלס קלור",
+      "lat": 32.085,
+      "lon": 34.766,
+      "date": "2026-09-20T08:00+03:00",
+      "dateText": "20.09.2026",
+      "time": "08:00",
+      "activity": "הליכה על החוף",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25924"
+    },
+    {
+      "id": "25923",
+      "reporter": "אמיר פרלברג",
+      "location": "תל אביב מרכז - גורדון, בוגרשוב, פרישמן, צ'ארלס קלור",
+      "lat": 32.085,
+      "lon": 34.766,
+      "date": "2026-09-20T07:30+03:00",
+      "dateText": "20.09.2026",
+      "time": "07:30",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25923"
+    },
     {
       "id": "25922",
       "reporter": "Dor Edelist",
@@ -1250,38 +1282,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25836"
-    },
-    {
-      "id": "25835",
-      "reporter": "מישמיש בורא",
-      "location": "בת ים וראשון לציון",
-      "lat": 32.015,
-      "lon": 34.743,
-      "date": "2026-08-29T11:00+03:00",
-      "dateText": "29.08.2026",
-      "time": "11:00",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25835"
-    },
-    {
-      "id": "25831",
-      "reporter": "יאחנקו יאנה",
-      "location": "חופי אשקלון והדרום",
-      "lat": 31.67,
-      "lon": 34.556,
-      "date": "2026-08-29T12:43+03:00",
-      "dateText": "29.08.2026",
-      "time": "12:43",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": "חוטית נודדת",
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25831"
     }
   ]
 }
