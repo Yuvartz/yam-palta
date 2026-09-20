@@ -14,7 +14,7 @@
   (ECMWF-IFS, ICON); הפער בין המודלים הופך למשפט אמון ("המודלים מסכימים").
 - **עוגן מציאות** — מדידה אמיתית ממצוף חדרה (ISRAMAR) מוצגת מול התחזית.
 - **מדוזות** — דיווחי גולשים מ-meduzot.co.il עם התראת קרבה (25 ק"מ / 48 שעות).
-- **התראות** — בדפדפן כשהאפליקציה פתוחה; Web Push למסך נעול מוכן בקוד אך **עדיין לא מוגדר** (ראה SETUP-PUSH.md: Google Form → Sheet → GitHub Action, ללא backend).
+- **התראות** — בדפדפן כשהאפליקציה פתוחה, ו-Web Push למסך נעול דרך Cloudflare Worker קטן (`workers/push`: אחסון מנויים פרטי, בדיקה כל 15 דק׳, מקסימום 2 התראות ביום + תצוגה מקדימה ל-19:00, שעות שקט, כיבוי מהאפליקציה). הפעלה: SETUP-PUSH.md.
 - **20 חופים** — ישראל, סיני ויוון, פלוס "📍 קרוב אליי", מיקום מותאם והדבקת קישור Google Maps.
 - **השבוע** — כרטיס אחד: לכל יום 14 עמודות זעירות (06 מימין → 19 משמאל), גובה וצבע רציף לפי המדד (אינטרפולציה ב-OKLab בין צבעי הדרגות), ◆ שיא היום, קו "עכשיו", קו סף 8.0, נקודות לילה; אחוז שעות הפלטה והשיא; לחיצה פותחת פירוט לכל שעה.
 - **📷 צלם את הים** — פותח את המצלמה, מאתר את החוף הקרוב (GPS, עד 40 ק״מ) ומטביע על התמונה את מדד הפלטה, הדרגה, טמפ׳ המים, השעה והחוף; שיתוף ישיר או שמירה. בלי מיקום — המדד של החוף שנבחר, ונאמר כך.
@@ -36,10 +36,10 @@ docs/                  ← מוגש ע"י GitHub Pages
   splash/, icon-*.png  ← נוצרים ע"י scripts/build-app-icons.py
   img/waves/           ← ספרייטים של גלים (נוצרים ע"י scripts/build-wave-sprites.py)
   data/                ← נכתב ע"י GitHub Actions (מצוף + מדוזות)
+workers/push/          ← Cloudflare Worker: /subscribe /unsubscribe /test + cron כל 15 דק׳ (policy.js = מה נשלח ומתי)
 scripts/
   fetch-buoy.mjs       ← מצוף חדרה (ISRAMAR) → docs/data/hadera-waves.json (כל שעה)
   fetch-jellyfish.mjs  ← דיווחי מדוזות → docs/data/jellyfish.json (כל שעה)
-  send-push.mjs        ← שולח Web Push לפי המדד (כל שעה; ראה SETUP-PUSH.md)
   build-app-icons.py   ← אייקונים, splash, badge (Pillow)
   build-wave-sprites.py← חיתוך ספרייטי הגלים מהארטוורק
   build-og-image.py    ← תמונת השיתוף og-image.png (1200×630)

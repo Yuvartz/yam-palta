@@ -11,7 +11,7 @@
 //   • Google Fonts: cache-first (immutable files).
 // Bump VERSION on any shell change — activate cleans older yp-* caches (only ours: Cache Storage
 // is shared by every project on this GitHub Pages origin).
-const VERSION = "v14";
+const VERSION = "v15";
 const PREFIX = "yp-";
 const SHELL_CACHE = `${PREFIX}shell-${VERSION}`;
 const API_CACHE = `${PREFIX}api-${VERSION}`;
@@ -158,22 +158,31 @@ self.addEventListener("push", e => {
   }));
 });
 
-// Browsers occasionally rotate push subscriptions; re-subscribe so the permission stays live.
-// The page re-submits the fresh subscription to the sheet on its next open.
+// Push backend (Cloudflare Worker) — keep in sync with PUSH.apiUrl in index.html. Empty = off.
+const PUSH_API = "";
+
+// Browsers occasionally rotate push subscriptions; re-subscribe AND tell the server the new
+// endpoint (it keeps the beach + state under the new key), so the person keeps getting alerts.
 self.addEventListener("pushsubscriptionchange", e => {
   const opts = e.oldSubscription && e.oldSubscription.options;
-  if (opts && opts.applicationServerKey) {
-    e.waitUntil(self.registration.pushManager.subscribe({
-      userVisibleOnly: true, applicationServerKey: opts.applicationServerKey,
-    }).catch(() => {}));
-  }
+  if (!opts || !opts.applicationServerKey) return;
+  e.waitUntil(self.registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: opts.applicationServerKey })
+    .then(sub => PUSH_API && e.oldSubscription ? fetch(PUSH_API + "/rotate", { method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ oldEndpoint: e.oldSubscription.endpoint, subscription: sub.toJSON() }) }) : null)
+    .catch(() => {}));
 });
 
+// Tap → the beach the alert was about (?b=key). Reuse an open window when there is one.
 self.addEventListener("notificationclick", e => {
   e.notification.close();
-  const target = (e.notification.data && e.notification.data.url) || "./";
-  e.waitUntil(clients.matchAll({ type: "window", includeUncontrolled: true }).then(list => {
-    for (const c of list) if ("focus" in c) { if ("navigate" in c && target !== "./") c.navigate(target).catch(() => {}); return c.focus(); }
+  const target = new URL((e.notification.data && e.notification.data.url) || "./", self.registration.scope).href;
+  e.waitUntil((async () => {
+    const list = await clients.matchAll({ type: "window", includeUncontrolled: true });
+    const mine = list.filter(c => c.url.startsWith(self.registration.scope));
+    for (const c of mine) {
+      if ("navigate" in c) { try { const n = await c.navigate(target); if (n && "focus" in n) return n.focus(); } catch (err) {} }
+      if ("focus" in c) return c.focus();
+    }
     return clients.openWindow(target);
-  }));
+  })());
 });

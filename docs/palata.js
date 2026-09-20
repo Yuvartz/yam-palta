@@ -1,6 +1,6 @@
 // Palata Index — the ONE definition of the scoring math and the notification voice.
-// Loaded by docs/index.html (browser global `Palata`) and by scripts/send-push.mjs
-// (Node, via createRequire) — previously each carried its own copy and they had
+// Loaded by docs/index.html (browser global `Palata`) and by workers/push (the Cloudflare
+// Worker that sends background push) — previously each carried its own copy and they had
 // already drifted apart. Tune here, both channels follow.
 (function (root, factory) {
   if (typeof module === "object" && module.exports) module.exports = factory();

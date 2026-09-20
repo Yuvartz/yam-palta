@@ -111,3 +111,14 @@
 - **אסטרא (Codex), דירוג סיבות ל-iOS:** (1) לחץ זיכרון בפענוח 24–48MP / HEIC — `createImageBitmap` + base64 מוסיפים באפרים; (2) canvas ריק/`toBlob` null בשקט תחת לחץ זיכרון; (3) תאימות ציור (`roundRect` נייטיב מ-16, לא 16.4 — כבר polyfilled). geolocation/fonts/SW לא סבירים (נתפסים). המלצה: `<img>` קודם (Safari מדגים-מטה JPEG ענק בעצמו), ציור פעם אחת ל-canvas מוגבל שמשמש כתמונת העבודה, בלי ImageBitmap/base64 כברירת מחדל, בדיקת context ופיקסל, deadlines.
 - **יושם:** `loadImage` חדש בסדר img→canvas≤1600 (בדיקת פיקסל לא-ריק) → ImageBitmap → data URL, כל שלב עם timeout 20 שנ׳ ורישום מה נוסה; `handleCameraFile` בשלבים (decode/locate/assets/render/encode) — איתור ונכסים לא קטלניים, ציור הכרטיס עם נפילה לכיתוב פשוט, בדיקת null מ-toBlob; הודעת שגיאה = שלב + סיבה + סביבה (build, iOS/Safari, מותקן/דפדפן, סוג וגודל הקובץ). `BUILD="v12"` מוצג בשורת הסביבה כדי לדעת איזו גרסה נבדקה.
 - אימות מקומי: 4032×3024 JPEG → canvas 1600×1200, שיתוף פעיל; קובץ פגום → "decode: cannot decode untyped — img:… | bitmap:… | dataurl:…" + סביבה.
+
+## סבב 10 — מערכת ההתראות מחדש (2026-09-20)
+
+אסטרא סקר את כל השרשרת (`docs-internal/codex-notify-review.md`) והמליץ על Cloudflare Worker במקום Google Form→Sheet→Action. יושם:
+- `workers/push/` — Worker: `/subscribe` (200 = הרשמה מאושרת), `/unsubscribe`, `/test` (שליחה אמיתית דרך אפל/גוגל), `/rotate` (רוטציית מנוי מה-SW), `/health`; cron כל 15 דק׳: תחזית אחת לכל חוף, `policy.decide()`, שליחה, מחיקת 404/410, שמירת מצב. KV לאחסון. ספרייה: `@block65/webcrypto-web-push`.
+- `policy.js` (טהור, 8 בדיקות עוברות): onset בסף 8.0 עם ≥ שעה רגועה נוספת, עד 2 ביום; deluxe פעם ביום; תצוגה מקדימה ב-19:00 לבוקר מחר (≥2 שעות) עם שעות אמת; שקט 21–06; מזהי אירוע דטרמיניסטיים = אידמפוטנטי.
+- לקוח: מצב הכפתור משקף הרשמה **שהשרת אישר**; "כבה"; בדיקה מהשרת; סנכרון אוטומטי בהפעלה ובכל טעינה (A→B→A נפתר); התראה מקומית — סוף החלון הרציף הנוכחי, שעות שקט, קישור עמוק; אין כפל מקומי+שרת.
+- SW: `pushsubscriptionchange` → `/rotate`; לחיצה → ניווט לחוף (`?b=`).
+- הוסרו `scripts/send-push.mjs` ו-`push-notify.yml`. SETUP-PUSH.md נכתב מחדש (6 צעדים, ~30 דק׳).
+- אימות מקומי: `wrangler dev --local` — health, subscribe (200), origin זר (403), cron אמיתי מול Open-Meteo (`subs=1 beaches=1 errors=0`), unsubscribe, `/test` בלי סודות → 503 עם הסבר.
+- **מה שנשאר לבעלים:** חשבון Cloudflare, KV id, שני סודות, deploy, ולמסור את כתובת ה-Worker.

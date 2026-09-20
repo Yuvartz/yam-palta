@@ -24,3 +24,8 @@ yarn-error.log*
 
 # local secrets (VAPID keys etc.) — never commit
 *.local.txt
+
+# push backend
+workers/push/node_modules/
+workers/push/.wrangler/
+workers/push/.dev.vars

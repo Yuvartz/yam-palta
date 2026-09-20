@@ -1,0 +1,29 @@
+# Yam Palata push backend — Cloudflare Worker (free tier is plenty).
+# One-time setup (see ../../SETUP-PUSH.md):
+#   npm install
+#   npx wrangler login
+#   npx wrangler kv namespace create SUBS        → paste the id below
+#   npx wrangler secret put VAPID_PRIVATE_KEY    → the private key from VAPID-KEYS.local.txt
+#   npx wrangler secret put VAPID_SUBJECT        → mailto:you@example.com
+#   npx wrangler deploy                          → prints https://yam-palata-push.<you>.workers.dev
+name = "yam-palata-push"
+main = "src/index.js"
+compatibility_date = "2025-06-01"
+compatibility_flags = ["nodejs_compat"]
+
+[triggers]
+crons = ["*/15 * * * *"]   # every 15 minutes, UTC; the policy converts to Israel time itself
+
+[[kv_namespaces]]
+binding = "SUBS"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+preview_id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+[vars]
+APP_URL = "https://yuvartz.github.io/yam-palta/"
+VAPID_PUBLIC_KEY = "BO4TStlec2oXqIQcRZLKGFBEQmzXwM6RMw_B9IS6elX5HQ6Xyj3KXOC6v4sEZcwtpVGen8iW8o7hFql64sM0pgM"
+# Origins allowed to call the API (comma-separated). Add the custom domain when it goes live.
+ALLOWED_ORIGINS = "https://yuvartz.github.io,http://localhost:5050,http://127.0.0.1:5050"
+
+[observability]
+enabled = true
