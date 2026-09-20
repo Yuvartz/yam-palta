@@ -36,9 +36,10 @@
   // to score as a neutral 0.5, which let "no data" reach כמעט פלטה and fire notifications.
   // Missing chop falls back to total height; missing history falls back to the current wind.
   function scoreOf(waveHeight, chop, windKt, histKt) {
-    if (waveHeight == null || windKt == null || !isFinite(waveHeight) || !isFinite(windKt)) return null;
-    if (chop == null) chop = waveHeight;
-    if (histKt == null) histKt = windKt;
+    if (waveHeight == null || windKt == null || !isFinite(waveHeight) || !isFinite(windKt) || waveHeight < 0 || windKt < 0) return null;
+    // Secondary factors: a missing OR invalid value falls back rather than poisoning the sum with NaN
+    if (chop == null || !isFinite(chop) || chop < 0) chop = waveHeight;
+    if (histKt == null || !isFinite(histKt) || histKt < 0) histKt = windKt;
     const sum = heightScoreFn(waveHeight) * WEIGHTS.height + chopScoreFn(chop) * WEIGHTS.chop
       + windScoreFn(windKt) * WEIGHTS.wind + windScoreFn(histKt) * WEIGHTS.history;
     return Math.min(Math.round(clamp01(sum) * 100), heightTierCap(waveHeight));
