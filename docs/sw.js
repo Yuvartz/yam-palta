@@ -11,7 +11,7 @@
 //   • Google Fonts: cache-first (immutable files).
 // Bump VERSION on any shell change — activate cleans older yp-* caches (only ours: Cache Storage
 // is shared by every project on this GitHub Pages origin).
-const VERSION = "v17";
+const VERSION = "v18";
 const PREFIX = "yp-";
 const SHELL_CACHE = `${PREFIX}shell-${VERSION}`;
 const API_CACHE = `${PREFIX}api-${VERSION}`;
@@ -159,7 +159,7 @@ self.addEventListener("push", e => {
 });
 
 // Push backend (Cloudflare Worker) — keep in sync with PUSH.apiUrl in index.html. Empty = off.
-const PUSH_API = "";
+const PUSH_API = "https://yam-palata-push.yam-palata-push.workers.dev";
 
 // Browsers occasionally rotate push subscriptions; re-subscribe AND tell the server the new
 // endpoint (it keeps the beach + state under the new key), so the person keeps getting alerts.

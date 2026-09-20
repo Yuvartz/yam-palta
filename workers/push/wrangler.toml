@@ -16,8 +16,8 @@ crons = ["*/15 * * * *"]   # every 15 minutes, UTC; the policy converts to Israe
 
 [[kv_namespaces]]
 binding = "SUBS"
-id = "REPLACE_WITH_KV_NAMESPACE_ID"
-preview_id = "REPLACE_WITH_KV_NAMESPACE_ID"
+id = "3b1b295d9b2346afb08d42b7d00bfbb6"
+preview_id = "3b1b295d9b2346afb08d42b7d00bfbb6"
 
 [vars]
 APP_URL = "https://yamplata.com/"
