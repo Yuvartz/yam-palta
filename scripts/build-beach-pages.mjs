@@ -9,27 +9,9 @@ const require = createRequire(import.meta.url);
 const Palata = require("../docs/palata.js");
 
 const SITE = "https://yamplata.com";
-const BEACHES = [
-  { slug: "tel-aviv", key: "telaviv", name: "תל אביב", en: "Tel Aviv", lat: 32.0809, lon: 34.7610, area: "מרכז" },
-  { slug: "herzliya", key: "herzliya", name: "הרצליה", en: "Herzliya", lat: 32.1624, lon: 34.7990, area: "שרון" },
-  { slug: "netanya", key: "netanya", name: "נתניה", en: "Netanya", lat: 32.3215, lon: 34.8532, area: "שרון" },
-  { slug: "caesarea", key: "caesarea", name: "קיסריה", en: "Caesarea", lat: 32.4860, lon: 34.8820, area: "חוף הכרמל" },
-  { slug: "haifa", key: "haifa", name: "חיפה", en: "Haifa", lat: 32.8275, lon: 34.9897, area: "צפון" },
-  { slug: "akko", key: "akko", name: "עכו", en: "Akko (Acre)", lat: 32.9270, lon: 35.0690, area: "צפון" },
-  { slug: "bat-yam", key: "batyam", name: "בת ים", en: "Bat Yam", lat: 32.0170, lon: 34.7370, area: "מרכז" },
-  { slug: "ashdod", key: "ashdod", name: "אשדוד", en: "Ashdod", lat: 31.8044, lon: 34.6473, area: "דרום" },
-  { slug: "ashkelon", key: "ashkelon", name: "אשקלון", en: "Ashkelon", lat: 31.6699, lon: 34.5738, area: "דרום" },
-  { slug: "eilat", key: "eilat", name: "אילת", en: "Eilat", lat: 29.48, lon: 34.93, area: "ים סוף" },   // open water off the coral reserve; the city point has no marine data
-];
-// English tier names for the /en/ twin (labels only; thresholds/colours come from palata.js).
-const TIER_EN = { deluxe: "Palata Deluxe", palata: "Flat Sea", almost: "Almost Flat", gentle: "Light Waves", waves: "Some Waves", big: "Big Waves", stormy: "Stormy" };
-const pad = n => String(n).padStart(2, "0");
-const HE_DAYS = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
-const EN_DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-const dayNameEn = ds => EN_DAYS[new Date(ds + "T12:00:00Z").getUTCDay()];
+import { BEACHES as ALL_BEACHES, TIER_EN, pad, dayName, dayNameEn, israelNow } from "./lib/beaches.mjs";
+const BEACHES = ALL_BEACHES.filter(b => b.pages !== false);   // static pages only for beaches the app has as presets
 const alternates = (slug) => { const he = slug ? `${SITE}/${slug}/` : `${SITE}/`, en = slug ? `${SITE}/en/${slug}/` : `${SITE}/en/`; return `<link rel="alternate" hreflang="he" href="${he}" /><link rel="alternate" hreflang="en" href="${en}" /><link rel="alternate" hreflang="x-default" href="${he}" />`; };
-const israelNow = () => { const s = new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Jerusalem", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date()); return { dateStr: s.slice(0, 10), hour: +s.slice(11, 13), minute: +s.slice(14, 16), text: `${s.slice(8, 10)}.${s.slice(5, 7)}.${s.slice(0, 4)} ${s.slice(11, 16)}` }; };
-const dayName = ds => HE_DAYS[new Date(ds + "T12:00:00Z").getUTCDay()];
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
 // Same recipe as the app and the push Worker (Palata.recipeUrls / blendHourly / scoreSeries): the static

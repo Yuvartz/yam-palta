@@ -89,8 +89,8 @@
   const RECIPE = { waveModels: ["meteofrance_wave", "ecmwf_wam"], partModel: "meteofrance_wave", windModels: ["ecmwf_ifs025", "icon_seamless"] };
   const median = vals => { const a = (vals || []).filter(v => v != null && isFinite(v)).sort((x, y) => x - y); if (!a.length) return null; const m = a.length >> 1; return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2; };
   function recipeUrls(lat, lon, opts) {
-    const o = opts || {}, fd = o.forecastDays || 7, pd = o.pastDays == null ? 1 : o.pastDays;
-    const common = `latitude=${lat}&longitude=${lon}&timezone=Asia%2FJerusalem&forecast_days=${fd}&past_days=${pd}`;
+    const o = opts || {}, fd = o.forecastDays || 7, pd = o.pastDays == null ? 1 : o.pastDays, tz = encodeURIComponent(o.timezone || "Asia/Jerusalem");   // "auto" = the beach's own clock
+    const common = `latitude=${lat}&longitude=${lon}&timezone=${tz}&forecast_days=${fd}&past_days=${pd}`;
     return {
       marine: `https://marine-api.open-meteo.com/v1/marine?${common}&hourly=wave_height,wind_wave_height,sea_surface_temperature&models=best_match,${RECIPE.waveModels.join(",")}`,
       weather: `https://api.open-meteo.com/v1/forecast?${common}&hourly=wind_speed_10m&models=${RECIPE.windModels.join(",")}`,
@@ -119,7 +119,7 @@
       waveHeight: pick(waveCols, waveFb, i), windWave: pick(partCols, partFb, i), seaTemp: sst[i] == null ? null : sst[i],
       windKmh: j == null ? null : pick(windCols, windFb, j),
     }; });
-    return { hours, grid: { lat: marine.latitude, lon: marine.longitude } };
+    return { hours, grid: { lat: marine.latitude, lon: marine.longitude }, timezone: marine.timezone || null, utcOffsetSeconds: marine.utc_offset_seconds == null ? null : marine.utc_offset_seconds };
   }
   // Attach `score` to each hour: wind history = trailing HISTORY_HOURS mean, chop = wind waves (or total height).
   function scoreSeries(hours) {

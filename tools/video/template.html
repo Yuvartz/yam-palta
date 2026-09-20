@@ -23,7 +23,21 @@
   .brand .word { font-family: "JetBrains Mono", monospace; font-weight: 800; font-size: 44px; letter-spacing: 6px; color: #e6edf6; }
   .brand img { width: 96px; height: 96px; border-radius: 22px; box-shadow: 0 10px 40px rgba(255,212,121,.25); }
   .scene { position: absolute; left: 0; right: 0; top: 0; opacity: 0; will-change: transform, opacity; }
-  #s1 { top: 340px; } #s2 { top: 40px; } #s3 { top: 200px; } #s4 { top: 300px; }
+  #s1 { top: 340px; } #s2 { top: 40px; } #s2b { top: 20px; } #s3 { top: 200px; } #s4 { top: 300px; }
+  .board { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; direction: rtl; }
+  .board.one { grid-template-columns: 1fr; }
+  .cell { display: flex; align-items: center; gap: 16px; background: linear-gradient(180deg, rgba(20,27,42,.92), rgba(20,27,42,.7)); border: 1px solid rgba(148,178,255,.10); border-radius: 26px; padding: 16px 22px; opacity: 0; position: relative; }
+  .cell .sc { min-width: 118px; text-align: center; font-size: 60px; font-weight: 800; line-height: 1; letter-spacing: -2px; }
+  .cell .nm { flex: 1; min-width: 0; }
+  .cell .nm b { display: block; font-size: 32px; font-weight: 800; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cell .nm small { display: block; font-size: 25px; color: var(--muted); margin-top: 4px; white-space: nowrap; }
+  .cell .mini { position: absolute; left: 22px; right: 22px; bottom: 8px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.07); overflow: hidden; }
+  .cell .mini i { display: block; height: 100%; border-radius: 3px; }
+  .cell.top { border-color: rgba(255,212,121,.55); }
+  .cell .crown { position: absolute; top: -14px; right: 18px; font-size: 22px; background: var(--gold); color: #1a1406; font-weight: 900; padding: 2px 12px; border-radius: 999px; }
+  .board-title { font-size: 56px; font-weight: 900; margin-bottom: 8px; }
+  .board-title span { color: var(--calm); }
+  .board-sub { font-size: 32px; color: var(--muted); margin-bottom: 30px; }
   h1 { font-size: 118px; font-weight: 900; line-height: 1.08; letter-spacing: -1px; }
   h1 .q { display: block; color: var(--gold); }
   .date { margin-top: 34px; font-size: 46px; color: var(--muted); font-weight: 500; }
@@ -86,6 +100,11 @@
       <div class="rows-title" id="rowsTitle"></div>
       <div class="rows" id="rows"></div>
     </section>
+    <section class="scene" id="s2b">
+      <div class="board-title" id="boardTitle"></div>
+      <div class="board-sub" id="boardSub"></div>
+      <div class="board" id="board"></div>
+    </section>
     <section class="scene" id="s3">
       <div class="week">
         <h2 id="weekTitle"></h2>
@@ -138,6 +157,16 @@
         </div>
         <img src="../../docs/img/tiers/${b.tierKey}.png" alt="" />
       </div>`).join("");
+    document.getElementById("boardTitle").innerHTML = data.board.title;
+    document.getElementById("boardSub").textContent = data.board.sub;
+    const board = document.getElementById("board"); board.className = "board" + (data.board.items.length <= 8 ? " one" : "");
+    board.innerHTML = data.board.items.map(b => `
+      <div class="cell${b.top ? " top" : ""}">
+        ${b.top ? `<span class="crown">הכי שטוח</span>` : ""}
+        <div class="sc num" style="color:${scoreColor(b.score)}">${b.score == null ? "—" : fmt(b.score)}</div>
+        <div class="nm"><b>${b.name}</b><small>${b.sub}</small></div>
+        <div class="mini"><i style="width:${b.score == null ? 0 : Math.round(b.score)}%;background:${scoreColor(b.score)}"></i></div>
+      </div>`).join("");
     document.getElementById("weekTitle").innerHTML = data.week.title;
     document.getElementById("weekSub").textContent = data.week.sub;
     const bars = data.week.bars;
@@ -163,11 +192,13 @@
   const set = (el, o, dy = 0, sc = 1) => { el.style.opacity = o; el.style.transform = `translateY(${dy}px) scale(${sc})`; };
 
   window.seek = function (t) {
-    const k = T / 12;   // scale the 12-s script to the requested duration
-    const s1 = [0, 2.6 * k], s2 = [2.3 * k, 7.6 * k], s3 = [7.3 * k, 10.3 * k], s4 = [10.0 * k, T + 1];
+    const k = T / 15;   // scale the 15-s script to the requested duration
+    const s1 = [0, 2.5 * k], s2 = [2.2 * k, 6.6 * k], s2b = [6.3 * k, 10.6 * k], s3 = [10.3 * k, 13.1 * k], s4 = [12.8 * k, T + 1];
     const o1 = win(t, ...s1); set(document.getElementById("s1"), o1, (1 - o1) * 40, 0.98 + 0.02 * o1);
     const o2 = win(t, ...s2); const S2 = document.getElementById("s2"); set(S2, o2, 0);
     document.querySelectorAll("#rows .row").forEach((r, i) => { const a = s2[0] + 0.25 + i * 0.55 * k; const o = win(t, a, s2[1] + 1, 0.55, 0.01); set(r, Math.min(o, o2 > 0 ? 1 : 0), (1 - o) * 60, 0.96 + 0.04 * o); });
+    const ob = win(t, ...s2b); set(document.getElementById("s2b"), ob, (1 - ob) * 24);
+    document.querySelectorAll("#board .cell").forEach((c, i) => { const a = s2b[0] + 0.15 + i * 0.09 * k; const o = win(t, a, s2b[1] + 1, 0.4, 0.01); set(c, Math.min(o, ob > 0 ? 1 : 0), (1 - o) * 30, 0.97 + 0.03 * o); });
     const o3 = win(t, ...s3); set(document.getElementById("s3"), o3, (1 - o3) * 30);
     document.querySelectorAll("#bars .bar").forEach((b, i) => { const a = s3[0] + 0.2 + i * 0.05 * k; const g = ease((t - a) / 0.6); b.style.transform = `scaleY(${Math.max(0.02, g)})`; b.querySelector(".v") && (b.querySelector(".v").style.opacity = g); });
     const o4 = win(t, ...s4, 0.7, 0.01); set(document.getElementById("s4"), o4, (1 - o4) * 30, 0.97 + 0.03 * o4);
