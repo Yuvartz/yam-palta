@@ -2273,8 +2273,32 @@
       }
       return { name: (allLocations()[LS.loc] || BUILTIN.telaviv).name, h: nearestHourData(), located: false, dist: 0 };
     }
-    function loadImage(file) {
-      return new Promise((res, rej) => { const img = new Image(); img.onload = () => res(img); img.onerror = rej; img.src = URL.createObjectURL(file); camFile = img.src; });
+    // Decode the photo. iPhones hand over 12–48 MP files (sometimes HEIC): decode straight from
+    // the blob and downscale during decode where the browser can, so the <img> path — which may
+    // fail on huge or HEIC inputs in Safari — is only the fallback. Errors carry a readable reason.
+    async function loadImage(file) {
+      if (!file.type.startsWith("image/") && !/\.(jpe?g|png|heic|heif|webp)$/i.test(file.name || "")) throw new Error(`סוג קובץ לא נתמך: ${file.type || file.name}`);
+      if (window.createImageBitmap) {
+        try {
+          let bmp;
+          try { bmp = await createImageBitmap(file, { resizeWidth: 1600, resizeQuality: "high" }); } catch (e) { bmp = await createImageBitmap(file); }
+          if (bmp && bmp.width) return bmp;   // ImageBitmap draws like an image (naturalWidth → width)
+        } catch (e) { console.warn("createImageBitmap failed, falling back to <img>", e); }
+      }
+      return new Promise((res, rej) => {
+        const img = new Image();
+        img.onload = () => img.naturalWidth ? res(img) : rej(new Error("התמונה נטענה ריקה (0×0)"));
+        img.onerror = () => rej(new Error(`הדפדפן לא הצליח לפענח את התמונה (${file.type || "סוג לא ידוע"})`));
+        img.src = URL.createObjectURL(file); camFile = img.src;
+      });
+    }
+    // Safari before 16.4 has no CanvasRenderingContext2D.roundRect — the card used it unguarded.
+    if (window.CanvasRenderingContext2D && !CanvasRenderingContext2D.prototype.roundRect) {
+      CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+        r = Math.min(r || 0, w / 2, h / 2);
+        this.moveTo(x + r, y); this.arcTo(x + w, y, x + w, y + h, r); this.arcTo(x + w, y + h, x, y + h, r);
+        this.arcTo(x, y + h, x, y, r); this.arcTo(x, y, x + w, y, r); this.closePath(); return this;
+      };
     }
     // ---- Stamp renderer: one glass card, draggable anywhere on the photo ----
     // camState.anchor = the card's bottom-right corner in normalized photo coords (0–1).
@@ -2336,7 +2360,11 @@
       x.font = `800 ${Math.round(24 * base)}px 'JetBrains Mono', Consolas, monospace`; x.fillStyle = "#2dd4bf"; x.fillText("YAM PALATA", bx + bsz + 12 * base, by - 14 * base);
       x.font = `500 ${Math.round(17 * base)}px Heebo, Arial, sans-serif`; x.fillStyle = "rgba(230,237,246,.5)"; x.fillText("yuvartz.github.io/yam-palta", bx + bsz + 12 * base, by + 8 * base);
     }
-    function photoDims(img) { const MAX = 1600, ratio = Math.min(1, MAX / Math.max(img.naturalWidth, img.naturalHeight)); return { W: Math.round(img.naturalWidth * ratio), H: Math.round(img.naturalHeight * ratio) }; }
+    function photoDims(img) {
+      const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;   // HTMLImageElement or ImageBitmap
+      const MAX = 1600, ratio = Math.min(1, MAX / Math.max(iw, ih));
+      return { W: Math.max(1, Math.round(iw * ratio)), H: Math.max(1, Math.round(ih * ratio)) };
+    }
     function drawPreview() {
       const c = $("camCanvas"); if (!c || !camState) return;
       renderStamp(c.getContext("2d"), c.width, c.height, camState);
@@ -2382,7 +2410,10 @@
         Sound.chime(false); Track.event("camera-photo", place.located ? "gps" : "no-gps");
       } catch (e) {
         console.warn("camera compose failed", e);
-        $("camBody").innerHTML = `<div class="cam-status">לא הצלחנו לעבד את התמונה. נסו שוב.</div>`;
+        // Say WHY — a bare "try again" told us nothing when it failed on an iPhone.
+        const why = e && (e.message || e.name) ? String(e.message || e.name) : "שגיאה לא ידועה";
+        $("camBody").innerHTML = `<div class="cam-status">לא הצלחנו לעבד את התמונה.<br><small style="opacity:.7;direction:ltr;unicode-bidi:isolate;display:inline-block;margin-top:6px">${esc(why)}</small><br><button class="btn" style="margin-top:14px" onclick="App.openCamera()">צלם שוב</button></div>`;
+        Track.event("camera-error", why.slice(0, 60));
       }
     }
     async function cameraShare() {
