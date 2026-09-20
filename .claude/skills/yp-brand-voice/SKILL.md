@@ -17,7 +17,7 @@ Read `docs-internal/marketing/playbook.md` (voice rules, copy bank) and, for dep
 ## Fixed elements
 - Name: **YAM PLATA** / ים פלטה. Handle @yamplata. Tagline: הם מחפשים גלים. אנחנו מחפשים פלטה. פחות גלים. יותר ים.
 - Tier names exactly as in `docs/palata.js` TIERS (פלטה דלוקס, ים פלטה, כמעט פלטה, גלים קלים, יש גלים, גלים גדולים, וואלאק סוער). 8.0 is the bar; "כמעט" stays "כמעט".
-- Any post that shows a score, hour or beach carries: "תחזית לשטיחות הים · מתעדכנת · אינה אישור בטיחות" and the link `https://yamplata.com/?b=<key>&utm_source=<channel>&utm_campaign=<campaign>`.
+- Any post that shows a score, hour or beach carries: "תחזית לשטיחות הים · מתעדכנת · אינה אישור בטיחות" and the link `https://yamplata.com/?b=<key>&utm_source=<channel>&utm_campaign=<campaign>` (`?b=` only for app-preset beaches; otherwise the home page or `/en/`).
 - Numbers come from `render.mjs` output (`caption.txt`/`.json`) or the app. Never typed from memory, never rounded up.
 
 ## Per-format shape

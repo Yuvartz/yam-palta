@@ -18,6 +18,9 @@ Tooling: `tools/video/render.mjs` (see `tools/video/README.md`). Runs from `tool
 ## Platform specs (current)
 Vertical 1080×1920 H.264 30 fps, ≤ 15 s: Instagram Reels/Stories, TikTok, YouTube Shorts, Facebook Reels, X (video ≤ 2:20 ok). Cover = `.poster.png`. Keep the bottom 250 px and top 180 px free of key text (already in template). Add on-platform captions only in the post text; the video already burns its own labels.
 
+## Calendar rules (Israel)
+Check Hebrew holidays before planning: never post on Yom Kippur; treat Shabbat/holiday evenings as owner's call; חול המועד and summer are family-beach peaks; Sinai edition = Thursday/Friday. Deep link `?b=<key>` only for app-preset beaches; world/planet stories link to the home page (or `/en/`) with UTM.
+
 ## Freshness rules
 - A "tomorrow" story must be posted before 06:00 Israel time of that day; otherwise re-render with `--target now` or skip.
 - World editions: each beach is scored in its own local morning; say "לפי השעון המקומי".

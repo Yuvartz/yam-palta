@@ -39,6 +39,10 @@ Never: Google Business profile for the app itself (not eligible); paid ads befor
 ## Measurement (exists)
 GoatCounter `yuvartz.goatcounter.com`, events: launch, beach, camera, share, notifications, push-registered, maps-link, support-click. Use UTM: `utm_source=<channel>&utm_campaign=<name>&utm_content=<creative>` and keep `?b=<beach>`. KPIs: installs (push-registered as proxy), weekly actives, notification subscribers (Worker /health), shares, beach-page organic visits (Search Console once verified).
 
+## Calendar awareness (Israel)
+- Check the Hebrew calendar before scheduling: no posting on Yom Kippur; Shabbat and holiday evenings are low-value for "tomorrow" stories (owner decides); חול המועד סוכות/פסח and summer vacation are peak family-beach windows; Friday afternoon = weekend planners; Sinai stories fit Thursday/Friday.
+- Links: `?b=<key>` only for beaches that exist as presets in the app (`pages !== false` in `scripts/lib/beaches.mjs`); for world/planet/extra beaches link to `https://yamplata.com/` (or `/en/`) with UTM only.
+
 ## Legal / honesty guardrails
 - Open-Meteo free API is **non-commercial**: free app + donations OK; ads or paid tiers require the paid plan first.
 - Never invent or round a score; never post a stale "tomorrow" after 06:00 of that day; never imply safety.
@@ -47,6 +51,9 @@ GoatCounter `yuvartz.goatcounter.com`, events: launch, beach, camera, share, not
 
 ## Owner checklist status (update here)
 - [ ] admin email + 2FA · [ ] @yamplata on IG/TikTok/X/YouTube/FB · [ ] FB page ↔ IG Business · [ ] Telegram channel · [ ] Buffer free connected · [ ] HTTPS media hosting for MP4s · [ ] Search Console verified · [ ] PayPal/BMC link for DONATE.url
+
+## Decisions log
+- 2026-09-20: `calendar.md` opened. No accounts yet → week 1 (20–26.9) is soft-launch prep, daily story rendered and **held**; Astra day 1 (soft launch) moves to Sun 27.9 (Chol HaMoed Sukkot), day 8 (public launch) to week 3. Erev Yom Kippur (20.9 evening) and Yom Kippur (21.9): nothing goes out even once accounts exist. First pack: `tools/video/out/pack-2026-09-21/`.
 
 ## Copy bank (short list; full 20+10 in Astra §6)
 הם מחפשים גלים. אנחנו מחפשים פלטה. · פחות גלים. יותר ים. · הגלשן יכול לנוח. המשקפת פחות. · המגבת מוכנה. מה עם הים? · כמעט פלטה זה עדיין כמעט. אנחנו לא מעגלים בשביל הלייק. · יש גלים. יש גם מחר. · הקפה של הבוקר מחפש נוף שטוח. · אולי מחר המשקפת תקום לפניכם.
