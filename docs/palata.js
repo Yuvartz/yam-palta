@@ -47,7 +47,7 @@
   const TIERS = [
     { min: 98, key: "deluxe", emoji: "🪞",  label: "פלטה דלוקס", short: "דלוקס", color: "#ffd479" },
     { min: 90, key: "palata", emoji: "🌊",  label: "ים פלטה",    short: "פלטה",  color: "#2dd4bf" },
-    { min: 80, key: "almost", emoji: "🐢",  label: "כמעט פלטה",  short: "כמעט",  color: "#5ec9c2" },
+    { min: 80, key: "almost", emoji: "🐢",  label: "כמעט פלטה",  short: "כמעט",  color: "#8ee3c8" },
     { min: 60, key: "gentle", emoji: "🏊",  label: "גלי עדין",   short: "עדין",  color: "#e9c46a" },
     { min: 40, key: "waves",  emoji: "🌬️", label: "יש גלים",    short: "גלים",  color: "#f0a55a" },
     { min: 20, key: "big",    emoji: "🏄",  label: "גל גדול",    short: "גדול",  color: "#ec7a5a" },
@@ -76,7 +76,7 @@
   }
   const eveningCopy = (beach, s, e) => ({
     title: `🌅 מחר פלטה ב${beach}`,
-    body: `צפוי ים רגוע ${pad(s)}:00–${pad(e)}:00. כוון שעון, הים מחכה.`,
+    body: `צפוי ים רגוע ⁦${pad(s)}:00–${pad(e)}:00⁩. כוון שעון, הים מחכה.`,   // LRI…PDI: the range stays LTR inside RTL notification text
   });
 
   return {

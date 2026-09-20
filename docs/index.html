@@ -322,7 +322,7 @@
     .tl-h { font-family: var(--mono); font-size: 12px; color: var(--muted); }
     .tl-row.tl-now .tl-h { color: var(--text); font-weight: 700; }
     .tl-wave { display: flex; align-items: center; }
-    .tl-wave-img { height: 20px; width: auto; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; }
+    .tl-wave-svg { display: block; width: 46px; height: 20px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.35)); }
     .tl-height { font-size: 12px; color: var(--muted); white-space: nowrap; }
     .tl-score { font-size: 14px; font-weight: 800; text-align: left; white-space: nowrap; }
     .tl-status { font-size: 11.5px; font-weight: 700; text-align: left; white-space: nowrap; }
@@ -481,6 +481,11 @@
     .sst-now .d { font-size: 12px; font-weight: 700; margin-top: 4px; }
     .sst-chart { flex: 1; min-width: 0; height: 64px; }
     .sst-chart svg { width: 100%; height: 100%; display: block; overflow: visible; }
+    .sst-clim { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.06); font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+    .sst-clim:empty { display: none; }
+    .sst-clim .clim-temp { font-size: 26px; }
+    .sst-clim .clim-when { font-size: 13px; }
+    .sst-clim .clim-src { flex-basis: 100%; font-size: 11.5px; }
     .sst-axis { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 4px; direction: ltr; }
 
     /* Forecast rows: the bar is coloured by the day's PEAK tier, and the peak index sits beside the % */
@@ -495,6 +500,127 @@
 
     /* Share sheet fallback toast keeps the RTL dark styling */
     .toast-ok { border-color: rgba(45,212,191,.45); color: var(--calm); }
+
+    /* ---- Inline icon system (replaces UI emoji — consistent on every OS) ---- */
+    .ic { display: inline-flex; width: 1em; height: 1em; vertical-align: -0.15em; flex: 0 0 auto; }
+    .ic svg { width: 100%; height: 100%; display: block; }
+    .metric .label .ic, .card h2 .ic { font-size: 15px; color: var(--calm); opacity: .85; }
+    .card h2 .ic { font-size: 16px; }
+    .tier-art { display: inline-flex; vertical-align: middle; margin-inline-start: 4px; filter: drop-shadow(0 0 10px color-mix(in srgb, currentColor 45%, transparent)); }
+    .tier-art svg, .tier-art img { width: 100%; height: 100%; display: block; object-fit: contain; }
+    .hero h1 { display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .hero h1 .tier-art { animation: bob 3.4s ease-in-out infinite; }
+    @media (prefers-reduced-motion: reduce) { .hero h1 .tier-art { animation: none; } }
+    .next-line .time .tier-art, .fb-btn .tier-art { filter: none; margin: 0; }
+    .h2-loc { color: var(--calm); font-weight: 800; }
+    .h2-loc::before { content: "·"; color: var(--muted); margin: 0 6px 0 2px; font-weight: 500; }
+    .h2-loc:empty { display: none; }
+    .tl-nav svg { width: 12px; height: 12px; }
+    .loc .ic { font-size: 14px; margin-inline-start: -2px; }
+    .streak .ic { color: #ffd479; font-size: 15px; }
+
+    /* Jellyfish notice: a quiet line under the verdict instead of a loud chip on top */
+    .hero-notes { display: flex; flex-direction: column; gap: 6px; align-items: center; margin: 8px 0 0; }
+    .hero-note { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; padding: 5px 11px; border-radius: 999px; border: 1px solid; background: none; color: inherit; font-family: var(--sans); cursor: pointer; transition: transform .12s; }
+    .hero-note:active { transform: scale(.96); }
+    .hero-note .ic { font-size: 14px; }
+    .hero-note.jelly { color: #ff9db0; border-color: rgba(255,140,180,.35); background: rgba(255,140,180,.08); }
+    .hero-note.jelly.high { border-color: rgba(255,80,120,.55); background: rgba(255,80,120,.14); }
+    .hero-note.buoy-warn { color: #f0a55a; border-color: rgba(240,165,90,.4); background: rgba(240,165,90,.1); cursor: default; }
+    .buoy-credit { margin-top: 8px; }
+    .buoy-credit:empty { display: none; }
+
+    /* Beach switch: keep the page, dim it, slide the new data in — no skeleton flash */
+    #app { transition: opacity .25s var(--ease), filter .25s var(--ease); }
+    #app.switching { opacity: .45; filter: saturate(.6); pointer-events: none; }
+    #app.switching .hero-content, #app.switching .timeline { transition: transform .25s var(--ease); transform: translateY(6px); }
+    .switch-bar { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 60; background: linear-gradient(90deg, transparent, var(--calm), transparent); background-size: 40% 100%; background-repeat: no-repeat; animation: switchBar .9s ease-in-out infinite; opacity: 0; pointer-events: none; transition: opacity .2s; }
+    .switch-bar.on { opacity: 1; }
+    @keyframes switchBar { from { background-position: -40% 0; } to { background-position: 140% 0; } }
+    .hero-content.enter { animation: heroEnter .45s var(--ease) both; }
+    @keyframes heroEnter { from { opacity: 0; transform: translateY(10px) scale(.985); } to { opacity: 1; transform: none; } }
+    .tl-body.dragging { transition: none !important; animation: none !important; }
+    .tl-body { transition: transform .22s var(--ease), opacity .22s var(--ease); will-change: transform; }
+    @media (prefers-reduced-motion: reduce) { .switch-bar, .hero-content.enter { animation: none; } #app, #app.switching .hero-content, #app.switching .timeline, .tl-body { transition: none; transform: none; } }
+
+    /* Week card: one row per day = 14 mini bars (06→19 right-to-left), height + colour = score */
+    .week-row { display: grid; grid-template-columns: 62px minmax(0, 1fr) 72px; align-items: center; column-gap: 6px; padding: 9px 0; min-height: 60px; border-radius: 10px; cursor: pointer; direction: rtl; transition: background .18s var(--ease); }
+    .week-row:hover { background: rgba(255,255,255,.035); }
+    .week-row:focus-visible { outline: 2px solid var(--calm); outline-offset: 2px; }
+    .week-row + .week-row, .day-hours + .week-row { border-top: 1px solid rgba(255,255,255,.05); }
+    .week-row .name { font-weight: 700; font-size: 13.5px; white-space: nowrap; }
+    .week-row .name small { display: block; color: var(--muted); font-weight: 500; font-size: 11px; }
+    .wb-chart { position: relative; height: 42px; display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); gap: 2px; direction: rtl; }
+    .wb { position: relative; height: 100%; }
+    .wb-bar { position: absolute; left: 0; right: 0; bottom: 4px; height: var(--h, 1px); border-radius: 2px 2px 0 0; transition: height .35s var(--ease); }
+    .wb.past .wb-bar { opacity: .4; }
+    .wb.now::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: #fff; border-radius: 1px; }
+    .wb-best { position: absolute; top: 0; left: 50%; width: 5px; height: 5px; background: #fff; transform: translateX(-50%) rotate(45deg); border-radius: 1px; box-shadow: 0 0 6px rgba(255,255,255,.8); }
+    .wb-night { position: absolute; left: 50%; bottom: 4px; width: 3px; height: 3px; border-radius: 50%; background: var(--muted); transform: translateX(-50%); opacity: .7; }
+    .wb-nodata { position: absolute; left: 50%; bottom: 18px; width: 5px; height: 1.5px; background: var(--muted); transform: translateX(-50%); opacity: .6; }
+    .wb-thresh { position: absolute; left: 0; right: 0; bottom: 29.6px; border-top: 1px dashed rgba(138,152,173,.55); pointer-events: none; z-index: 1; }
+    .week-row .stat { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.15; position: relative; padding-inline-end: 16px; }
+    .week-row .stat b { font-family: var(--mono); font-size: 15px; font-weight: 800; }
+    .week-row .stat small { font-size: 10.5px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+    .week-row .stat .chev { position: absolute; inset-inline-end: 0; top: 50%; transform: translateY(-50%); color: var(--muted); transition: transform .2s; width: 12px; height: 12px; }
+    .week-row .stat .chev svg { width: 12px; height: 12px; }
+    .week-row.expanded .stat .chev { transform: translateY(-50%) rotate(180deg); }
+    .week-hours { display: grid; grid-template-columns: 62px minmax(0, 1fr) 72px; column-gap: 6px; padding: 0 0 6px; direction: rtl; }
+    .wb-axis { display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); gap: 2px; direction: rtl; font-family: var(--mono); font-size: 9.5px; color: var(--muted); text-align: center; }
+    .wb-ramp { position: relative; height: 8px; border-radius: 4px; margin-top: 4px; }
+    .wb-ramp i { position: absolute; top: -3px; width: 0; height: 14px; border-left: 1px dashed rgba(255,255,255,.75); }
+    .wb-ramp-lbl { position: relative; display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 3px; direction: rtl; }
+    .wb-keys { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-top: 8px; font-size: 11px; color: var(--muted); }
+    .wb-keys span { display: inline-flex; align-items: center; gap: 5px; }
+    .wb-keys i { display: inline-block; width: 10px; height: 10px; }
+    .wb-k-best { width: 6px !important; height: 6px !important; background: #fff; transform: rotate(45deg); border-radius: 1px; }
+    .wb-k-now { height: 2px !important; background: #fff; border-radius: 1px; }
+    .wb-k-past { background: color-mix(in oklab, #e9c46a 40%, transparent); border-radius: 2px; }
+    .wb-k-night { width: 4px !important; height: 4px !important; border-radius: 50%; background: var(--muted); }
+    .wb-k-thresh { height: 0 !important; border-top: 1px dashed rgba(138,152,173,.8); }
+    .heat-legend { display: block; margin-top: 12px; }
+    .hr { grid-template-columns: 50px 9px 1fr auto; direction: rtl; }
+    .hr.hr-now { background: rgba(255,255,255,.05); border-radius: 8px; }
+    .hr.hr-past { opacity: .6; }
+    .hr .hr-data b { font-size: 12.5px; }
+    @media (prefers-reduced-motion: reduce) { .wb-bar { transition: none; } }
+
+    /* Narrow phones: four icon buttons + the wordmark must share one line */
+    @media (max-width: 430px) {
+      .topbar-left { gap: 6px; }
+      .icon-btn, .install-btn { width: 34px; height: 34px; font-size: 16px; }
+      .icon-btn svg { width: 16px; height: 16px; }
+      .brand .wordmark { font-size: 18px; letter-spacing: 2px; }
+      .brand-logo { width: 26px; height: 26px; }
+    }
+    /* Camera: photo + verdict stamp */
+    .cam-modal .modal { max-width: 420px; padding: 16px; }
+    .cam-preview { width: 100%; border-radius: 14px; display: block; background: #000; }
+    .cam-status { color: var(--muted); font-size: 13px; text-align: center; padding: 18px 0; }
+    .cam-actions { display: flex; gap: 10px; margin-top: 12px; } .cam-actions .btn { margin-top: 0; }
+    .cam-hint { font-size: 12px; color: var(--muted); margin: 10px 0 0; text-align: center; }
+
+    /* ---- Review pass (yp-* skills): interaction states, hit areas, motion hygiene ---- */
+    body.modal-open { overflow: hidden; }                                   /* no page scroll behind a dialog */
+    input[type=range]:focus-visible { outline: 2px solid var(--calm); outline-offset: 4px; }
+    .loc-x { position: absolute; }
+    .loc-x::after { content: ""; position: absolute; inset: -9px; }         /* 36px effective target, visual stays 18px */
+    .loc-x:focus-visible { outline: 2px solid var(--calm); outline-offset: 2px; }
+    .hero-warn:focus-visible, .fb-btn:focus-visible, .jelly-item:focus-visible, .cmp:focus-visible { outline: 2px solid var(--calm); outline-offset: 3px; }
+    /* Toasts and the install nudge sit at the bottom on phones — the top slot covered the beach chips */
+    .install-tip { top: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); inset-inline-end: 12px; inset-inline-start: 12px; max-width: 440px; margin-inline-start: auto; text-align: start; }
+    @media (min-width: 760px) { .install-tip { inset-inline-start: auto; } }
+    .tl-cols { display: grid; grid-template-columns: 42px 1fr 50px 38px 58px; gap: 7px; padding: 0 3px 2px; font-size: 9.5px; color: var(--muted); font-weight: 700; letter-spacing: .2px; }
+    .tl-cols span:nth-child(n+3) { text-align: left; }
+    .pct-note { font-size: 11.5px; color: var(--muted); margin: 10px 0 0; line-height: 1.45; }
+    /* Ambient loops stop while the tab is in the background (battery) */
+    body.bg .wave-track, body.bg .wave-layer, body.bg .sparkle, body.bg .star, body.bg .turtle, body.bg .turtle-inner, body.bg .surfer, body.bg .surfer-inner, body.bg .seajelly, body.bg .seajelly-in, body.bg .seajelly-in svg, body.bg .moon, body.bg .act .scene { animation-play-state: paused; }
+    @media (prefers-reduced-motion: reduce) {
+      .install-tip, .modal, .alert-banner, .score-detail, .day-hours.open, .jelly-collapse.open, .fb-panel, .bar > i.fill, .icon-btn.on .snd-w1, .icon-btn.on .snd-w2 { animation: none; }
+      .spinner { animation-duration: 1.6s; }
+      .loc, .install-btn, .icon-btn, .btn, .cmp, .day, .heat-cell, .bar > i { transition: none; }
+      html { scroll-behavior: auto; }
+    }
 
     /* Desktop: the single column floats on a deeper ambient sea instead of a flat void */
     @media (min-width: 760px) {
@@ -514,14 +640,15 @@
     <div class="topbar">
       <div class="brand"><img class="brand-logo" src="brand-badge.png" alt="" /><span class="wordmark">YAM PALATA</span></div>
       <div class="topbar-left">
-        <div class="streak" id="streak"><span>🔥</span><span class="n" id="streakN">0</span><span>ימים רצופים</span></div>
+        <div class="streak" id="streak"><span class="ic" data-ic="flame"></span><span class="n" id="streakN">0</span><span>ימים רצופים</span></div>
+        <button class="icon-btn" id="camBtn" onclick="App.openCamera()" title="צלם את הים" aria-label="צלם את הים והטבע את המדד על התמונה"><span class="ic" data-ic="camera" style="font-size:18px"></span></button>
         <button class="icon-btn" id="soundBtn" onclick="App.toggleSound()" title="צלילים" aria-label="הפעל צלילים" aria-pressed="false">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor" stroke="none"/><path class="snd-w1" d="M15.5 8.5a5 5 0 0 1 0 7"/><path class="snd-w2" d="M18.5 5.5a9 9 0 0 1 0 13"/><path class="snd-x" d="M16 9l5 5M21 9l-5 5"/></svg>
         </button>
         <button class="icon-btn" id="shareBtn" onclick="App.share()" title="שתף" aria-label="שתף את מצב הים">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
         </button>
-        <button class="install-btn" id="installBtn" onclick="App.installApp()" title="הוסף כאפליקציה" aria-label="הוסף כאפליקציה">📲</button>
+        <button class="install-btn" id="installBtn" onclick="App.installApp()" title="הוסף כאפליקציה" aria-label="הוסף כאפליקציה"><span class="ic" data-ic="install" style="font-size:18px"></span></button>
       </div>
     </div>
 
@@ -561,42 +688,35 @@
       </div>
 
       <div class="card">
-        <h2>נתונים נוכחיים</h2>
+        <h2>נתונים נוכחיים<span class="h2-loc"></span></h2>
         <div id="jellyList" class="jelly-collapse"></div>
         <div id="metricsDate" class="metrics-date"></div>
         <div class="metrics" id="metrics"></div>
+        <div class="credit buoy-credit" id="buoyCredit"></div>
         <div class="credit">מקורות: תחזית — <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> (CC-BY 4.0; מודלים: Météo-France MFWAM, ECMWF, DWD ICON/EWAM) · גלים נמדדים — <a href="https://isramar.ocean.org.il/isramar2009/station/HaderaRDI.aspx" target="_blank" rel="noopener">מצוף חדרה, ISRAMAR / חקר ימים ואגמים</a> · מדוזות — <a href="https://www.meduzot.co.il/list" target="_blank" rel="noopener">מדוזות בים</a></div>
       </div>
 
       <div class="card" id="sstCard" style="display:none">
-        <h2>🌡️ טמפ׳ המים · 7 ימים אחורה, 3 קדימה</h2>
+        <h2><span class="ic" data-ic="thermo"></span>טמפ׳ המים<span class="h2-loc"></span></h2>
         <div id="sstBody"></div>
-      </div>
-
-      <div class="card clim-card" id="climCard" style="display:none">
-        <h2>🌡️ שיא חום המים</h2>
-        <div id="climBody"></div>
+        <div id="sstClim" class="sst-clim"></div>
       </div>
 
       <div class="card">
-        <h2>פירוט גלים</h2>
+        <h2>פירוט גלים<span class="h2-loc"></span></h2>
         <div class="metrics" id="waveDetail"></div>
-        <p class="wave-note">💡 בפשטות: <b>גלים קצרים מהרוח</b> — ים "קופצני" שנוצר מרוח שנושבת כאן עכשיו. <b>גלים ארוכים מרחוק</b> (סוול) — גלים חלקים ומתגלגלים שהגיעו מסערה רחוקה. <b>זמן בין גלים</b> — כמה שניות עוברות בין גל לגל; ככל שארוך יותר, הים מסודר ורגוע יותר.</p>
+        <p class="wave-note"><span class="ic" data-ic="bulb" style="color:var(--calm)"></span> בפשטות: <b>גלים קצרים מהרוח</b> — ים "קופצני" שנוצר מרוח שנושבת כאן עכשיו. <b>גלים ארוכים מרחוק</b> (סוול) — גלים חלקים ומתגלגלים שהגיעו מסערה רחוקה. <b>זמן בין גלים</b> — כמה שניות עוברות בין גל לגל; ככל שארוך יותר, הים מסודר ורגוע יותר.</p>
       </div>
 
       <div class="card">
-        <h2>מתי השבוע · מפת חום לפי שעה</h2>
-        <div class="heat" id="heat"></div>
+        <h2><span class="ic" data-ic="calendar"></span>השבוע<span class="h2-loc"></span></h2>
+        <div id="week"></div>
         <div class="heat-legend" id="heatLegend"></div>
+        <p class="pct-note">כל עמודה = שעה אחת (06 מימין עד 19 משמאל); גובה וצבע = המדד באותה שעה. האחוז = חלק משעות האור (זריחה→שקיעה) שבהן התחזית עומדת בסף 8.0 — לא הסתברות. לחצו על יום לפירוט שעתי.</p>
       </div>
 
       <div class="card">
-        <h2>תחזית 6 ימים · % זמן ים פלטה · לחצו ליום</h2>
-        <div id="forecast"></div>
-      </div>
-
-      <div class="card">
-        <h2>חלון הפלטה</h2>
+        <h2><span class="ic" data-ic="timer"></span>חלון הפלטה<span class="h2-loc"></span></h2>
         <div id="nextWindow"></div>
       </div>
 
@@ -608,6 +728,7 @@
           <div class="credit">קובע רק את הערת הנוחות ליד טמפ׳ המים — לא משפיע על מדד הפלטה</div>
         </div>
         <button class="btn" id="notifyBtn" onclick="App.enableNotifications()">🔔 הפעל התראות על ים פלטה</button>
+        <div class="credit" id="notifyHelp" style="text-align:center"></div>
       </div>
 
       <div class="updated" id="updated"></div>
@@ -631,6 +752,21 @@
         <button class="btn ok" onclick="App.confirmAdd()">הוסף</button>
         <button class="btn ghost" onclick="App.closeAdd()">ביטול</button>
       </div>
+    </div>
+  </div>
+
+  <div class="switch-bar" id="switchBar" aria-hidden="true"></div>
+  <input type="file" id="camInput" accept="image/*" capture="environment" hidden aria-hidden="true" />
+  <div class="modal-back cam-modal" id="camModal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="camTitle">
+      <h3 id="camTitle">הים שלך, עם המדד</h3>
+      <div id="camBody"><div class="cam-status">מכין את התמונה…</div></div>
+      <div class="cam-actions">
+        <button class="btn ok" id="camShare" onclick="App.cameraShare()">שתף</button>
+        <a class="btn" id="camSave" download="yam-palata.jpg" style="text-align:center;text-decoration:none;display:block">שמור</a>
+        <button class="btn ghost" onclick="App.closeCamera()">סגור</button>
+      </div>
+      <p class="cam-hint" id="camHint"></p>
     </div>
   </div>
 
@@ -724,10 +860,78 @@
     const PALATA_WEIGHTS = Palata.WEIGHTS;
     const PALATA_TIERS = Palata.TIERS;
 
-    const HEIGHT_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 15c3.5 0 4-9 8-9s4.5 9 8 9 4-4 4-4"/><path d="M2 20h20" opacity=".4"/></svg>`;
-    const CHOP_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l3-4 3 4 3-4 3 4 3-4 3 4 2-2.5"/><path d="M2 19h20" opacity=".4"/></svg>`;
-    const WIND_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h11a3 3 0 1 0-3-3"/><path d="M3 12h15.5a3 3 0 1 1-3 3"/><path d="M3 16h8.5a2.5 2.5 0 1 1-2.5 2.5"/></svg>`;
-    const HISTORY_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>`;
+    // Score-breakdown icons: duotone (soft fill + crisp stroke), one visual family.
+    const SVGO = `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">`;
+    const HEIGHT_ICON = `${SVGO}<path d="M3 22c4 0 5-11 10-11s6 11 10 11 5-5 6-5" /><path d="M3 22c4 0 5-11 10-11s6 11 10 11 5-5 6-5V29H3z" fill="currentColor" fill-opacity=".18" stroke="none"/><path d="M13 11c-2.5 0-4 3-4 3" opacity=".55"/><circle cx="14.5" cy="9.5" r="1" fill="currentColor" stroke="none" opacity=".8"/></svg>`;
+    const CHOP_ICON = `${SVGO}<path d="M3 20l3.5-5 3.5 5 3.5-5 3.5 5 3.5-5 3.5 5 3.5-5"/><path d="M3 20l3.5-5 3.5 5 3.5-5 3.5 5 3.5-5 3.5 5 3.5-5V28H3z" fill="currentColor" fill-opacity=".18" stroke="none"/><path d="M8 10l2-3M15 10l2-3M22 10l2-3" opacity=".5"/></svg>`;
+    const WIND_ICON = `${SVGO}<path d="M4 11h14a3.5 3.5 0 1 0-3.5-3.5"/><path d="M4 16h20a3.5 3.5 0 1 1-3.5 3.5"/><path d="M4 21h10a3 3 0 1 1-3 3"/><path d="M4 11h14a3.5 3.5 0 1 0-3.5-3.5M4 16h20a3.5 3.5 0 1 1-3.5 3.5M4 21h10a3 3 0 1 1-3 3" stroke="currentColor" stroke-opacity=".25" stroke-width="6" stroke-linecap="round"/></svg>`;
+    const HISTORY_ICON = `${SVGO}<circle cx="17" cy="17" r="10" fill="currentColor" fill-opacity=".14"/><circle cx="17" cy="17" r="10"/><path d="M17 11v6l4 2.5"/><path d="M3 9h5M2 14h4M3 19h5" opacity=".6"/></svg>`;
+    // UI icon set (24px line icons) — used instead of emoji for labels, buttons and chips.
+    const I = (body, extra = "") => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" ${extra}>${body}</svg>`;
+    const ICON = {
+      water: I(`<path d="M3 11c2.2 0 2.2-2 4.5-2s2.3 2 4.5 2 2.3-2 4.5-2 2.3 2 4.5 2"/><path d="M3 17c2.2 0 2.2-2 4.5-2s2.3 2 4.5 2 2.3-2 4.5-2 2.3 2 4.5 2" opacity=".5"/>`),
+      thermo: I(`<path d="M14 14.6V5.5a2 2 0 1 0-4 0v9.1a4 4 0 1 0 4 0z"/><path d="M12 10v6" opacity=".55"/>`),
+      sun: I(`<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>`),
+      uv: I(`<circle cx="12" cy="13" r="3.6"/><path d="M12 4v2.4M4 13H2M22 13h-2M6.3 7.3 4.9 5.9M17.7 7.3l1.4-1.4"/><path d="M5 20h14" opacity=".45"/>`),
+      compass: I(`<circle cx="12" cy="12" r="9"/><path d="M15.6 8.4l-2.1 5.1-5.1 2.1 2.1-5.1z" fill="currentColor" fill-opacity=".35"/>`),
+      sunrise: I(`<path d="M3 18h18M6.5 14a5.5 5.5 0 0 1 11 0"/><path d="M12 3.5V8M9.5 6l2.5-2.5L14.5 6"/>`),
+      sunset: I(`<path d="M3 18h18M6.5 14a5.5 5.5 0 0 1 11 0"/><path d="M12 8V3.5M9.5 5.5 12 8l2.5-2.5"/>`),
+      moon: I(`<path d="M19.5 14.2A8 8 0 1 1 9.8 4.5a6.5 6.5 0 0 0 9.7 9.7z"/>`),
+      moonrise: I(`<path d="M17 13.5A6 6 0 1 1 9.5 6a4.6 4.6 0 0 0 7.5 7.5z"/><path d="M19 14v7M16.5 16.5 19 14l2.5 2.5" opacity=".9"/>`),
+      moonset: I(`<path d="M17 13.5A6 6 0 1 1 9.5 6a4.6 4.6 0 0 0 7.5 7.5z"/><path d="M19 21v-7M16.5 18.5 19 21l2.5-2.5" opacity=".9"/>`),
+      timer: I(`<circle cx="12" cy="13" r="7.5"/><path d="M12 9.5V13l2.5 1.5M9.5 2.5h5"/>`),
+      swell: I(`<path d="M2 14c3-6.5 7-6.5 10 0s7 6.5 10 0"/><path d="M2 19h20" opacity=".4"/>`),
+      chop: I(`<path d="M2 13l2.9-4 2.9 4 2.8-4 2.9 4 2.8-4 2.9 4 1.8-2.5"/><path d="M2 19h20" opacity=".4"/>`),
+      calendar: I(`<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>`),
+      camera: I(`<path d="M4 8.5h3.2l1.6-2.5h6.4l1.6 2.5H20a1 1 0 0 1 1 1V19a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5a1 1 0 0 1 1-1z"/><circle cx="12" cy="14" r="3.5"/>`),
+      pin: I(`<path d="M12 21.5s-6.5-6-6.5-11.5a6.5 6.5 0 0 1 13 0C18.5 15.5 12 21.5 12 21.5z"/><circle cx="12" cy="10" r="2.2"/>`),
+      plus: I(`<path d="M12 5v14M5 12h14"/>`),
+      flame: I(`<path d="M12 3c1 3.5 4.5 5 4.5 9.2A4.5 4.5 0 0 1 7.5 12.2c0-1.6.6-2.8 1.6-3.9.1 1.6.8 2.5 1.7 2.8C10.3 8.3 11.4 6 12 3z" fill="currentColor" fill-opacity=".25"/>`),
+      buoy: I(`<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.8"/><path d="M6 6l3.3 3.3M14.7 14.7 18 18M18 6l-3.3 3.3M9.3 14.7 6 18"/>`),
+      alert: I(`<path d="M12 4 2.5 20h19z"/><path d="M12 10v4.5M12 17.2h.01"/>`),
+      bulb: I(`<path d="M9.5 18.5h5M10.5 21.5h3M12 3a6 6 0 0 0-4 10.5c.7.6 1 1.4 1 2.5h6c0-1.1.3-1.9 1-2.5A6 6 0 0 0 12 3z"/>`),
+      install: I(`<path d="M12 3v12M7.5 10.5 12 15l4.5-4.5M4 19h16"/>`),
+      bell: I(`<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>`),
+      check: I(`<path d="M5 12.5l4.5 4.5L19 7.5"/>`),
+      chevL: I(`<path d="M14.5 5.5 8 12l6.5 6.5"/>`, `stroke-width="2.4"`),
+      chevR: I(`<path d="M9.5 5.5 16 12l-6.5 6.5"/>`, `stroke-width="2.4"`),
+      chevD: I(`<path d="M5.5 9.5 12 16l6.5-6.5"/>`, `stroke-width="2.4"`),
+      jelly: JELLY_ART_REF(),
+    };
+    function JELLY_ART_REF() { return `<svg viewBox="0 0 60 84" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M8 36 C8 16 22 8 30 8 C38 8 52 16 52 36 C48 33 44 39 40 35 C36 31 32 39 30 35 C28 39 24 31 20 35 C16 39 12 33 8 36 Z" fill="currentColor" fill-opacity=".4" stroke-width="2.5"/><g stroke-width="2.5" opacity=".85"><path d="M14 36q-3 10 1 18"/><path d="M23 38q3 10-1 18"/><path d="M37 38q-3 10 1 18"/><path d="M46 36q3 10-1 18"/></g><g stroke-width="3.5"><path d="M27 37q-2 12 0 20"/><path d="M33 37q2 12 0 20"/></g></svg>`; }
+    const ic = (name, style = "") => `<span class="ic" aria-hidden="true"${style ? ` style="${style}"` : ""}>${ICON[name] || ""}</span>`;
+    // Verdict art per tier — our own line drawings instead of OS emoji (🏊 looked different on
+    // every phone). Emoji stay only in text channels (notifications, share text).
+    const T = body => `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
+    const TIER_ART = {
+      deluxe: T(`<circle cx="24" cy="15" r="5.5" fill="currentColor" fill-opacity=".25"/><path d="M4 29h40"/><path d="M12 29c0 3 24 3 24 0" opacity=".45"/><path d="M19 35h10M22 40h4" opacity=".45"/><path d="M38 7l1.3 2.7 2.7 1.3-2.7 1.3L38 15l-1.3-2.7L34 11l2.7-1.3z" fill="currentColor" stroke="none"/><path d="M9 11l.9 1.8 1.8.9-1.8.9L9 16.4l-.9-1.8-1.8-.9 1.8-.9z" fill="currentColor" stroke="none" opacity=".7"/>`),
+      palata: T(`<circle cx="35" cy="13" r="5" fill="currentColor" fill-opacity=".25"/><path d="M4 28c5 0 5-3.5 10-3.5s5 3.5 10 3.5 5-3.5 10-3.5 5 3.5 10 3.5"/><path d="M4 36c5 0 5-3 10-3s5 3 10 3 5-3 10-3 5 3 10 3" opacity=".45"/>`),
+      almost: `<svg viewBox="0 0 80 64" fill="none" stroke-linecap="round" stroke-linejoin="round"><g fill="currentColor" opacity=".82"><ellipse cx="58" cy="18" rx="8" ry="4.5" transform="rotate(35 58 18)"/><ellipse cx="58" cy="46" rx="8" ry="4.5" transform="rotate(-35 58 46)"/><ellipse cx="27" cy="14" rx="10" ry="5" transform="rotate(-32 27 14)"/><ellipse cx="27" cy="50" rx="10" ry="5" transform="rotate(32 27 50)"/><ellipse cx="11" cy="32" rx="7" ry="5.5"/></g><ellipse cx="42" cy="32" rx="22" ry="18" fill="currentColor"/><g stroke="#0e1420" stroke-width="2" opacity=".5" fill="none"><polygon points="42,24 50,28 50,36 42,40 34,36 34,28"/><path d="M42 24V18M50 28l5-3M50 36l5 3M42 40v6M34 36l-5 3M34 28l-5-3"/></g><circle cx="8" cy="30" r="1.5" fill="#0e1420"/></svg>`,
+      // Freestyle swimmer, side view: filled head, recovery arm arcing forward, body gliding on a
+      // soft filled swell with a small splash — bolder shapes than the earlier stick figure.
+      gentle: `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="34" cy="16.5" r="4.2" fill="currentColor" stroke="none"/>
+        <path d="M29.5 22.5C25 21.5 20 23 14.5 27.5" stroke-width="3.4"/>
+        <path d="M29.5 22.5c.8-5.5 5.5-9 11.5-8" stroke-width="3"/>
+        <circle cx="10" cy="22" r="1.4" fill="currentColor" stroke="none" opacity=".75"/><circle cx="7" cy="25.5" r="1" fill="currentColor" stroke="none" opacity=".55"/>
+        <path d="M3 32c5 0 6-3.5 11-3.5s6 3.5 11 3.5 6-3.5 11-3.5 6 3.5 11 3.5"/>
+        <path d="M3 40c5 0 6-3 11-3s6 3 11 3 6-3 11-3 6 3 11 3" opacity=".4"/>
+      </svg>`,
+      waves: T(`<path d="M6 13h14a3 3 0 1 0-3-3"/><path d="M6 19h20a3 3 0 1 1-3 3"/><path d="M4 33c4 0 4-4.5 8-4.5s4 4.5 8 4.5 4-4.5 8-4.5 4 4.5 8 4.5 4-4.5 8-4.5"/><path d="M4 40c4 0 4-3 8-3s4 3 8 3 4-3 8-3 4 3 8 3 4-3 8-3" opacity=".45"/>`),
+      big: T(`<path d="M6 38c7 0 6-17 17-17 7 0 12 5 12 11-4-3-8-3-11 0 6 0 8 3 9 6H6z" fill="currentColor" fill-opacity=".22"/><path d="M6 38c7 0 6-17 17-17 7 0 12 5 12 11-4-3-8-3-11 0"/><path d="M24 32c6 0 8 3 9 6" opacity=".6"/><path d="M38 12l1.2 2.4 2.4 1.2-2.4 1.2L38 19.2 36.8 16.8 34.4 15.6l2.4-1.2z" fill="currentColor" stroke="none" opacity=".6"/>`),
+      stormy: T(`<path d="M15 24a7 7 0 0 1 13.5-2.2A5 5 0 1 1 30 32H15a4 4 0 0 1 0-8z" fill="currentColor" fill-opacity=".18"/><path d="M23 30l-3 7h5l-3 7"/><path d="M4 43c3 0 3-3.5 6-3.5s3 3.5 6 3.5" opacity=".6"/><path d="M32 43c3 0 3-3.5 6-3.5s3 3.5 6 3.5" opacity=".6"/>`),
+    };
+    // Tier illustrations: generated stickers (gpt-image-1, brief by Codex — see scripts/gen-tier-art.py)
+    // in docs/img/tiers/<key>.png; the inline SVG remains the fallback while an image is missing/loading.
+    const TIER_IMG = new Set(["deluxe", "palata", "almost", "gentle", "waves", "big", "stormy"]);
+    const tierArt = (tier, px = 38) => {
+      if (!tier) return "";
+      const inner = TIER_IMG.has(tier.key)
+        ? `<img src="img/tiers/${tier.key}.png" alt="" width="${px}" height="${px}" decoding="async" onerror="this.outerHTML=TIER_ART_FALLBACK['${tier.key}']">`
+        : (TIER_ART[tier.key] || "");
+      return `<span class="tier-art" style="width:${px}px;height:${px}px" aria-hidden="true">${inner}</span>`;
+    };
+    window.TIER_ART_FALLBACK = TIER_ART;
     const SWIM_ART = `<svg viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="46" cy="22" r="6" fill="currentColor" stroke="none"/><path d="M12 40c7-5 13-5 19-2l7 4c4 2 9 2 13-1"/><path d="M38 42l7-11"/><path d="M5 54c4 0 4 3 8 3s4-3 8-3 4 3 8 3 4-3 8-3 4 3 8 3 4-3 8-3" opacity=".5"/></svg>`;
     const SNORKEL_ART = `<svg viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><rect x="15" y="24" width="31" height="20" rx="7"/><path d="M30 44c0 4 2 7 6 7"/><path d="M46 28c6 0 9 4 9 10v15"/><path d="M50 53h9"/><path d="M15 31H8" opacity=".7"/><path d="M5 62c4 0 4 3 8 3s4-3 8-3 4 3 8 3 4-3 8-3 4 3 8 3 4-3 8-3" opacity=".45"/></svg>`;
     const SUP_ART = `<svg viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="31" cy="13" r="5" fill="currentColor" stroke="none"/><path d="M31 18v15M31 33l-5 9M31 33l5 9"/><path d="M31 23l11-7"/><path d="M47 7L37 42"/><ellipse cx="34" cy="50" rx="23" ry="4.5"/><path d="M5 62c4 0 4 3 8 3s4-3 8-3 4 3 8 3 4-3 8-3 4 3 8 3 4-3 8-3" opacity=".45"/></svg>`;
@@ -1064,7 +1268,7 @@
         const chip = `<button class="loc ${k === cur ? "active" : ""}" aria-pressed="${k === cur}" onclick="App.setLocation('${k}')">${esc(v.name)}</button>`;
         // Added beaches (anything not built-in) get a remove ×; the list used to be append-only.
         return BUILTIN[k] ? chip : `<span class="loc-wrap">${chip}<button class="loc-x" aria-label="הסר את ${esc(v.name)}" title="הסר" onclick="App.removeLocation('${k}')">×</button></span>`;
-      }).join("") + `<button class="loc geo" id="geoBtn" onclick="App.useMyLocation()">📍 קרוב אליי</button><button class="loc add" onclick="App.openAdd()">＋ הוסף</button>`;
+      }).join("") + `<button class="loc geo" id="geoBtn" onclick="App.useMyLocation()">${ic("pin")} קרוב אליי</button><button class="loc add" onclick="App.openAdd()">${ic("plus")} הוסף</button>`;
     }
     function removeLocation(key) {
       if (BUILTIN[key]) return;
@@ -1077,31 +1281,40 @@
     // forecast that drives the score. Only meaningful for Mediterranean spots near the buoy;
     // hidden for the Red Sea (Eilat/Nuweiba) and for stale measurements. Quiet confirmation
     // most days, a coloured warning only when the measured sea is rougher than predicted.
-    function buoyLineHTML(ref) {
-      if (!buoy || !buoy.measured || buoy.measured.waveHeight == null || !buoy.station) return "";
-      const m = buoy.measured;
-      if (hoursSince(m.measuredAt) > 6) return "";
+    function buoyInfo(ref) {
+      if (!buoy || !buoy.measured || buoy.measured.waveHeight == null || !buoy.station) return null;
+      const m = buoy.measured, age = hoursSince(m.measuredAt);
+      if (age > 6) return null;
       const loc = allLocations()[LS.loc];
-      if (!loc || haversine(loc.lat, loc.lon, buoy.station.lat, buoy.station.lon) > 150) return "";
+      if (!loc) return null;
+      const dist = haversine(loc.lat, loc.lon, buoy.station.lat, buoy.station.lon);
+      if (dist > 150) return null;
       const meas = m.waveHeight, fc = ref && ref.waveHeight != null ? ref.waveHeight : null;
-      // Attribution: the measurement is © ISRAMAR / IOLR — always name and link the source.
+      const kind = fc != null && meas - fc >= 0.3 ? "warn" : fc != null && fc - meas >= 0.3 ? "lower" : "ok";
+      return { meas, fc, kind, dist: Math.round(dist), age: Math.round(age) };
+    }
+    // Neutral buoy confirmation → the sources line of "נתונים נוכחיים" (it was noise in the hero).
+    // Attribution: the measurement is © ISRAMAR / IOLR — always name and link the source.
+    function buoyCreditHTML(ref) {
+      const b = buoyInfo(ref); if (!b) return "";
       const stn = `<a href="${esc(buoy.sourceUrl || "https://isramar.ocean.org.il/")}" target="_blank" rel="noopener">${esc(buoy.station.name)} (ISRAMAR)</a>`;
-      if (fc != null && meas - fc >= 0.3)
-        return `<p class="buoy warn">⚠️ המצוף מודד גל גבוה מהתחזית — ${meas.toFixed(1)}מ׳ בפועל מול ${fc.toFixed(1)}מ׳ צפוי · ייתכן שהים סוער מהצפוי · ${stn}</p>`;
-      if (fc != null && fc - meas >= 0.3)
-        return `<p class="buoy">🛟 המצוף מודד גל נמוך מהתחזית — ${meas.toFixed(1)}מ׳ בפועל · ${stn}</p>`;
-      return `<p class="buoy">🛟 נמדד עכשיו: גל ${meas.toFixed(1)}מ׳ · ${stn} · התחזית מאומתת</p>`;
+      const when = b.age <= 0 ? "בשעה האחרונה" : `לפני ${b.age} שע׳`, where = `${b.dist} ק״מ מכאן`;
+      if (b.kind === "warn") return `${ic("alert", "color:#f0a55a")} המצוף מודד ${b.meas.toFixed(1)} מ׳ (${when}, ${where}) — גבוה מהתחזית ${b.fc.toFixed(1)} מ׳ · ${stn}`;
+      if (b.kind === "lower") return `${ic("buoy")} המצוף מודד ${b.meas.toFixed(1)} מ׳ (${when}, ${where}) — נמוך מהתחזית ${b.fc.toFixed(1)} מ׳ · ${stn}`;
+      return `${ic("buoy")} מדידה אזורית: גל ${b.meas.toFixed(1)} מ׳ (${when}, ${where}) — תואם לתחזית · ${stn}`;
     }
     // Warnings zone at the top of the hero. A short, illustrated chip per active hazard; tapping it
     // opens the details. Jellyfish is live now; the structure is ready for more (e.g. polluted sea).
-    function warningsHTML() {
+    // Quiet notes under the verdict: jellyfish (tap for reports) and a buoy warning when the measured
+    // sea is rougher than forecast. Neutral buoy confirmations live in the sources line, not here.
+    function heroNotesHTML(ref) {
       const out = [];
       const near = nearbyJelly(), sev = jellySeverity(near.length);
       if (!sev) jellyOpen = false;   // chip gone (location switch / reports aged out) → don't leave the list stuck open
-      if (sev) out.push(`<button class="hero-warn jelly ${sev.key}" onclick="App.toggleJelly()">
-        <span class="hw-ic">${JELLY_ART}</span><span>מדוזות · ${sev.word}</span><span class="hw-chev">${jellyOpen ? "▴" : "▾"}</span></button>`);
-      // Future hazards (e.g. polluted sea) plug in here as additional chips once a data source exists.
-      return out.length ? `<div class="hero-warnings">${out.join("")}</div>` : "";
+      if (sev) out.push(`<button class="hero-note jelly ${sev.key}" onclick="App.toggleJelly()" aria-expanded="${jellyOpen}">${ic("jelly")}<span>מדוזות · ${sev.word}</span>${ic("chevD", jellyOpen ? "transform:rotate(180deg)" : "")}</button>`);
+      const b = buoyInfo(ref);
+      if (b && b.kind === "warn") out.push(`<span class="hero-note buoy-warn">${ic("alert")}<span>המצוף מודד גל גבוה מהתחזית: ${b.meas.toFixed(1)} מ׳ בפועל מול ${b.fc.toFixed(1)} מ׳ צפוי</span></span>`);
+      return out.length ? `<div class="hero-notes">${out.join("")}</div>` : "";
     }
     function renderHero() {
       const hero = $("hero"); const ref = nearestHourData();
@@ -1134,8 +1347,7 @@
       const reveal = scoreReveal; scoreReveal = false;
       hero.innerHTML = `
         ${skyStars}${moon}
-        <div class="hero-content">
-          ${warningsHTML()}
+        <div class="hero-content${reveal ? " enter" : ""}">
           <div class="hero-score${scoreOpen ? " open" : ""}${reveal ? " pop" : ""}" style="color:${scCol}" onclick="App.toggleScore()"
                role="button" tabindex="0" aria-expanded="${scoreOpen}" aria-label="מדד הפלטה — הצג פירוט"
                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();App.toggleScore()}">
@@ -1143,9 +1355,9 @@
             <div class="sc-label">מדד הפלטה <span class="sc-chev">${scoreOpen ? "▴" : "▾"}</span></div>
           </div>
           ${scoreOpen ? scoreDetailHTML(ref) : ""}
-          <h1 class="${reveal ? "verdict" : ""}">${tier ? tier.emoji + " " + title : title}</h1><p class="sub ${reveal ? "verdict" : ""}">${desc}</p>
+          <h1 class="${reveal ? "verdict" : ""}">${tierArt(tier, 40)}<span>${title}</span></h1><p class="sub ${reveal ? "verdict" : ""}">${desc}</p>
           ${conf ? `<p class="conf">${conf}</p>` : ""}
-          ${buoyLineHTML(ref)}
+          ${heroNotesHTML(ref)}
           ${todayTimeline()}
         </div>${turtle}${sparks}${seajelly}${surfers}${waveScene(chopH, period, deluxe, waveH)}`;
       if (reveal && score != null) { countUp($("scNum"), score / 10); Sound.verdict(stateKey); }
@@ -1173,10 +1385,16 @@
       const now = israelNow();
       return now.hour < DAY_START || now.hour * 60 + now.minute >= sunsetMinutesFor(now);
     }
+    // Deterministic per date: the sky used to reshuffle on every re-render (hourly tick, toggles).
+    function seededRand(seed) { let t = seed >>> 0; return () => { t += 0x6D2B79F5; let r = Math.imul(t ^ (t >>> 15), 1 | t); r ^= r + Math.imul(r ^ (r >>> 7), 61 | r); return ((r ^ (r >>> 14)) >>> 0) / 4294967296; }; }
     function stars(n) {
       // Anchored from the top in px (sky band above the wave-scene), independent of hero height.
+      const rnd = seededRand(parseInt(israelNow().dateStr.replace(/-/g, ""), 10));
       let s = "";
-      for (let i = 0; i < n; i++) s += `<span class="star" style="left:${(3 + Math.random() * 94).toFixed(0)}%;top:${(8 + Math.random() * 130).toFixed(0)}px;animation-delay:${(Math.random() * 4).toFixed(1)}s;animation-duration:${(2 + Math.random() * 3).toFixed(1)}s"></span>`;
+      for (let i = 0; i < n; i++) {
+        const size = rnd() < 0.2 ? 3 : 2;   // a few brighter stars
+        s += `<span class="star" style="left:${(3 + rnd() * 94).toFixed(0)}%;top:${(8 + rnd() * 130).toFixed(0)}px;width:${size}px;height:${size}px;animation-delay:${(rnd() * 4).toFixed(1)}s;animation-duration:${(2 + rnd() * 3).toFixed(1)}s"></span>`;
+      }
       return s;
     }
     function scoreDetailHTML(h) {
@@ -1190,16 +1408,40 @@
         </div>`).join("");
       return `<div class="score-detail" onclick="event.stopPropagation()">${body}</div>`;
     }
-    function toggleScore() { scoreOpen = !scoreOpen; Sound.tick(); renderHero(); }
+    // renderHero() replaces the focused node — put keyboard focus back on the toggle.
+    function toggleScore() { scoreOpen = !scoreOpen; Sound.tick(); const had = document.activeElement && document.activeElement.classList.contains("hero-score"); renderHero(); if (had) { const el = $("hero").querySelector(".hero-score"); if (el) el.focus({ preventScroll: true }); } }
     // Hand-drawn wave sprite frames (flat -> breaking), recolored live via CSS mask so they
     // still track the calm/rough status color like the previous procedural SVG did.
-    const WAVE_SPRITE_DIMS = [[212, 110], [208, 110], [208, 110], [208, 110], [207, 110], [204, 110], [189, 110], [190, 110], [191, 110], [190, 110]];
-    function miniWave(height, color) {
-      const h = height == null ? 0.15 : height;
-      const n = Math.min(1, Math.max(0, h / 1.1));
-      const idx = Math.round(Math.pow(n, 0.85) * (WAVE_SPRITE_DIMS.length - 1));
-      const [w, hgt] = WAVE_SPRITE_DIMS[idx];
-      return `<div class="tl-wave-img" style="aspect-ratio:${w}/${hgt};background-color:${color};-webkit-mask-image:url('img/waves/wave-${idx}.png');mask-image:url('img/waves/wave-${idx}.png')"></div>`;
+    // Procedural mini sea for the timeline (replaces the hand-drawn PNG sprites, which looked
+    // muddy at 20px): a filled swell whose amplitude, frequency and foam follow the wind chop;
+    // crisp at any pixel density and tinted by the hour's tier colour.
+    // The line is a real two-component sea, not a generic squiggle:
+    //   • long swell  — amplitude from swell height, wavelength from swell period (a 9 s swell
+    //     draws ~1.5 long humps across the tile, a 4 s sea draws ~3.5 short ones);
+    //   • wind chop   — small high-frequency ripples riding on the swell, amplitude from wind-wave
+    //     height, with foam ticks only once chop passes ~0.25 m (white caps).
+    // Vertical scale is fixed (0.8 m of total sea = full tile) so rows compare honestly.
+    function miniWave(h, color) {
+      const W = 46, H = 20;
+      const swell = h && h.swell != null ? h.swell : (h && h.waveHeight != null ? h.waveHeight : 0.1);
+      const chop = h ? (chopHeight(h) ?? 0) : 0.05;
+      const period = h && (h.swellPeriod || h.wavePeriod) ? (h.swellPeriod || h.wavePeriod) : 6;
+      const PX_PER_M = 14;                                       // 0.8 m ≈ 11 px of half-amplitude budget
+      const aS = Math.min(6.5, swell * PX_PER_M * 0.5), aC = Math.min(3.2, chop * PX_PER_M * 0.6);
+      const cycS = Math.max(1.2, Math.min(3.6, 13 / Math.max(3.5, period)));   // period → wavelength
+      const cycC = 5.5;                                          // chop is always short
+      const mid = H - 5 - aS - aC;                               // sea surface sits low; crests never clip
+      const y = x => mid - aS * Math.sin((2 * Math.PI * x * cycS) / W) - aC * Math.sin((2 * Math.PI * x * cycC) / W + 1.1);
+      let top = `M0 ${y(0).toFixed(1)}`;
+      for (let x = 1.5; x <= W; x += 1.5) top += ` L${x.toFixed(1)} ${y(x).toFixed(1)}`;
+      let foam = "";
+      if (chop > 0.25) for (let k = 0; k < cycC; k++) { const x = ((k + 0.22) / cycC) * W + 1; if (x < W - 2) foam += `<circle cx="${x.toFixed(1)}" cy="${(y(x) - 1.3).toFixed(1)}" r="${chop > 0.45 ? 1.2 : 0.9}" fill="#fff" opacity=".85"/>`; }
+      const id = "mw" + Math.round(aS * 10) + "_" + Math.round(aC * 10) + "_" + Math.round(cycS * 10);
+      return `<svg class="tl-wave-svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true" style="color:${color}">
+        <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity=".55"/><stop offset="1" stop-color="currentColor" stop-opacity=".05"/></linearGradient></defs>
+        <path d="${top} L${W} ${H} L0 ${H}Z" fill="url(#${id})"/>
+        <path d="${top}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>${foam}
+      </svg>`;
     }
     function sunsetHourFor(month) { if (month >= 6 && month <= 8) return 19; if (month >= 3 && month <= 5) return 18; if (month >= 9 && month <= 11) return 17; return 16; }
     function addDays(dateStr, n) { const d = new Date(dateStr + "T12:00"); d.setDate(d.getDate() + n); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; }
@@ -1290,13 +1532,25 @@
       return { illum: (1 - Math.cos(phaseAngle * ARAD)) / 2, waxing: phaseAngle < 180 };
     }
     function fmtIsraelHM(date) { return date ? new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Jerusalem", hour: "2-digit", minute: "2-digit", hour12: false }).format(date) : null; }
+    // Real phase geometry: the terminator is a half-ellipse whose width is R·|cos(phase)|, so a half
+    // moon has a straight edge and gibbous phases bulge the right way (the old two-circle trick drew
+    // lens-shaped quarters). Northern hemisphere: a waxing moon is lit on its right side.
     function moonGlyph(illum, waxing, size = 40) {
-      const R = size / 2, cx = R, cy = R;
+      const R = size / 2 - 1, cx = size / 2, cy = size / 2;
       const k = Math.max(0, Math.min(1, illum));
-      const darkX = cx + (waxing ? -1 : 1) * 2 * R * k;
-      return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
-        <circle cx="${cx}" cy="${cy}" r="${R - 1}" fill="#f3ecd6" stroke="rgba(255,255,255,.35)" stroke-width="1"/>
-        <circle cx="${darkX}" cy="${cy}" r="${R - 1}" fill="#1b2436"/>
+      const phase = Math.acos(1 - 2 * k);                 // 0 = new, π/2 = half, π = full
+      const rx = Math.abs(Math.cos(phase)) * R;           // terminator ellipse half-width
+      const litRight = waxing;                            // lit limb side
+      const limb = litRight ? 1 : 0;                      // sweep to draw the lit outer limb
+      const bulge = k >= 0.5 ? (litRight ? 0 : 1) : (litRight ? 1 : 0);   // which way the terminator curves
+      const lit = `M${cx} ${cy - R} A${R} ${R} 0 0 ${limb} ${cx} ${cy + R} A${rx.toFixed(2)} ${R} 0 0 ${bulge} ${cx} ${cy - R}Z`;
+      return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" aria-hidden="true">
+        <defs><radialGradient id="moonLit" cx="45%" cy="40%" r="70%"><stop offset="0" stop-color="#fff8e6"/><stop offset="1" stop-color="#e8dfc4"/></radialGradient></defs>
+        <circle cx="${cx}" cy="${cy}" r="${R}" fill="#1b2436" stroke="rgba(255,255,255,.28)" stroke-width="1"/>
+        <path d="${lit}" fill="url(#moonLit)"/>
+        <circle cx="${(cx - R * 0.25).toFixed(1)}" cy="${(cy - R * 0.2).toFixed(1)}" r="${(R * 0.16).toFixed(1)}" fill="rgba(0,0,0,.07)"/>
+        <circle cx="${(cx + R * 0.3).toFixed(1)}" cy="${(cy + R * 0.28).toFixed(1)}" r="${(R * 0.11).toFixed(1)}" fill="rgba(0,0,0,.07)"/>
+        <circle cx="${(cx + R * 0.05).toFixed(1)}" cy="${(cy + R * 0.5).toFixed(1)}" r="${(R * 0.08).toFixed(1)}" fill="rgba(0,0,0,.06)"/>
       </svg>`;
     }
     // Hero mini-timeline: today by default (or tomorrow once past sunset — "today" is over).
@@ -1319,7 +1573,7 @@
         const idx = h ? palataIndex(h) : null;
         return `<div class="tl-row ${hr === nowSlot ? "tl-now" : ""}">
           <span class="tl-h">${pad(hr)}:00</span>
-          <span class="tl-wave">${miniWave(chop, col)}</span>
+          <span class="tl-wave" title="${h ? `סוול ${h.swell != null ? h.swell.toFixed(2) : "—"} מ׳ כל ${h.swellPeriod ? round(h.swellPeriod) : "—"} שנ׳ · גלי רוח ${chop != null ? chop.toFixed(2) : "—"} מ׳` : ""}">${miniWave(h, col)}</span>
           <span class="tl-height num">${height != null ? height.toFixed(2) + " מ׳" : "—"}</span>
           <span class="tl-score num" style="color:${col}">${idx != null ? (idx / 10).toFixed(1) : "—"}</span>
           <span class="tl-status" style="color:${col}">${lbl}</span>
@@ -1331,10 +1585,11 @@
       heroDayAnim = null;
       return `<div class="timeline" id="heroTimeline" ontouchstart="App.heroSwipeStart(event)" ontouchmove="App.heroSwipeMove(event)" ontouchend="App.heroSwipeEnd(event)">
         <div class="tl-date">
-          <button class="tl-nav" onclick="App.heroDayNav(-1)" ${heroDay <= 0 ? "disabled" : ""} aria-label="יום קודם">›</button>
+          <button class="tl-nav" onclick="App.heroDayNav(-1)" ${heroDay <= 0 ? "disabled" : ""} aria-label="יום קודם">${ICON.chevR}</button>
           <span class="tl-date-txt${animClass}">${hebrewDay(baseDate)} · ${shortDate(baseDate)}</span>
-          <button class="tl-nav" onclick="App.heroDayNav(1)" ${heroDay >= HERO_DAY_MAX ? "disabled" : ""} aria-label="יום הבא">‹</button>
+          <button class="tl-nav" onclick="App.heroDayNav(1)" ${heroDay >= HERO_DAY_MAX ? "disabled" : ""} aria-label="יום הבא">${ICON.chevL}</button>
         </div>
+        <div class="tl-cols" aria-hidden="true"><span>שעה</span><span>צורת הים</span><span>גובה גל</span><span>מדד</span><span>מצב</span></div>
         <div class="tl-body${animClass}">${rows}</div>
         <div class="tl-dots">${dots}</div>
       </div>`;
@@ -1346,23 +1601,43 @@
       // Swap ONLY the timeline: a full renderHero() rebuilds the wave layers and every drifting
       // figure, so the whole sea visibly restarts on each day flip. Precision > brute force.
       const tl = $("heroTimeline");
+      const focusLbl = document.activeElement && document.activeElement.classList.contains("tl-nav") ? document.activeElement.getAttribute("aria-label") : null;
       if (tl) tl.outerHTML = todayTimeline();
       else if (hourly.length) renderHero();
+      // The nav buttons were just replaced — keep keyboard focus on the same arrow (or its twin when
+      // it became disabled at the range edge).
+      if (focusLbl) {
+        const nt = $("heroTimeline"); if (!nt) return;
+        const same = nt.querySelector(`.tl-nav[aria-label="${focusLbl}"]`), any = nt.querySelector(".tl-nav:not(:disabled)");
+        const target = same && !same.disabled ? same : any; if (target) target.focus({ preventScroll: true });
+      }
     }
     // Swipe the mini-timeline to flip days. touchmove suppresses the page's vertical scroll only
     // once the gesture is clearly horizontal, so a diagonal swipe still scrolls the page normally.
     let heroSwipeX = null, heroSwipeY = null, heroSwipeLock = null;
     function heroSwipeStart(e) { heroSwipeX = e.touches[0].clientX; heroSwipeY = e.touches[0].clientY; heroSwipeLock = null; }
+    // The rows follow the finger (damped) so the gesture feels physical; at the range edges the
+    // resistance doubles, and on release the rows either snap back or slide into the next day.
     function heroSwipeMove(e) {
       if (heroSwipeX == null) return;
       const dx = e.touches[0].clientX - heroSwipeX, dy = e.touches[0].clientY - heroSwipeY;
       if (heroSwipeLock == null && Math.hypot(dx, dy) > 10) heroSwipeLock = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
-      if (heroSwipeLock === "x") e.preventDefault();
+      if (heroSwipeLock !== "x") return;
+      e.preventDefault();
+      if (REDUCED.matches) return;
+      const body = document.querySelector("#heroTimeline .tl-body"); if (!body) return;
+      const atEdge = (dx < 0 && heroDay >= HERO_DAY_MAX) || (dx > 0 && heroDay <= 0);
+      const shift = dx * (atEdge ? 0.15 : 0.4);
+      body.classList.add("dragging");
+      body.style.transform = `translateX(${shift.toFixed(1)}px)`;
+      body.style.opacity = String(Math.max(0.45, 1 - Math.abs(shift) / 220));
     }
     function heroSwipeEnd(e) {
       if (heroSwipeX == null) return;
       const dx = e.changedTouches[0].clientX - heroSwipeX, wasHorizontal = heroSwipeLock === "x";
       heroSwipeX = heroSwipeY = heroSwipeLock = null;
+      const body = document.querySelector("#heroTimeline .tl-body");
+      if (body) { body.classList.remove("dragging"); body.style.transform = ""; body.style.opacity = ""; }   // snap back (transition)
       if (!wasHorizontal || Math.abs(dx) < 40) return;
       heroDayNav(dx < 0 ? 1 : -1);   // swipe left -> next day, swipe right -> previous day
     }
@@ -1375,17 +1650,17 @@
       const caveats = [];
       if (ref.seaTemp != null && ref.seaTemp < waterMin) caveats.push(`🧊 המים ${round(ref.seaTemp)}° — קרים מה-${fmtT(waterMin)}° שהעדפת`);
       if (nearbyJelly().length) caveats.push("🪼 דווחו מדוזות בקרבת מקום — שימו לב");
-      el.innerHTML = `<div class="card good-card${deluxe ? " deluxe" : ""}"><h2>${deluxe ? "💎 הים מושלם עכשיו ל…" : "🐢 הים רגוע עכשיו ל…"}</h2><div class="activities">${act(SWIM_ART, "שחייה")}${act(SNORKEL_ART, "שנירקול")}${act(SUP_ART, "סאפ")}</div>${caveats.length ? `<p class="wave-note" style="margin-top:10px">${caveats.join(" · ")}</p>` : ""}</div>`;
+      el.innerHTML = `<div class="card good-card${deluxe ? " deluxe" : ""}"><h2>${tierArt(palataTier(palataIndex(ref)), 20)} ${deluxe ? "הים מושלם עכשיו ל…" : "הים רגוע עכשיו ל…"}</h2><div class="activities">${act(SWIM_ART, "שחייה")}${act(SNORKEL_ART, "שנירקול")}${act(SUP_ART, "סאפ")}</div>${caveats.length ? `<p class="wave-note" style="margin-top:10px">${caveats.join(" · ")}</p>` : ""}</div>`;
     }
     function renderWaveDetails() {
       const el = $("waveDetail"); const cur = nearestHourData();
       if (!cur) { el.innerHTML = ""; return; }
       const dirIdx = cur.waveDir != null ? Math.round(cur.waveDir / 45) % 8 : null;
       el.innerHTML = `
-        <div class="metric"><div class="label">⏱️ זמן בין גלים</div><div class="value">${cur.wavePeriod != null ? round(cur.wavePeriod) : "—"}<small> שניות</small></div></div>
-        <div class="metric"><div class="label">🌊 גלים קצרים מהרוח</div><div class="value">${fmt(cur.windWave)}<small> מ׳</small></div></div>
-        <div class="metric"><div class="label">〰️ גלים ארוכים מרחוק</div><div class="value">${fmt(cur.swell)}<small> מ׳</small></div>${cur.swellPeriod != null ? `<div class="opt" style="color:var(--muted)">כל ${round(cur.swellPeriod)} שניות</div>` : ""}</div>
-        <div class="metric"><div class="label">🧭 כיוון גל</div><div class="value compass" style="font-family:var(--sans);font-size:15px">${dirIdx != null ? ARROWS[dirIdx] + " " + COMPASS[dirIdx] : "—"}</div></div>`;
+        <div class="metric"><div class="label">${ic("timer")} זמן בין גלים</div><div class="value">${cur.wavePeriod != null ? round(cur.wavePeriod) : "—"}<small> שניות</small></div></div>
+        <div class="metric"><div class="label">${ic("chop")} גלים קצרים מהרוח</div><div class="value">${fmt(cur.windWave)}<small> מ׳</small></div></div>
+        <div class="metric"><div class="label">${ic("swell")} גלים ארוכים מרחוק</div><div class="value">${fmt(cur.swell)}<small> מ׳</small></div>${cur.swellPeriod != null ? `<div class="opt" style="color:var(--muted)">כל ${round(cur.swellPeriod)} שניות</div>` : ""}</div>
+        <div class="metric"><div class="label">${ic("compass")} כיוון גל</div><div class="value compass" style="font-family:var(--sans);font-size:15px">${dirIdx != null ? ARROWS[dirIdx] + " " + COMPASS[dirIdx] : "משתנה"}</div></div>`;
     }
     function renderMetrics() {
       const el = $("metrics"); const cur = nearestHourData();
@@ -1399,22 +1674,31 @@
       const loc = allLocations()[LS.loc] || BUILTIN.telaviv;
       const moonRS = moonRiseSet(now.dateStr, loc.lat, loc.lon);
       el.innerHTML = `
-        <div class="metric"><div class="label">🌊 טמפ׳ מים</div><div class="value" style="color:${sea.color}">${fmt(cur.seaTemp)}<small> °C</small></div>${sea.note ? `<div class="opt" style="color:${sea.color}">${sea.note}</div>` : ""}</div>
-        <div class="metric"><div class="label">☀️ טמפ׳ אוויר</div><div class="value" style="color:${air.color}">${fmt(cur.airTemp)}<small> °C</small></div></div>
-        <div class="metric combo"><div class="sub"><div class="label">🧭 כיוון רוח</div><div class="value compass">${dirIdx != null ? ARROWS[dirIdx] + " " + COMPASS[dirIdx] : "—"}</div></div><div class="sub"><div class="label">😎 מדד UV (שמש)</div><div class="value"${uvInfo(cur.uv) ? ` style="color:${uvInfo(cur.uv).color}"` : ""}>${cur.uv != null ? round(cur.uv) : "—"}</div>${uvInfo(cur.uv) ? `<div class="opt" style="color:${uvInfo(cur.uv).color}">${uvInfo(cur.uv).word}</div>` : ""}</div></div>
-        <div class="metric combo"><div class="sub"><div class="label">🌅 זריחה</div><div class="value">${sun.sunrise || "—"}</div></div><div class="sub"><div class="label">🌇 שקיעה</div><div class="value">${sun.sunset || "—"}</div></div></div>
-        <div class="metric combo"><div class="sub"><div class="label">🌙 זריחת ירח</div><div class="value">${fmtIsraelHM(moonRS.rise) || "—"}</div></div><div class="sub"><div class="label">🌙 שקיעת ירח</div><div class="value">${fmtIsraelHM(moonRS.set) || "—"}</div></div></div>`;
+        <div class="metric"><div class="label">${ic("water")} טמפ׳ מים</div><div class="value" style="color:${sea.color}">${fmt(cur.seaTemp)}<small> °C</small></div>${sea.note ? `<div class="opt" style="color:${sea.color}">${sea.note}</div>` : ""}</div>
+        <div class="metric"><div class="label">${ic("sun")} טמפ׳ אוויר</div><div class="value" style="color:${air.color}">${fmt(cur.airTemp)}<small> °C</small></div></div>
+        <div class="metric combo"><div class="sub"><div class="label">${ic("compass")} כיוון רוח</div><div class="value compass">${dirIdx != null ? ARROWS[dirIdx] + " " + COMPASS[dirIdx] : "משתנה"}</div></div><div class="sub"><div class="label">${ic("uv")} מדד UV (שמש)</div><div class="value"${uvInfo(cur.uv) ? ` style="color:${uvInfo(cur.uv).color}"` : ""}>${cur.uv != null ? round(cur.uv) : "—"}</div>${uvInfo(cur.uv) ? `<div class="opt" style="color:${uvInfo(cur.uv).color}">${uvInfo(cur.uv).word}</div>` : ""}</div></div>
+        <div class="metric combo"><div class="sub"><div class="label">${ic("sunrise")} זריחה</div><div class="value">${sun.sunrise || "—"}</div></div><div class="sub"><div class="label">${ic("sunset")} שקיעה</div><div class="value">${sun.sunset || "—"}</div></div></div>
+        <div class="metric combo"><div class="sub"><div class="label">${ic("moonrise")} זריחת ירח</div><div class="value">${fmtIsraelHM(moonRS.rise) || "—"}</div></div><div class="sub"><div class="label">${ic("moonset")} שקיעת ירח</div><div class="value">${fmtIsraelHM(moonRS.set) || "—"}</div></div></div>`;
     }
     function hourLabel(h) {
       const tier = palataTier(palataIndex(h));
       return tier ? [tier.short, tier.color] : ["—", "var(--muted)"];
     }
+    // Hourly detail = the textual twin of the bar strip: every hour 06–19, score + tier + state.
     function dayHoursHTML(ds) {
-      const rows = hourly.filter(h => h.dateStr === ds && h.hour >= 5 && h.hour <= 20 && (h.hour - 5) % 3 === 0);
-      if (!rows.length) return `<div class="next-empty" style="padding:8px 0">אין נתונים ליום זה</div>`;
-      return rows.map(h => {
-        const [lbl, col] = hourLabel(h); const chop = chopHeight(h);
-        return `<div class="hr"><span class="t num">${pad(h.hour)}:00</span><span class="hr-dot" style="background:${col}"></span><span class="hr-data">גל ${h.waveHeight != null ? h.waveHeight.toFixed(2) : "—"} מ׳ · גלי רוח ${chop != null ? chop.toFixed(2) : "—"} · רוח ${h.windKmh != null ? Math.round(toKnots(h.windKmh)) : "—"} קשר · מים ${h.seaTemp != null ? round(h.seaTemp) + "°" : "—"}</span><span class="hr-v" style="color:${col}">${lbl}</span></div>`;
+      const now = israelNow(), byHour = {}; hourly.forEach(h => { if (h.dateStr === ds) byHour[h.hour] = h; });
+      if (!Object.keys(byHour).length) return `<div class="next-empty" style="padding:8px 0">אין נתונים ליום זה</div>`;
+      return HEAT_HOURS.map(hr => {
+        const h = byHour[hr], s = h ? palataIndex(h) : null, t = s != null ? palataTier(s) : null, chop = h ? chopHeight(h) : null;
+        const past = ds === now.dateStr && hr < now.hour, isNow = ds === now.dateStr && hr === now.hour, night = !isDaylightAt(ds, hr);
+        const state = isNow ? "עכשיו" : past ? "עבר" : night ? "לילה" : "";
+        const col = s != null ? scoreColor(s) : "var(--muted)";
+        return `<div class="hr${isNow ? " hr-now" : ""}${past ? " hr-past" : ""}">
+          <span class="t num"><bdi dir="ltr">${pad(hr)}:00</bdi></span>
+          <span class="hr-dot" style="background:${col}"></span>
+          <span class="hr-data"><b class="num" style="color:${col}">${s != null ? (s / 10).toFixed(1) : "—"}</b> ${t ? t.short : night ? "לילה" : "אין נתונים"}${h ? ` · גל ${h.waveHeight != null ? h.waveHeight.toFixed(2) : "—"} מ׳ · גלי רוח ${chop != null ? chop.toFixed(2) : "—"} · רוח ${h.windKmh != null ? Math.round(toKnots(h.windKmh)) : "—"} קשר · מים ${h.seaTemp != null ? round(h.seaTemp) + "°" : "—"}` : ""}</span>
+          <span class="hr-v" style="color:${isNow ? "var(--text)" : "var(--muted)"}">${state}</span>
+        </div>`;
       }).join("");
     }
     // Peak daytime index of a day (future hours only for today) — the honest headline for a day
@@ -1428,22 +1712,7 @@
       }
       return best;
     }
-    let forecastAnimated = false;   // bars fill on the first paint only — not on every hourly re-render
-    function renderForecast() {
-      const fill = forecastAnimated ? "" : " fill"; forecastAnimated = true;
-      $("forecast").innerHTML = forecastDays(6).map(d => {
-        const peak = dayPeak(d.dateStr), tier = peak ? palataTier(peak.score) : null;
-        const col = tier ? tier.color : "var(--calm)";
-        // Bar length = % of the day that is palata; a 0% day still shows a thin sliver in its peak tier
-        // colour so the eye can read the week's shape at a glance.
-        const w = d.pct > 0 ? d.pct : (peak ? Math.max(3, peak.score / 100 * 12) : 0);
-        return `
-        <div class="day" id="d-${d.dateStr}" onclick="App.toggleDay('${d.dateStr}')"
-             role="button" tabindex="0" aria-expanded="false" aria-label="תחזית שעתית ל${hebrewDay(d.dateStr)}"
-             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();App.toggleDay('${d.dateStr}')}"><div class="name">${hebrewDay(d.dateStr)}<small>${shortDate(d.dateStr)}</small></div><div class="bar" style="--c:${col}"><i class="${fill}" style="width:${w}%;opacity:${d.pct > 0 ? 1 : .55}"></i></div><div class="pct num">${d.pct}%${peak ? `<small>שיא <span style="color:${col}">${(peak.score / 10).toFixed(1)}</span> · ${pad(peak.h.hour)}:00</small>` : ""}</div><span class="chev">▾</span></div>
-        <div class="day-hours" id="dh-${d.dateStr}"></div>`;
-      }).join("");
-    }
+    // (The former 6-day bar list merged into renderWeek — one card, one list, the same data.)
     function toggleDay(ds) {
       const el = $("dh-" + ds), row = $("d-" + ds); if (!el) return;
       const open = el.classList.toggle("open");
@@ -1475,10 +1744,11 @@
       el.innerHTML = forecastDays(3).map(d => {
         const label = `${hebrewDay(d.dateStr)} <small style="color:var(--muted)">${shortDate(d.dateStr)}</small>`;
         const w = bestWindowForDay(d.dateStr);
-        if (w) return `<div class="next-line"><span class="when">${label}</span><span class="time" style="color:${w.tier.color}">${w.tier.emoji} ${pad(w.start.hour)}:00–${pad(w.end.hour + 1)}:00</span></div>`;
+        // Time ranges are isolated LTR: inside RTL text "06:00–09:00" can otherwise render as "09:00–06:00".
+        if (w) return `<div class="next-line"><span class="when">${label}</span><span class="time" style="color:${w.tier.color};display:inline-flex;align-items:center;gap:6px">${tierArt(w.tier, 20)} <bdi dir="ltr">${pad(w.start.hour)}:00–${pad(w.end.hour + 1)}:00</bdi></span></div>`;
         // No palata window — still answer the real question ("when is it LEAST rough?") instead of a dead "none".
         const p = dayPeak(d.dateStr);
-        if (p) { const t = palataTier(p.score); return `<div class="next-line"><span class="when">${label}</span><span class="time soft">ללא פלטה · הכי רגוע <b style="color:${t.color}">${pad(p.h.hour)}:00</b> (${(p.score / 10).toFixed(1)})</span></div>`; }
+        if (p) { const t = palataTier(p.score); return `<div class="next-line"><span class="when">${label}</span><span class="time soft">הכי רגוע <b style="color:${t.color}">${pad(p.h.hour)}:00</b> · <b style="color:${t.color}">${(p.score / 10).toFixed(1)}</b></span></div>`; }
         return `<div class="next-line"><span class="when">${label}</span><span class="time" style="color:var(--muted);font-weight:600">ללא פלטה</span></div>`;
       }).join("");
     }
@@ -1526,7 +1796,7 @@
       }).join("");
       list.innerHTML = items + `<div class="credit">מקור: דיווחי גולשים ב-<a href="https://www.meduzot.co.il/list" target="_blank" rel="noopener">מדוזות בים</a> · מתעדכן כל שעה</div>`;
     }
-    function renderJelly() { if (hourly.length) renderHero(); renderJellyReports(); }   // hero first: warningsHTML resets jellyOpen when the chip is gone
+    function renderJelly() { if (hourly.length) renderHero(); renderJellyReports(); }   // hero first: heroNotesHTML resets jellyOpen when the chip is gone
     // ---- User feedback → Google Form (no backend) ----
     const fbKey = () => `yp-fb-${LS.loc}-${israelNow().dateStr}`;   // throttle: one "done" state per beach per day
     function renderFeedback() {
@@ -1538,7 +1808,7 @@
       $("fbPanel").style.display = fbOpen ? "" : "none";
       $("fbChev").textContent = fbOpen ? "▴" : "▾";
       $("fbButtons").innerHTML = PALATA_TIERS.map(t =>
-        `<button class="fb-btn" onclick="App.submitFeedback('${t.key}')"><span class="fb-emoji">${t.emoji}</span><span>${t.label}</span></button>`).join("");
+        `<button class="fb-btn" onclick="App.submitFeedback('${t.key}')" style="color:${t.color}"><span class="fb-emoji">${tierArt(t, 26)}</span><span style="color:var(--text)">${t.label}</span></button>`).join("");
     }
     function toggleFeedback() { fbOpen = !fbOpen; renderFeedback(); }
     function submitFeedback(tierKey) {
@@ -1569,7 +1839,12 @@
       try {
         const res = await fetch("data/jellyfish.json?v=" + Math.floor(Date.now() / 3600000), { cache: "no-cache" });
         if (!res.ok) return;
-        const j = await res.json(); jelly = j.reports || []; renderJelly(); renderGoodFor();
+        const j = await res.json();
+        // Rebuild the hero (and restart its sea animation) only if the warning chip actually changes;
+        // otherwise just refresh the list — the feed lands ~1s after first paint and used to make the
+        // whole scene visibly jump.
+        const before = nearbyJelly().length > 0; jelly = j.reports || []; const after = nearbyJelly().length > 0;
+        if (before !== after && hourly.length) renderHero(); renderJellyReports(); renderGoodFor();
       } catch (e) { console.warn("jellyfish feed failed", e); }
     }
     // Real measured wave data from the Hadera buoy, refreshed hourly into data/hadera-waves.json
@@ -1578,8 +1853,21 @@
       try {
         const res = await fetch("data/hadera-waves.json?v=" + Math.floor(Date.now() / 3600000), { cache: "no-cache" });
         if (!res.ok) return;
-        buoy = await res.json(); if (hourly.length) renderHero();
+        buoy = await res.json(); patchBuoyLine();
       } catch (e) { console.warn("buoy feed failed", e); }
+    }
+    // Swap only the buoy sentence inside the hero instead of rebuilding the whole scene.
+    function patchBuoyLine() {
+      if (!hourly.length) return;
+      const ref = nearestHourData(), credit = $("buoyCredit");
+      if (credit) credit.innerHTML = buoyCreditHTML(ref);
+      // Hero notes (jelly + buoy warning) — replace just that block, never the whole scene.
+      const hero = $("hero"); if (!hero) return;
+      const html = heroNotesHTML(ref), cur = hero.querySelector(".hero-notes");
+      if (cur) { if (html) cur.outerHTML = html; else cur.remove(); return; }
+      if (!html) return;
+      const anchor = hero.querySelector(".hero-content .conf") || hero.querySelector(".hero-content .sub");
+      if (anchor) anchor.insertAdjacentHTML("afterend", html);
     }
 
     // ---- Historical sea-temperature climatology: average annual peak (warmest) water temp ----
@@ -1623,14 +1911,13 @@
       } catch (e) { console.warn("climatology fetch failed", e); }
     }
     function renderClimatology() {
-      const card = $("climCard"), body = $("climBody"); if (!card || !body) return;
+      const el = $("sstClim"); if (!el) return;
       const d = climatology[LS.loc];
-      if (!d) { card.style.display = "none"; return; }
-      card.style.display = "";
-      if (d.error) { body.innerHTML = `<div class="clim-loading">אין מספיק נתוני עבר לחוף זה.</div>`; return; }
-      body.innerHTML = `
-        <div class="clim-peak"><span class="clim-temp">${d.avgMax}°</span><span class="clim-when">בדרך כלל סביב ${d.day} ${HEB_MONTHS[d.month]}</span></div>
-        <div class="clim-note">הטמפ׳ המקסימלית הממוצעת של המים, לפי ${d.years} השנים האחרונות · מקור: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a></div>`;
+      if (!d || d.error) { el.innerHTML = ""; syncSSTCard(); return; }   // no seasonal line when the archive has no coverage
+      el.innerHTML = `
+        <span class="clim-temp">${d.avgMax}°</span><span class="clim-when">שיא החום העונתי — בדרך כלל סביב ${d.day} ${HEB_MONTHS[d.month]}</span>
+        <span class="clim-src">הטמפ׳ המקסימלית הממוצעת של המים ב-${d.years} השנים האחרונות · מקור: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a></span>`;
+      syncSSTCard();
     }
 
     function renderStreak() { const s = streakCount(), b = $("streak"); if (s >= 1) { b.classList.add("on"); $("streakN").textContent = s; } else b.classList.remove("on"); }
@@ -1644,32 +1931,80 @@
       const when = `<span class="num">${pad(t.hour)}:${pad(t.minute)}</span>${t.dateStr && t.dateStr !== israelNow().dateStr ? ` (${shortDate(t.dateStr)})` : ""}`;
       $("updated").innerHTML = dataStale
         ? `<span style="color:#f0a55a">⚠️ אין חיבור — מוצגת התחזית השמורה מ-${when}</span> · <a href="#" onclick="App.refresh();return false">נסה שוב</a>`
+        : refreshFailed
+        ? `<span style="color:#f0a55a">⚠️ הרענון נכשל — מוצגת התחזית מ-${when}</span> · <a href="#" onclick="App.refresh();return false">נסה שוב</a>`
         : `עודכן לאחרונה ${when} · מקור: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>`;
     }
     // renderHero() already draws the jellyfish chip — only the report list is rendered again here
     // (renderJelly() used to rebuild the hero a second time, restarting every wave animation).
-    function renderAll() { lastRenderHour = israelNow().hour; renderHero(); renderGoodFor(); renderWaveDetails(); renderMetrics(); renderSST(); renderHeat(); renderForecast(); renderNextWindow(); renderStreak(); renderUpdated(); renderJellyReports(); renderFeedback(); renderClimatology(); }
+    function renderAll() {
+      lastRenderHour = israelNow().hour;
+      const name = (allLocations()[LS.loc] || BUILTIN.telaviv).name;
+      document.querySelectorAll(".h2-loc").forEach(el => { el.textContent = name; });   // the reader has scrolled far — say which beach this is
+      renderHero(); renderGoodFor(); renderWaveDetails(); renderMetrics(); renderSST(); renderWeek(); renderNextWindow(); renderStreak(); renderUpdated(); renderJellyReports(); renderFeedback(); renderClimatology();
+      const bc = $("buoyCredit"); if (bc) bc.innerHTML = buoyCreditHTML(nearestHourData());
+    }
 
     // ---- Week heatmap: one coloured cell per daylight hour, six days ----
     const HEAT_HOURS = Array.from({ length: DAY_END - DAY_START + 1 }, (_, i) => DAY_START + i);   // 06..19
-    let heatAnimated = false;
-    function renderHeat() {
-      const el = $("heat"), lg = $("heatLegend"); if (!el) return;
-      const now = israelNow(), days = forecastDays(6), reveal = !heatAnimated; heatAnimated = true;
+    // "השבוע": one row per day = heat strip (an hour per cell, coloured by tier) + % + peak; tap → hourly list.
+    // Replaces the former separate heatmap and 6-day bar list, which showed the same data twice.
+    // Continuous score → colour: OKLab interpolation between the tier anchor colours, so 7.5 and
+    // 6.0 (both "gentle") no longer look identical. Anchors sit exactly on the tier thresholds.
+    const COLOR_ANCHORS = [[0, "#f06a6a"], [20, "#ec7a5a"], [40, "#f0a55a"], [60, "#e9c46a"], [80, "#8ee3c8"], [90, "#2dd4bf"], [98, "#ffd479"], [100, "#ffd479"]];
+    function scoreColor(s) {
+      if (s == null) return "var(--muted)";
+      const v = Math.max(0, Math.min(100, s));
+      for (let i = 0; i < COLOR_ANCHORS.length - 1; i++) {
+        const [a, ca] = COLOR_ANCHORS[i], [b, cb] = COLOR_ANCHORS[i + 1];
+        if (v <= b) { if (v === a) return ca; if (v === b) return cb; const t = (v - a) / (b - a); return `color-mix(in oklab, ${ca} ${Math.round((1 - t) * 100)}%, ${cb} ${Math.round(t * 100)}%)`; }
+      }
+      return COLOR_ANCHORS[COLOR_ANCHORS.length - 1][1];
+    }
+    // Bar height: the whole 0–100 range wasted the strip on a 40–80 sea, so the visible range is
+    // 30→100 mapped onto 3→32px (a 6.0 is ~15px, a 7.9 ~23px, a 9.5 ~30px). Anything below 30 is a stub.
+    const BAR_MIN = 3, BAR_RANGE = 29, BAR_BASE = 4;
+    const barHeight = s => BAR_MIN + BAR_RANGE * Math.max(0, Math.min(1, (s - 30) / 70));
+    // "השבוע": one row per day = 14 miniature bars (06–19, right→left), height + colour = score,
+    // ◆ = best hour, underline = now, dim = past, dot = night, dash = no data, dashed line = 8.0.
+    function renderWeek() {
+      const el = $("week"), lg = $("heatLegend"); if (!el) return;
+      const now = israelNow(), days = forecastDays(6);
       const g = dayGroups(hourly);
-      let n = 0;
+      const open = new Set([...el.querySelectorAll(".day-hours.open")].map(x => x.id));   // keep expanded days across re-renders
       el.innerHTML = days.map(d => {
         const byHour = {}; (g.get(d.dateStr) || []).forEach(h => { byHour[h.hour] = h; });
+        const peak = dayPeak(d.dateStr), tier = peak ? palataTier(peak.score) : null;
         const cells = HEAT_HOURS.map(hr => {
-          const h = byHour[hr], s = h ? palataIndex(h) : null, t = s != null ? palataTier(s) : null;
+          const h = byHour[hr], s = h ? palataIndex(h) : null;
           const past = d.dateStr === now.dateStr && hr < now.hour, isNow = d.dateStr === now.dateStr && hr === now.hour;
-          const title = `${hebrewDay(d.dateStr)} ${pad(hr)}:00 — ${t ? t.label + " · " + (s / 10).toFixed(1) : "אין נתונים"}`;
-          const style = `--c:${t ? t.color : ""};${past ? "opacity:.3;" : ""}--d:${(n++ * 0.006).toFixed(3)}s`;
-          return `<span class="heat-cell${t ? "" : " empty"}${isNow ? " on" : ""}${reveal ? " reveal" : ""}" style="${style}" title="${title}" role="img" aria-label="${title}"></span>`;
+          const night = !isDaylightAt(d.dateStr, hr), best = peak && peak.h.hour === hr && peak.h.dateStr === d.dateStr;
+          const title = `${hebrewDay(d.dateStr)} ${pad(hr)}:00 — ${s != null ? palataTier(s).label + " · " + (s / 10).toFixed(1) : night ? "לילה" : "אין נתונים"}`;
+          const inner = night ? `<i class="wb-night"></i>` : s == null ? `<i class="wb-nodata"></i>`
+            : `<i class="wb-bar" style="--h:${barHeight(s).toFixed(1)}px;background:${scoreColor(s)}"></i>`;
+          return `<span class="wb${past ? " past" : ""}${isNow ? " now" : ""}" title="${title}">${best ? `<i class="wb-best"></i>` : ""}${inner}</span>`;
         }).join("");
-        return `<div class="heat-day">${hebrewDay(d.dateStr)}<small>${shortDate(d.dateStr)}</small></div><div class="heat-row">${cells}</div>`;
-      }).join("") + `<div class="heat-hours">${HEAT_HOURS.map(h => `<span>${h % 2 === 0 ? pad(h) : ""}</span>`).join("")}</div>`;
-      lg.innerHTML = PALATA_TIERS.map(t => `<span><i style="background:${t.color}"></i>${t.short}</span>`).join("");   // RTL: calm on the right → stormy on the left
+        const summary = `${hebrewDay(d.dateStr)}: ${d.pct}% משעות האור פלטה${peak ? `, שיא ${(peak.score / 10).toFixed(1)} ב-${pad(peak.h.hour)}:00` : ""}`;
+        const isOpen = open.has("dh-" + d.dateStr);
+        return `
+        <div class="week-row${isOpen ? " expanded" : ""}" id="d-${d.dateStr}" onclick="App.toggleDay('${d.dateStr}')" role="button" tabindex="0" aria-expanded="${isOpen}" aria-controls="dh-${d.dateStr}" aria-label="${summary} — לחצו לפירוט שעתי"
+             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();App.toggleDay('${d.dateStr}')}">
+          <div class="name">${hebrewDayShort(d.dateStr)}<small>${shortDate(d.dateStr)}</small></div>
+          <div class="wb-chart" aria-hidden="true"><div class="wb-thresh" style="bottom:${(BAR_BASE + barHeight(Palata.CALM_MIN)).toFixed(1)}px"></div>${cells}</div>
+          <div class="stat">
+            <b style="color:${d.pct > 0 ? "var(--calm)" : "var(--muted)"}">${d.pct}%</b>
+            ${peak ? `<small>◆ <span style="color:${scoreColor(peak.score)}">${(peak.score / 10).toFixed(1)}</span> · <bdi dir="ltr">${pad(peak.h.hour)}:00</bdi></small>` : `<small>—</small>`}
+            <span class="chev">${ICON.chevD}</span>
+          </div>
+        </div>
+        <div class="day-hours${isOpen ? " open" : ""}" id="dh-${d.dateStr}" role="region" aria-label="פירוט שעתי ${hebrewDay(d.dateStr)}">${isOpen ? dayHoursHTML(d.dateStr) : ""}</div>`;
+      }).join("") + `<div class="week-hours" aria-hidden="true"><span></span><div class="wb-axis">${HEAT_HOURS.map(h => `<span>${[6, 10, 14, 19].includes(h) ? `<bdi dir="ltr">${pad(h)}</bdi>` : ""}</span>`).join("")}</div><span></span></div>`;
+      // Legend: one continuous ramp (low on the right, high on the left) + the marks.
+      const stops = Array.from({ length: 11 }, (_, i) => `${scoreColor(i * 10)} ${i * 10}%`).join(", ");
+      lg.innerHTML = `
+        <div class="wb-ramp" style="background:linear-gradient(to left, ${stops})"><i style="right:80%"></i></div>
+        <div class="wb-ramp-lbl"><span>0</span><span style="position:absolute;right:calc(80% - 8px)">8.0</span><span>10</span></div>
+        <div class="wb-keys"><span><i class="wb-k-best"></i>שיא היום</span><span><i class="wb-k-now"></i>עכשיו</span><span><i class="wb-k-past"></i>עבר</span><span><i class="wb-k-night"></i>לילה</span><span><i class="wb-k-thresh"></i>סף 8.0</span></div>`;
     }
 
     // ---- Sea temperature trend: the past 7 days we already fetch + the next 3 ----
@@ -1683,8 +2018,7 @@
         if (vals.length) pts.push({ ds, v: vals.reduce((a, b) => a + b, 0) / vals.length });
       }
       pts.sort((a, b) => a.ds < b.ds ? -1 : 1);
-      if (pts.length < 4) { card.style.display = "none"; return; }
-      card.style.display = "";
+      if (pts.length < 4) { body.innerHTML = ""; syncSSTCard(); return; }
       const cur = nearestHourData(), nowV = cur && cur.seaTemp != null ? cur.seaTemp : pts.find(p => p.ds === now.dateStr)?.v;
       const first = pts[0], todayI = pts.findIndex(p => p.ds >= now.dateStr);
       const delta = nowV != null ? nowV - first.v : null;
@@ -1711,7 +2045,10 @@
           </div>
         </div>
         <div class="sst-axis"><span>${shortDate(first.ds)}</span><span>היום</span><span>${shortDate(pts[pts.length - 1].ds)}</span></div>`;
+      syncSSTCard();
     }
+    // One water-temperature card: the trend on top, the typical seasonal peak underneath.
+    function syncSSTCard() { const card = $("sstCard"); if (!card) return; card.style.display = ($("sstBody").innerHTML.trim() || $("sstClim").innerHTML.trim()) ? "" : "none"; }
 
     function hebrewDay(ds) {
       const now = israelNow();
@@ -1721,6 +2058,7 @@
       return new Intl.DateTimeFormat("he-IL", { weekday: "long" }).format(new Date(ds + "T12:00"));
     }
     const shortDate = ds => { const d = new Date(ds + "T12:00"); return `${d.getDate()}.${d.getMonth() + 1}`; };
+    const hebrewDayShort = ds => hebrewDay(ds).replace(/^יום /, "");   // "שלישי" fits a narrow column; "יום שלישי" wrapped
 
     // Weekly alert
     function recomputeAlert() {
@@ -1815,7 +2153,7 @@
       const now = israelNow(), win = bestWindowForDay(now.dateStr) || bestWindowForDay(addDays(now.dateStr, 1));
       const parts = [`${t ? t.emoji : "🌊"} ים פלטה ב${loc.name}: ${s != null ? (s / 10).toFixed(1) : "—"}/10${t ? " — " + t.label : ""}`];
       if (ref && ref.seaTemp != null) parts.push(`מים ${round(ref.seaTemp)}°`);
-      if (win) parts.push(`חלון פלטה ${win.start.dateStr === now.dateStr ? "היום" : "מחר"} ${pad(win.start.hour)}:00–${pad(win.end.hour + 1)}:00`);
+      if (win) parts.push(`חלון פלטה ${win.start.dateStr === now.dateStr ? "היום" : "מחר"} ⁦${pad(win.start.hour)}:00–${pad(win.end.hour + 1)}:00⁩`);   // LRI…PDI keeps the range LTR in chat apps
       return parts.join(" · ");
     }
     function shareUrl() {
@@ -1836,6 +2174,116 @@
       if (PRESETS[k] && !LS.customs[k]) { const c = LS.customs; c[k] = { ...PRESETS[k] }; LS.customs = c; }
       if (allLocations()[k]) LS.loc = k;
       history.replaceState(null, "", location.pathname);   // keep the address bar clean after applying
+    }
+
+    // ---------- Camera: photograph the sea, stamp the verdict where you stand ----------
+    // Flow: native camera (file input with capture) → geolocate → nearest known beach within 40 km
+    // (its live index; fetched if it isn't the displayed one) → canvas composite → share/save.
+    // Falls back to the displayed beach when location is denied/unavailable, and says so.
+    let camBlob = null, camFile = null;
+    function openCamera() { Sound.tick(); const inp = $("camInput"); if (!inp) return; inp.value = ""; inp.click(); }
+    function closeCamera() { closeModal("camModal"); camBlob = null; if (camFile) { URL.revokeObjectURL(camFile); camFile = null; } }
+    function geoOnce(ms = 8000) {
+      return new Promise(res => {
+        if (!navigator.geolocation) return res(null);
+        navigator.geolocation.getCurrentPosition(p => res({ lat: p.coords.latitude, lon: p.coords.longitude }), () => res(null), { enableHighAccuracy: true, timeout: ms, maximumAge: 120000 });
+      });
+    }
+    async function placeForPhoto() {
+      const here = await geoOnce();
+      const known = { ...BUILTIN, ...PRESETS, ...LS.customs };
+      if (here) {
+        let bestK = null, bestD = Infinity;
+        for (const [k, v] of Object.entries(known)) { const d = haversine(here.lat, here.lon, v.lat, v.lon); if (d < bestD) { bestD = d; bestK = k; } }
+        if (bestK && bestD <= 40) {
+          let data = bestK === LS.loc ? hourly : dataCache[bestK];
+          if (!data) { try { data = await fetchSingle(known[bestK]); dataCache[bestK] = data; } catch (e) { data = null; } }
+          const h = data ? currentHourOf(data) : null;
+          return { name: known[bestK].name, h, located: true, dist: bestD };
+        }
+        return { name: "המיקום שלי", h: null, located: true, dist: null };
+      }
+      return { name: (allLocations()[LS.loc] || BUILTIN.telaviv).name, h: nearestHourData(), located: false, dist: 0 };
+    }
+    function loadImage(file) {
+      return new Promise((res, rej) => { const img = new Image(); img.onload = () => res(img); img.onerror = rej; img.src = URL.createObjectURL(file); camFile = img.src; });
+    }
+    async function composePhoto(img, place) {
+      const MAX = 1600, ratio = Math.min(1, MAX / Math.max(img.naturalWidth, img.naturalHeight));
+      const W = Math.round(img.naturalWidth * ratio), H = Math.round(img.naturalHeight * ratio);
+      const c = document.createElement("canvas"); c.width = W; c.height = H; const x = c.getContext("2d");
+      x.drawImage(img, 0, 0, W, H);
+      const s = place.h ? palataIndex(place.h) : null, t = s != null ? palataTier(s) : null;
+      const base = Math.max(W, H) / 1600;   // scale typography with the photo
+      // bottom veil
+      const g = x.createLinearGradient(0, H * 0.55, 0, H); g.addColorStop(0, "rgba(10,14,22,0)"); g.addColorStop(1, "rgba(10,14,22,.86)");
+      x.fillStyle = g; x.fillRect(0, H * 0.55, W, H * 0.45);
+      try { await document.fonts.load(`800 ${Math.round(150 * base)}px Heebo`); await document.fonts.load(`700 ${Math.round(50 * base)}px 'JetBrains Mono'`); } catch (e) {}
+      x.direction = "rtl"; x.textAlign = "right"; x.textBaseline = "alphabetic";
+      const pad = 56 * base, right = W - pad; let y = H - pad;
+      // beach + time
+      const now = israelNow();
+      x.fillStyle = "rgba(230,237,246,.85)"; x.font = `500 ${Math.round(34 * base)}px Heebo, Arial, sans-serif`;
+      x.fillText(`${place.name}${place.located ? "" : " (לפי החוף שנבחר)"} · ${shortDate(now.dateStr)} · ${pad2(now.hour)}:${pad2(now.minute)}`, right, y);
+      y -= 52 * base;
+      // verdict
+      x.fillStyle = t ? t.color : "#e6edf6"; x.font = `900 ${Math.round(86 * base)}px Heebo, Arial, sans-serif`;
+      x.fillText(t ? `${t.emoji} ${t.label}` : "אין נתוני ים לרגע זה", right, y);
+      y -= 100 * base;
+      // score
+      if (s != null) {
+        x.font = `800 ${Math.round(170 * base)}px 'JetBrains Mono', Consolas, monospace`; x.fillStyle = t.color;
+        x.shadowColor = t.color; x.shadowBlur = 40 * base;
+        x.direction = "ltr"; x.textAlign = "right";
+        x.fillText((s / 10).toFixed(1), right - 110 * base, y);
+        x.shadowBlur = 0; x.font = `700 ${Math.round(54 * base)}px 'JetBrains Mono', Consolas, monospace`; x.fillStyle = "rgba(230,237,246,.7)";
+        x.textAlign = "left"; x.fillText("/10", right - 100 * base, y);
+        x.direction = "rtl"; x.textAlign = "right";
+        if (place.h && place.h.seaTemp != null) { x.font = `500 ${Math.round(36 * base)}px Heebo, Arial, sans-serif`; x.fillStyle = "rgba(230,237,246,.8)"; x.fillText(`מים ${round(place.h.seaTemp)}°`, right - 420 * base, y); }
+      }
+      // wordmark bottom-left
+      x.direction = "ltr"; x.textAlign = "left"; x.font = `800 ${Math.round(30 * base)}px 'JetBrains Mono', Consolas, monospace`; x.fillStyle = "#2dd4bf";
+      x.fillText("YAM PALATA", pad, H - pad);
+      x.font = `500 ${Math.round(20 * base)}px Heebo, Arial, sans-serif`; x.fillStyle = "rgba(230,237,246,.55)";
+      x.fillText("yuvartz.github.io/yam-palta", pad, H - pad + 30 * base);
+      return new Promise(res => c.toBlob(res, "image/jpeg", 0.9));
+    }
+    const pad2 = pad;
+    async function handleCameraFile(file) {
+      if (!file) return;
+      openModal("camModal");
+      $("camBody").innerHTML = `<div class="cam-status"><div class="spinner"></div>מאתר איפה אתה ומצרף את המדד…</div>`;
+      $("camHint").textContent = ""; $("camShare").disabled = true; $("camSave").removeAttribute("href");
+      try {
+        const [img, place] = await Promise.all([loadImage(file), placeForPhoto()]);
+        camBlob = await composePhoto(img, place);
+        const url = URL.createObjectURL(camBlob);
+        $("camBody").innerHTML = `<img class="cam-preview" src="${url}" alt="התמונה שלך עם מדד הפלטה" />`;
+        $("camSave").href = url; $("camShare").disabled = false;
+        $("camHint").textContent = place.located ? (place.h ? `זוהה: ${place.name} · המדד לשעה הנוכחית שם` : `זוהה מיקום, אך אין חוף מוכר ב-40 ק״מ — התמונה ללא מדד`) : "לא התקבל מיקום — הוטבע המדד של החוף שנבחר באפליקציה";
+        Sound.chime(false);
+      } catch (e) {
+        console.warn("camera compose failed", e);
+        $("camBody").innerHTML = `<div class="cam-status">לא הצלחנו לעבד את התמונה. נסו שוב.</div>`;
+      }
+    }
+    async function cameraShare() {
+      if (!camBlob) return;
+      const f = new File([camBlob], "yam-palata.jpg", { type: "image/jpeg" });
+      if (navigator.canShare && navigator.canShare({ files: [f] })) {
+        try { await navigator.share({ files: [f], title: "ים פלטה", text: shareText() }); return; } catch (e) { if (e && e.name === "AbortError") return; }
+      }
+      $("camSave").click();   // no file sharing here → save instead
+    }
+
+    // A deterministic sample notification so people can see (and hear) what an alert looks like
+    // before the sea actually turns flat.
+    function testNotification() {
+      if (!("Notification" in window) || Notification.permission !== "granted") return;
+      const cur = nearestHourData(), loc = (allLocations()[LS.loc] || BUILTIN.telaviv).name;
+      const c = notifyCopy(false, loc, cur && cur.seaTemp != null ? round(cur.seaTemp) : null, null, 85);
+      showLocalNotification("🔔 בדיקה · " + c.title, c.body);
+      toast("נשלחה התראת בדיקה. אם לא ראית אותה — בדקו את הגדרות ההתראות של הדפדפן/הטלפון", true);
     }
 
     // ---------- Install as app ----------
@@ -1902,9 +2350,13 @@
         btn.textContent = "🔕 הדפדפן לא תומך בהתראות"; btn.disabled = true; return;
       }
       // Honest label: without the push pipeline configured, alerts only fire while the app is open.
-      if (Notification.permission === "granted") { btn.textContent = PUSH.formUrl ? "✅ התראות פעילות" : "✅ התראות פעילות (כשהאפליקציה פתוחה)"; btn.classList.add("ok"); }
-      else if (Notification.permission === "denied") btn.textContent = "🔕 התראות חסומות בדפדפן";
-      else btn.textContent = "🔔 הפעל התראות על ים פלטה";
+      const help = $("notifyHelp");
+      if (Notification.permission === "granted") {
+        btn.textContent = PUSH.formUrl ? "✅ התראות פעילות" : "✅ התראות פעילות (כשהאפליקציה פתוחה)"; btn.classList.add("ok");
+        if (help) help.innerHTML = `ההתראה נשלחת ברגע שהים עובר לסף 8.0 בחוף שנבחר${PUSH.formUrl ? "" : " — כרגע רק כשהאפליקציה פתוחה או ברקע"} · <a href="#" onclick="App.testNotification();return false">שלח התראת בדיקה</a>`;
+      }
+      else if (Notification.permission === "denied") { btn.textContent = "🔕 התראות חסומות בדפדפן"; if (help) help.textContent = "כדי לאפשר: הגדרות האתר בדפדפן → התראות → אפשר, ואז רעננו."; }
+      else { btn.textContent = "🔔 הפעל התראות על ים פלטה"; if (help) help.textContent = ""; }
     }
     async function enableNotifications() {
       if (!("Notification" in window)) return;
@@ -1975,16 +2427,29 @@
         // overwrite the newer beach's view, and always cache under the key it was fetched for.
         dataCache[locKey] = data;
         if (seq !== loadSeq) return;
-        hourly = data; dailySun = sun; scoreReveal = true; dataStale = !!stale;
+        hourly = data; dailySun = sun; scoreReveal = true; dataStale = !!stale; refreshFailed = false;
         // A cached fallback keeps the page useful but is NOT "updated now": keep the real fetch time
         // for the footer and leave lastLoadTs old so the next focus retries the network.
         if (stale) { const d = fetchedAt ? new Date(fetchedAt) : null; lastUpdatedAt = d && !isNaN(d) ? israelTimeOf(d) : lastUpdatedAt; }
         else { lastUpdatedAt = israelNow(); lastLoadTs = Date.now(); }
         $("loading").classList.add("hidden"); $("app").classList.remove("hidden"); const intro = $("intro"); if (intro) intro.remove();
-        renderAll(); if (!stale) maybeNotify(); scanAlerts(); loadJelly(); loadBuoy(); loadClimatology();
+        renderAll(); endSwitch(); if (!stale) maybeNotify(); scanAlerts(); loadJelly(); loadBuoy(); loadClimatology();
         if (Sound.on && !document.hidden) Sound.ambientSync();   // re-tune the ambient sea to the new beach/hour
-      } catch (e) { console.error(e); if (seq === loadSeq && hourly.length === 0) showError("לא ניתן לטעון נתונים. בדוק חיבור לאינטרנט ונסה שוב."); }
+      } catch (e) {
+        console.error(e);
+        if (seq !== loadSeq) return;
+        if (switchFrom && allLocations()[switchFrom]) {
+          // The displayed data still belongs to the previous beach — go back to it honestly.
+          const wanted = (allLocations()[locKey] || {}).name || locKey;
+          LS.loc = switchFrom; renderLocations(); endSwitch();
+          toast(`לא הצלחנו לטעון את ${wanted} — נשארנו ב${(allLocations()[LS.loc] || {}).name || ""}`);
+          return;
+        }
+        if (hourly.length === 0) showError("לא ניתן לטעון נתונים. בדוק חיבור לאינטרנט ונסה שוב.");
+        else refreshFailed = true, renderUpdated();   // keep the valid forecast on screen, but say the refresh failed
+      }
     }
+    let refreshFailed = false;   // a background refresh failed while older data is still displayed
 
     // Modal focus management: remember the opener, focus into the dialog, restore on close.
     let modalOpener = null;
@@ -1992,12 +2457,12 @@
     // a real focus trap without hand-rolled key juggling.
     function openModal(id, focusId) {
       modalOpener = document.activeElement;
-      $(id).classList.add("show");
+      $(id).classList.add("show"); document.body.classList.add("modal-open");
       const wrap = document.querySelector(".wrap"); if (wrap) wrap.inert = true;
       const f = (focusId && $(focusId)) || $(id).querySelector("select, input, button"); if (f) f.focus();
     }
     function closeModal(id) {
-      $(id).classList.remove("show");
+      $(id).classList.remove("show"); document.body.classList.remove("modal-open");
       const wrap = document.querySelector(".wrap"); if (wrap) wrap.inert = false;
       if (modalOpener && modalOpener.focus) modalOpener.focus();
       modalOpener = null;
@@ -2101,9 +2566,25 @@
         { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 });
     }
 
-    function setLocation(key) { if (!allLocations()[key] || key === LS.loc) return; Sound.tick(); LS.loc = key; sessionStorage.setItem("yp-was-swim", "0"); renderLocations(); hourly = []; heroDay = 0; load(); if (("Notification" in window) && Notification.permission === "granted") subscribePush(); }
+    // Beach switch keeps the page on screen (dimmed, with a progress bar) instead of flashing the
+    // skeleton; the new beach's data slides in when it lands. On failure we roll back to the beach
+    // that is still displayed, so chips and content never disagree.
+    let switchFrom = null;
+    function setLocation(key) {
+      if (!allLocations()[key] || key === LS.loc) return;
+      Sound.tick(); switchFrom = hourly.length ? LS.loc : null;
+      LS.loc = key; sessionStorage.setItem("yp-was-swim", "0"); renderLocations(); heroDay = 0; scoreOpen = false; jellyOpen = false;
+      if (switchFrom) { $("app").classList.add("switching"); $("switchBar").classList.add("on"); }
+      else hourly = [];
+      load();
+      if (("Notification" in window) && Notification.permission === "granted") subscribePush();
+    }
+    function endSwitch() { $("app").classList.remove("switching"); $("switchBar").classList.remove("on"); switchFrom = null; }
     function init() {
       applyDeepLink();
+      document.querySelectorAll("[data-ic]").forEach(el => { el.innerHTML = ICON[el.dataset.ic] || ""; el.setAttribute("aria-hidden", "true"); });
+      $("camInput").addEventListener("change", e => handleCameraFile(e.target.files && e.target.files[0]));
+      $("camModal").addEventListener("click", e => { if (e.target.id === "camModal") closeCamera(); });
       renderLocations(); refreshNotifyBtn();
       const sb = $("soundBtn"); if (sb && Sound.on) { sb.classList.add("on"); sb.setAttribute("aria-pressed", "true"); sb.title = "צלילים פעילים"; }
       // Ambient can only start after a user gesture — the first tap anywhere re-arms it if sound was left on.
@@ -2120,6 +2601,7 @@
         if (e.key !== "Escape") return;
         if ($("addModal").classList.contains("show")) closeAdd();
         else if ($("installModal").classList.contains("show")) closeInstall();
+        else if ($("camModal").classList.contains("show")) closeCamera();
       });
       setupInstall();
       // Offline + fast repeat loads. Registration is best-effort: the app works identically
@@ -2138,12 +2620,13 @@
       setInterval(() => { if (!document.hidden) load(); }, REFRESH_MS);
       setInterval(minuteTick, 60 * 1000);
       document.addEventListener("visibilitychange", () => {
+        document.body.classList.toggle("bg", document.hidden);   // pauses the ambient CSS loops while hidden
         if (document.hidden) return;
         if (Date.now() - lastLoadTs > REFRESH_MS) load(); else minuteTick();
       });
     }
 
-    return { init, setLocation, removeLocation, refresh: load, enableNotifications, openAdd, closeAdd, confirmAdd, toggleDay, toggleJelly, toggleScore, installApp, closeInstall, submitFeedback, toggleFeedback, heroDayNav, heroSwipeStart, heroSwipeMove, heroSwipeEnd, useMyLocation, toggleSound, share };
+    return { init, setLocation, removeLocation, refresh: load, enableNotifications, openAdd, closeAdd, confirmAdd, toggleDay, toggleJelly, toggleScore, installApp, closeInstall, submitFeedback, toggleFeedback, heroDayNav, heroSwipeStart, heroSwipeMove, heroSwipeEnd, useMyLocation, toggleSound, share, openCamera, closeCamera, cameraShare, testNotification };
   })();
 
   document.addEventListener("DOMContentLoaded", App.init);
