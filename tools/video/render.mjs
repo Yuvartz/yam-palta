@@ -53,7 +53,7 @@ async function forecast(b) {
 function evaluate(all) {
   return all.map(({ b, hours, now, timezone }) => {
     const day = TARGET === "tomorrow" ? addDays(now.dateStr, 1) : now.dateStr;
-    const windowHours = TARGET === "tomorrow" ? [6, 7, 8, 9, 10, 11] : [now.hour];
+    const windowHours = TARGET === "tomorrow" ? [6, 7, 8, 9, 10, 11] : (now.hour >= 6 && now.hour <= 19 ? [now.hour] : []);
     const cand = hours.filter(h => h.dateStr === day && windowHours.includes(h.hour) && h.score != null);
     const best = cand.reduce((a, h) => (!a || h.score > a.score ? h : a), null);
     return { b, hours, now, timezone, day, best };
@@ -71,18 +71,21 @@ function buildData(evald, nowIL) {
   const boardOrder = R.order === "score" ? ranked : evald.filter(e => e.best);   // geographic order = catalogue order (north → south)
   const bars = top.hours.filter(h => h.dateStr === top.day && h.hour >= 6 && h.hour <= 19).map(h => ({ hour: h.hour, score: h.score }));
   const title2 = calmCount ? "יש פלטה." : "יש פלטה?";
+  const isPlanet = REGION === "planet", topDeluxe = top.best.score >= Palata.DELUXE_MIN;
+  const shortName = n => n.split(",")[0].replace(/\s*\(.*?\)\s*/g, " ").trim();
+  const BOARD_MAX = 27, boardItems = boardOrder.slice(0, BOARD_MAX);
   return {
     duration: DURATION,
-    title1: isWorld ? (isTomorrow ? (REGION === "world" ? "מחר בבוקר, בעולם:" : `מחר בבוקר, ${R.name}:`) : "עכשיו, בעולם:") : (isTomorrow ? "מחר בבוקר:" : "עכשיו בים:"),
-    title2,
+    title1: isPlanet ? (topDeluxe ? (isTomorrow ? "מחר יש 10 בעולם." : "יש 10 בעולם עכשיו.") : (isTomorrow ? "הכי פלטה בעולם מחר:" : "הכי פלטה בעולם עכשיו:")) : isWorld ? (isTomorrow ? (REGION === "world" ? "מחר בבוקר, בעולם:" : `מחר בבוקר, ${R.name}:`) : "עכשיו, בעולם:") : (isTomorrow ? "מחר בבוקר:" : "עכשיו בים:"),
+    title2: isPlanet ? `${fmt(top.best.score)} ב${shortName(top.b.name)}` : title2,
     dateLine: isWorld ? `${isTomorrow ? "מחר בבוקר, לפי השעון המקומי" : "כרגע, לפי השעון המקומי"} · ${scored.length} חופים${REGION === "world" ? "" : ` · ${R.name}`}` : `${isTomorrow ? "מחר, " : ""}${dLabel} · ${R.name}`,
-    pillText: calmCount ? `מדד הפלטה עובר 8.0 ב-${calmCount} מתוך ${scored.length} חופים` : (isWorld ? "גם בעולם הגולשים מרוצים היום. אנחנו מחכים" : "הגולשים מרוצים. אנחנו מחכים לבוקר שקט יותר"),
-    rowsTitle: isWorld ? `הכי שטוח <span>${isTomorrow ? "מחר בבוקר" : "עכשיו"}</span> ${REGION === "world" ? "בעולם" : "ב" + R.name}` : (REGION === "sinai" ? `הכי שטוח <span>${isTomorrow ? "מחר בבוקר" : "עכשיו"}</span> בדרך לשארם` : `השעות הכי שטוחות <span>${isTomorrow ? "מחר בבוקר" : "עכשיו"}</span>`),
+    pillText: isPlanet ? (topDeluxe ? `10 עגול. הים שם שכח לזוז · ${scored.length} חופים נסרקו` : `הכי קרוב ל-10 מתוך ${scored.length} חופים שנסרקו`) : calmCount ? `מדד הפלטה עובר 8.0 ב-${calmCount} מתוך ${scored.length} חופים` : (isWorld ? "גם בעולם הגולשים מרוצים היום. אנחנו מחכים" : "הגולשים מרוצים. אנחנו מחכים לבוקר שקט יותר"),
+    rowsTitle: isPlanet ? `שלושת הכי שטוחים <span>בכדור הארץ</span>` : isWorld ? `הכי שטוח <span>${isTomorrow ? "מחר בבוקר" : "עכשיו"}</span> ${REGION === "world" ? "בעולם" : "ב" + R.name}` : (REGION === "sinai" ? `הכי שטוח <span>${isTomorrow ? "מחר בבוקר" : "עכשיו"}</span> בדרך לשארם` : `השעות הכי שטוחות <span>${isTomorrow ? "מחר בבוקר" : "עכשיו"}</span>`),
     beaches: top3.map(e => { const t = tierOf(e.best.score); return { name: e.b.name, hour: `${pad(e.best.hour)}:00`, score: e.best.score, tierKey: t.key, tierLabel: t.label, water: e.best.seaTemp, wave: e.best.waveHeight }; }),
     board: {
-      title: isWorld ? `כל החופים, <span>מהשטוח לסוער</span>` : (REGION === "sinai" ? `<span>מאילת עד שארם</span>, תחנה-תחנה` : `כל החופים, <span>מצפון לדרום</span>`),
+      title: isPlanet ? `<span>${BOARD_MAX} המובילים</span> מתוך ${scored.length}` : isWorld ? `כל החופים, <span>מהשטוח לסוער</span>` : (REGION === "sinai" ? `<span>מאילת עד שארם</span>, תחנה-תחנה` : `כל החופים, <span>מצפון לדרום</span>`),
       sub: isWorld ? `הציון של כל חוף בשעה הכי שטוחה של הבוקר שלו` : `הציון בשעה הכי שטוחה של הבוקר (06:00–11:00)${boardOrder.length > 12 ? " · חופים סמוכים חולקים תא תחזית" : ""}`,
-      items: boardOrder.map(e => { const t = tierOf(e.best.score); const w = e.best.seaTemp != null ? ` · מים ${Math.round(e.best.seaTemp)}°` : ""; return { name: e.b.name, sub: `${pad(e.best.hour)}:00 · ${t.short}${w}`, subShort: `${pad(e.best.hour)}:00${w}`, score: e.best.score, top: e === top }; }),
+      items: boardItems.map(e => { const t = tierOf(e.best.score); const w = e.best.seaTemp != null ? ` · מים ${Math.round(e.best.seaTemp)}°` : ""; return { name: e.b.name, sub: `${pad(e.best.hour)}:00 · ${t.short}${w}`, subShort: `${pad(e.best.hour)}:00${w}`, score: e.best.score, top: e === top }; }),
     },
     week: { title: `${isTomorrow ? "מחר" : "היום"} ב<span>${top.b.name}</span>, שעה-שעה`, sub: `מדד הפלטה 06:00–19:00${isWorld ? " שעון מקומי" : ""} · ◆ ${pad(top.best.hour)}:00 הכי שטוח (${fmt(top.best.score)})`, bars },
     sourceLine: `<b>תחזית</b> לשטיחות הים, לא אישור בטיחות · מקור: <bdi>Open-Meteo</bdi> · הופק <bdi>${nowIL.text.slice(0, 5)} ${nowIL.text.slice(11)}</bdi><br><bdi>yamplata.com</bdi>`,
@@ -94,7 +97,9 @@ function caption(data) {
   const top = data.beaches[0], isTomorrow = TARGET === "tomorrow";
   const list = data.beaches.map(b => `${b.name} ${fmt(b.score)} ב-${b.hour}`).join(" · ");
   const calm = top.score >= Palata.CALM_MIN;
-  const lead = R.timezone === "auto"
+  const lead = REGION === "planet"
+    ? `${top.score >= Palata.DELUXE_MIN ? "יש 10 בעולם" : "הכי פלטה בכדור הארץ"} ${isTomorrow ? "מחר בבוקר" : "עכשיו"}: ${top.name}, ${fmt(top.score)}/10 (${top.tierLabel}). ${top.score >= Palata.DELUXE_MIN ? "הים שם שכח לזוז." : "עוד לא 10 עגול, אבל קרוב."}`
+    : R.timezone === "auto"
     ? `${isTomorrow ? "מחר בבוקר" : "עכשיו"} ${REGION === "world" ? "בעולם" : "ב" + R.name}: הכי שטוח ב${top.name}, ${fmt(top.score)}/10 (${top.tierLabel}). ${calm ? "יש למי לקנא." : "גם שם מחכים."}`
     : REGION === "sinai"
       ? `${isTomorrow ? "מחר בבוקר" : "עכשיו"} בדרך לשארם: הכי שטוח ב${top.name}, ${fmt(top.score)}/10 ב-${top.hour}, ${top.tierLabel}. ${calm ? "השנורקל כבר בתיק." : "הרוח עוד לא נרגעה."}`

@@ -27,7 +27,10 @@ node render.mjs --region world      # 26 iconic beaches worldwide, each scored i
 node render.mjs --region europe     # sub-editions: europe (23, incl. Cyprus/Greece/Turkey/Spain/Italy/Portugal/Croatia),
                                     #   caribbean (Jamaica, Bahamas, Aruba, Cuba, DR, Turks & Caicos, Mexico), americas (+Hawaii),
                                     #   asia (Thailand, Bali, Philippines, Maldives, Dubai), oceania (Australia, Bora Bora), africa (+Seychelles, Mauritius)
-node render.mjs --target now        # what is flat right now
+node render.mjs --region planet     # "the flattest beach on Earth": scans all 134 world beaches, headlines the top scorer
+                                    #   (special "יש 10 בעולם" headline when one reaches Palata Deluxe ≥ 9.8), board = top 27
+node render.mjs --region mideast    # Marsa Matruh, Hurghada, Marsa Alam, Aqaba, Abu Dhabi, Oman, Tunisia, Morocco
+node render.mjs --target now        # what is flat right now (world editions: daylight hours only, local time)
 node render.mjs --duration 15       # 6 / 12 / 15 s scripts
 node render.mjs --preview           # poster PNG only, ~5 s — check data and layout first
 ```
