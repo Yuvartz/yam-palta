@@ -23,7 +23,10 @@ ffmpeg must be on PATH (`ffmpeg -version`).
 ```bash
 node render.mjs                     # tomorrow morning (06–11), 18 Israeli Med beaches: top 3 + full north→south board
 node render.mjs --region sinai      # Eilat → Coral Beach → Taba → Bir Sweir → Ras Shitan → Nuweiba → Ras Abu Galum → Blue Hole → Dahab → Nabq → Naama Bay → Sharm
-node render.mjs --region world      # 18 famous beaches, each scored in its own local morning (timezone=auto), ranked
+node render.mjs --region world      # 26 iconic beaches worldwide, each scored in its own local morning (timezone=auto), ranked
+node render.mjs --region europe     # sub-editions: europe (23, incl. Cyprus/Greece/Turkey/Spain/Italy/Portugal/Croatia),
+                                    #   caribbean (Jamaica, Bahamas, Aruba, Cuba, DR, Turks & Caicos, Mexico), americas (+Hawaii),
+                                    #   asia (Thailand, Bali, Philippines, Maldives, Dubai), oceania (Australia, Bora Bora), africa (+Seychelles, Mauritius)
 node render.mjs --target now        # what is flat right now
 node render.mjs --duration 15       # 6 / 12 / 15 s scripts
 node render.mjs --preview           # poster PNG only, ~5 s — check data and layout first

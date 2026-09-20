@@ -28,10 +28,20 @@ const R = REGIONS[REGION]; if (!R) { console.error(`unknown region ${REGION}; on
 const tierOf = s => Palata.TIERS.find(t => s >= t.min) || Palata.TIERS[Palata.TIERS.length - 1];
 const fmt = s => (s / 10).toFixed(1);
 
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+// Open-Meteo's free tier answers 503/429 to bursts: retry with backoff (the whole board is ~50 requests).
+async function getJson(url, tries = 4) {
+  for (let i = 0; ; i++) {
+    const r = await fetch(url).catch(() => null);
+    if (r && r.ok) return r.json();
+    if (i >= tries - 1) throw new Error(`open-meteo ${r ? r.status : "network"}`);
+    await sleep(1200 * (i + 1) + Math.random() * 400);
+  }
+}
 async function forecast(b) {
   const u = Palata.recipeUrls(b.lat, b.lon, { forecastDays: 3, pastDays: 1, timezone: R.timezone });
-  const j = async r => { if (!r.ok) throw new Error(`open-meteo ${r.status}`); return r.json(); };
-  const [m, w] = await Promise.all([fetch(u.marine).then(j), fetch(u.weather).then(j)]);
+  const m = await getJson(u.marine), w = await getJson(u.weather);
+  await sleep(150);
   const blend = Palata.blendHourly(m, w);
   Palata.scoreSeries(blend.hours);
   // "now" at this beach: Israel clock for local regions, the beach's own clock for the world edition
@@ -55,7 +65,7 @@ function buildData(evald, nowIL) {
   if (!scored.length) throw new Error("no scorable hours for the target window");
   const ranked = [...scored].sort((x, y) => y.best.score - x.best.score);
   const top = ranked[0], top3 = ranked.slice(0, TOP_N);
-  const isTomorrow = TARGET === "tomorrow", isWorld = REGION === "world";
+  const isTomorrow = TARGET === "tomorrow", isWorld = R.timezone === "auto";
   const day = top.day, dLabel = `יום ${dayName(day)} ${+day.slice(8, 10)}.${+day.slice(5, 7)}`;
   const calmCount = scored.filter(e => e.best.score >= Palata.CALM_MIN).length;
   const boardOrder = R.order === "score" ? ranked : evald.filter(e => e.best);   // geographic order = catalogue order (north → south)
@@ -63,16 +73,16 @@ function buildData(evald, nowIL) {
   const title2 = calmCount ? "יש פלטה." : "יש פלטה?";
   return {
     duration: DURATION,
-    title1: isWorld ? (isTomorrow ? "מחר בבוקר, בעולם:" : "עכשיו, בעולם:") : (isTomorrow ? "מחר בבוקר:" : "עכשיו בים:"),
+    title1: isWorld ? (isTomorrow ? (REGION === "world" ? "מחר בבוקר, בעולם:" : `מחר בבוקר, ${R.name}:`) : "עכשיו, בעולם:") : (isTomorrow ? "מחר בבוקר:" : "עכשיו בים:"),
     title2,
-    dateLine: isWorld ? `${isTomorrow ? "מחר בבוקר לפי השעון המקומי" : "כרגע, לפי השעון המקומי"} · ${scored.length} חופים` : `${isTomorrow ? "מחר, " : ""}${dLabel} · ${R.name}`,
+    dateLine: isWorld ? `${isTomorrow ? "מחר בבוקר, לפי השעון המקומי" : "כרגע, לפי השעון המקומי"} · ${scored.length} חופים${REGION === "world" ? "" : ` · ${R.name}`}` : `${isTomorrow ? "מחר, " : ""}${dLabel} · ${R.name}`,
     pillText: calmCount ? `מדד הפלטה עובר 8.0 ב-${calmCount} מתוך ${scored.length} חופים` : (isWorld ? "גם בעולם הגולשים מרוצים היום. אנחנו מחכים" : "הגולשים מרוצים. אנחנו מחכים לבוקר שקט יותר"),
-    rowsTitle: isWorld ? `הכי שטוח <span>${isTomorrow ? "מחר בבוקר" : "עכשיו"}</span> בעולם` : (REGION === "sinai" ? `הכי שטוח <span>${isTomorrow ? "מחר בבוקר" : "עכשיו"}</span> בדרך לשארם` : `השעות הכי שטוחות <span>${isTomorrow ? "מחר בבוקר" : "עכשיו"}</span>`),
+    rowsTitle: isWorld ? `הכי שטוח <span>${isTomorrow ? "מחר בבוקר" : "עכשיו"}</span> ${REGION === "world" ? "בעולם" : "ב" + R.name}` : (REGION === "sinai" ? `הכי שטוח <span>${isTomorrow ? "מחר בבוקר" : "עכשיו"}</span> בדרך לשארם` : `השעות הכי שטוחות <span>${isTomorrow ? "מחר בבוקר" : "עכשיו"}</span>`),
     beaches: top3.map(e => { const t = tierOf(e.best.score); return { name: e.b.name, hour: `${pad(e.best.hour)}:00`, score: e.best.score, tierKey: t.key, tierLabel: t.label, water: e.best.seaTemp, wave: e.best.waveHeight }; }),
     board: {
       title: isWorld ? `כל החופים, <span>מהשטוח לסוער</span>` : (REGION === "sinai" ? `<span>מאילת עד שארם</span>, תחנה-תחנה` : `כל החופים, <span>מצפון לדרום</span>`),
       sub: isWorld ? `הציון של כל חוף בשעה הכי שטוחה של הבוקר שלו` : `הציון בשעה הכי שטוחה של הבוקר (06:00–11:00)${boardOrder.length > 12 ? " · חופים סמוכים חולקים תא תחזית" : ""}`,
-      items: boardOrder.map(e => { const t = tierOf(e.best.score); return { name: e.b.name, sub: `${pad(e.best.hour)}:00 · ${t.short}${e.best.seaTemp != null ? ` · מים ${Math.round(e.best.seaTemp)}°` : ""}`, score: e.best.score, top: e === top }; }),
+      items: boardOrder.map(e => { const t = tierOf(e.best.score); const w = e.best.seaTemp != null ? ` · מים ${Math.round(e.best.seaTemp)}°` : ""; return { name: e.b.name, sub: `${pad(e.best.hour)}:00 · ${t.short}${w}`, subShort: `${pad(e.best.hour)}:00${w}`, score: e.best.score, top: e === top }; }),
     },
     week: { title: `${isTomorrow ? "מחר" : "היום"} ב<span>${top.b.name}</span>, שעה-שעה`, sub: `מדד הפלטה 06:00–19:00${isWorld ? " שעון מקומי" : ""} · ◆ ${pad(top.best.hour)}:00 הכי שטוח (${fmt(top.best.score)})`, bars },
     sourceLine: `<b>תחזית</b> לשטיחות הים, לא אישור בטיחות · מקור: <bdi>Open-Meteo</bdi> · הופק <bdi>${nowIL.text.slice(0, 5)} ${nowIL.text.slice(11)}</bdi><br><bdi>yamplata.com</bdi>`,
@@ -84,12 +94,12 @@ function caption(data) {
   const top = data.beaches[0], isTomorrow = TARGET === "tomorrow";
   const list = data.beaches.map(b => `${b.name} ${fmt(b.score)} ב-${b.hour}`).join(" · ");
   const calm = top.score >= Palata.CALM_MIN;
-  const lead = REGION === "world"
-    ? `${isTomorrow ? "מחר בבוקר" : "עכשיו"} בעולם: הכי שטוח ב${top.name}, ${fmt(top.score)}/10 (${top.tierLabel}). ${calm ? "יש למי לקנא." : "גם שם מחכים."}`
+  const lead = R.timezone === "auto"
+    ? `${isTomorrow ? "מחר בבוקר" : "עכשיו"} ${REGION === "world" ? "בעולם" : "ב" + R.name}: הכי שטוח ב${top.name}, ${fmt(top.score)}/10 (${top.tierLabel}). ${calm ? "יש למי לקנא." : "גם שם מחכים."}`
     : REGION === "sinai"
       ? `${isTomorrow ? "מחר בבוקר" : "עכשיו"} בדרך לשארם: הכי שטוח ב${top.name}, ${fmt(top.score)}/10 ב-${top.hour}, ${top.tierLabel}. ${calm ? "השנורקל כבר בתיק." : "הרוח עוד לא נרגעה."}`
       : `${isTomorrow ? `מחר, ${data.dateLine.replace(/^מחר, /, "")}` : "עכשיו"}: ב${top.name} ${fmt(top.score)}/10 ב-${top.hour}, ${top.tierLabel}. ${calm ? "המשקפת מוכנה?" : "המגבת יכולה לחכות עוד קצת."}`;
-  const tags = REGION === "world" ? "#ימפלטה #YamPlata #flatsea #beachforecast #swim #snorkel #sup #יםשטוח" : REGION === "sinai" ? "#ימפלטה #YamPlata #סיני #דהב #נואיבה #שארם #אילת #שנירקול #יםשטוח #פלטה" : "#ימפלטה #YamPlata #יםשטוח #פלטה #שחייהבים #סאפ #שנירקול #תחזיתים #חוףהים #מחרבבוקר";
+  const tags = R.timezone === "auto" ? "#ימפלטה #YamPlata #flatsea #beachforecast #swim #snorkel #sup #יםשטוח" : REGION === "sinai" ? "#ימפלטה #YamPlata #סיני #דהב #נואיבה #שארם #אילת #שנירקול #יםשטוח #פלטה" : "#ימפלטה #YamPlata #יםשטוח #פלטה #שחייהבים #סאפ #שנירקול #תחזיתים #חוףהים #מחרבבוקר";
   return [lead, list, "", "הם מחפשים גלים. אנחנו מחפשים פלטה. פחות גלים. יותר ים.", `תחזית לשטיחות הים · מתעדכנת · אינה אישור בטיחות. הכול באפליקציה: ${SITE}/?utm_source=social&utm_campaign=daily_story_${REGION}`, "", tags].join("\n");
 }
 
@@ -99,7 +109,7 @@ function ffmpeg(args) {
 
 async function main() {
   const nowIL = israelNow();
-  const beaches = BEACHES.filter(b => b.region === REGION || (REGION === "sinai" && b.slug === "eilat"));
+  const beaches = BEACHES.filter(R.pick);
   console.log(`forecast for ${beaches.length} beaches (${REGION})…`);
   const all = [];
   for (const b of beaches) { try { all.push({ b, ...(await forecast(b)) }); } catch (e) { console.warn("skip", b.slug, e.message); } }

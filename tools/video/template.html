@@ -26,9 +26,16 @@
   #s1 { top: 340px; } #s2 { top: 40px; } #s2b { top: 20px; } #s3 { top: 200px; } #s4 { top: 300px; }
   .board { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; direction: rtl; }
   .board.one { grid-template-columns: 1fr; }
-  .cell { display: flex; align-items: center; gap: 16px; background: linear-gradient(180deg, rgba(20,27,42,.92), rgba(20,27,42,.7)); border: 1px solid rgba(148,178,255,.10); border-radius: 26px; padding: 16px 22px; opacity: 0; position: relative; }
+  .board.three { grid-template-columns: repeat(3, 1fr); gap: 12px 12px; }
+  .board.three .cell { padding: 12px 14px; gap: 10px; border-radius: 20px; }
+  .board.three .cell .sc { min-width: 84px; font-size: 44px; }
+  .board.three .cell .nm b { font-size: 23px; white-space: normal; line-height: 1.12; max-height: 52px; }
+  .board.three .cell .nm small { font-size: 19px; }
+  .board.three .cell .mini { left: 14px; right: 14px; bottom: 5px; height: 4px; }
+  .board.three .cell .crown { font-size: 17px; padding: 1px 9px; top: -12px; right: 10px; }
+  .cell { min-width: 0; display: flex; align-items: center; gap: 16px; background: linear-gradient(180deg, rgba(20,27,42,.92), rgba(20,27,42,.7)); border: 1px solid rgba(148,178,255,.10); border-radius: 26px; padding: 16px 22px; opacity: 0; position: relative; }
   .cell .sc { min-width: 118px; text-align: center; font-size: 60px; font-weight: 800; line-height: 1; letter-spacing: -2px; }
-  .cell .nm { flex: 1; min-width: 0; }
+  .cell .nm { flex: 1; min-width: 0; overflow: hidden; }
   .cell .nm b { display: block; font-size: 32px; font-weight: 800; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .cell .nm small { display: block; font-size: 25px; color: var(--muted); margin-top: 4px; white-space: nowrap; }
   .cell .mini { position: absolute; left: 22px; right: 22px; bottom: 8px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.07); overflow: hidden; }
@@ -159,12 +166,12 @@
       </div>`).join("");
     document.getElementById("boardTitle").innerHTML = data.board.title;
     document.getElementById("boardSub").textContent = data.board.sub;
-    const board = document.getElementById("board"); board.className = "board" + (data.board.items.length <= 8 ? " one" : "");
+    const board = document.getElementById("board"); board.className = "board" + (data.board.items.length <= 8 ? " one" : data.board.items.length > 18 ? " three" : "");
     board.innerHTML = data.board.items.map(b => `
       <div class="cell${b.top ? " top" : ""}">
         ${b.top ? `<span class="crown">הכי שטוח</span>` : ""}
         <div class="sc num" style="color:${scoreColor(b.score)}">${b.score == null ? "—" : fmt(b.score)}</div>
-        <div class="nm"><b>${b.name}</b><small>${b.sub}</small></div>
+        <div class="nm"><b>${data.board.items.length > 18 ? b.name.split(",")[0].replace(/\s*\(.*?\)\s*/g, " ").trim() : b.name}</b><small>${data.board.items.length > 18 ? b.subShort : b.sub}</small></div>
         <div class="mini"><i style="width:${b.score == null ? 0 : Math.round(b.score)}%;background:${scoreColor(b.score)}"></i></div>
       </div>`).join("");
     document.getElementById("weekTitle").innerHTML = data.week.title;
