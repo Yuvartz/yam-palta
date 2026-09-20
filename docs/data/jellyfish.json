@@ -1,8 +1,24 @@
 {
-  "updated": "2026-09-20T08:01:51.101Z",
+  "updated": "2026-09-20T13:17:45.082Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25922",
+      "reporter": "Dor Edelist",
+      "location": "נווה ים, הבונים ודור-נחשולים",
+      "lat": null,
+      "lon": null,
+      "date": "2026-09-20T13:32+03:00",
+      "dateText": "20.09.2026",
+      "time": "13:32",
+      "activity": "הליכה על החוף",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25922"
+    },
     {
       "id": "25921",
       "reporter": "שלמה יער-בר",
@@ -34,38 +50,6 @@
       "species": "פעמונית נקודה",
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25920"
-    },
-    {
-      "id": "25919",
-      "reporter": "ענת סיגל",
-      "location": "קרית ים",
-      "lat": 32.848,
-      "lon": 35.07,
-      "date": "2026-09-19T09:06+03:00",
-      "dateText": "19.09.2026",
-      "time": "09:06",
-      "activity": "-",
-      "distance": "0-200",
-      "quantity": null,
-      "species": "פעמונית נקודה",
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25919"
-    },
-    {
-      "id": "25918",
-      "reporter": "ענת סיגל",
-      "location": "קרית ים",
-      "lat": 32.848,
-      "lon": 35.07,
-      "date": "2026-09-19T09:06+03:00",
-      "dateText": "19.09.2026",
-      "time": "09:06",
-      "activity": "-",
-      "distance": "0-200",
-      "quantity": null,
-      "species": "פעמונית נקודה",
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25918"
     },
     {
       "id": "25917",
@@ -130,22 +114,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25914"
-    },
-    {
-      "id": "25913",
-      "reporter": "אמרי חמו",
-      "location": "אולגה וגדור",
-      "lat": 32.45,
-      "lon": 34.88,
-      "date": "2026-09-18T12:29+03:00",
-      "dateText": "18.09.2026",
-      "time": "12:29",
-      "activity": "צלילה חופשית שנירקול",
-      "distance": "0-200",
-      "quantity": null,
-      "species": "חוטית נודדת",
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25913"
     },
     {
       "id": "25912",
@@ -1282,6 +1250,38 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25836"
+    },
+    {
+      "id": "25835",
+      "reporter": "מישמיש בורא",
+      "location": "בת ים וראשון לציון",
+      "lat": 32.015,
+      "lon": 34.743,
+      "date": "2026-08-29T11:00+03:00",
+      "dateText": "29.08.2026",
+      "time": "11:00",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25835"
+    },
+    {
+      "id": "25831",
+      "reporter": "יאחנקו יאנה",
+      "location": "חופי אשקלון והדרום",
+      "lat": 31.67,
+      "lon": 34.556,
+      "date": "2026-08-29T12:43+03:00",
+      "dateText": "29.08.2026",
+      "time": "12:43",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": "חוטית נודדת",
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25831"
     }
   ]
 }
