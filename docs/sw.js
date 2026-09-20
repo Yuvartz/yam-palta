@@ -11,7 +11,7 @@
 //   • Google Fonts: cache-first (immutable files).
 // Bump VERSION on any shell change — activate cleans older yp-* caches (only ours: Cache Storage
 // is shared by every project on this GitHub Pages origin).
-const VERSION = "v11";
+const VERSION = "v12";
 const PREFIX = "yp-";
 const SHELL_CACHE = `${PREFIX}shell-${VERSION}`;
 const API_CACHE = `${PREFIX}api-${VERSION}`;
@@ -104,7 +104,9 @@ self.addEventListener("fetch", e => {
   if (req.mode === "navigate") {
     e.respondWith((async () => {
       try {
-        const res = await fetch(req);
+        // no-cache = revalidate with the server: GitHub Pages sends max-age=600, and Safari happily
+        // served a 10-minute-old page right after a deploy — "I tested and it's still broken".
+        const res = await fetch(req, { cache: "no-cache" });
         if (res && res.ok) {
           const copy = res.clone();
           e.waitUntil(caches.open(SHELL_CACHE).then(c => c.put("./", copy)));

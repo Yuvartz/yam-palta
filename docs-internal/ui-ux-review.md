@@ -104,3 +104,10 @@
 
 צילום המסך תויק ב-`files/reports/2026-09-20-iphone-camera-fail.jpeg`. ההודעה הישנה לא אמרה מה נכשל, ולכן אי אפשר לקבוע בוודאות; החשודים הסבירים ב-Safari של iOS: (1) פענוח קובץ ענק/HEIC מהמצלמה דרך `<img>` (12–48MP), (2) `roundRect` שחסר ב-Safari לפני 16.4, (3) canvas גדול. תיקונים: פענוח דרך `createImageBitmap` עם הקטנה בזמן הפענוח (נופל ל-`<img>` רק אם אין), polyfill ל-`roundRect`, `photoDims` תומך ב-ImageBitmap, והודעת שגיאה שמציגה את הסיבה בפועל + "צלם שוב" + אירוע `camera-error`. SW v11.
 אימות מקומי: תמונה סינתטית 4000×3000 → canvas 1600×1200, שיתוף פעיל; קובץ פגום → הודעה עם הסיבה. **צריך בדיקה חוזרת באייפון** — אם עדיין נכשל, הטקסט הקטן במודל אומר למה.
+
+## סבב 9 — האייפון עדיין נכשל; ייעוץ אסטרא (2026-09-20)
+
+- **מסקנה על "לא עובד" השני:** v11 היה באוויר, אבל הבעלים בדק ב-Safari (לא מותקן) ו-GitHub Pages שולח `max-age=600`; ה-SW ביקש navigation עם `fetch(req)` רגיל ולכן קיבל דף בן עד 10 דקות. תוקן: `fetch(req, {cache:"no-cache"})` ל-navigations (SW v12).
+- **אסטרא (Codex), דירוג סיבות ל-iOS:** (1) לחץ זיכרון בפענוח 24–48MP / HEIC — `createImageBitmap` + base64 מוסיפים באפרים; (2) canvas ריק/`toBlob` null בשקט תחת לחץ זיכרון; (3) תאימות ציור (`roundRect` נייטיב מ-16, לא 16.4 — כבר polyfilled). geolocation/fonts/SW לא סבירים (נתפסים). המלצה: `<img>` קודם (Safari מדגים-מטה JPEG ענק בעצמו), ציור פעם אחת ל-canvas מוגבל שמשמש כתמונת העבודה, בלי ImageBitmap/base64 כברירת מחדל, בדיקת context ופיקסל, deadlines.
+- **יושם:** `loadImage` חדש בסדר img→canvas≤1600 (בדיקת פיקסל לא-ריק) → ImageBitmap → data URL, כל שלב עם timeout 20 שנ׳ ורישום מה נוסה; `handleCameraFile` בשלבים (decode/locate/assets/render/encode) — איתור ונכסים לא קטלניים, ציור הכרטיס עם נפילה לכיתוב פשוט, בדיקת null מ-toBlob; הודעת שגיאה = שלב + סיבה + סביבה (build, iOS/Safari, מותקן/דפדפן, סוג וגודל הקובץ). `BUILD="v12"` מוצג בשורת הסביבה כדי לדעת איזו גרסה נבדקה.
+- אימות מקומי: 4032×3024 JPEG → canvas 1600×1200, שיתוף פעיל; קובץ פגום → "decode: cannot decode untyped — img:… | bitmap:… | dataurl:…" + סביבה.
