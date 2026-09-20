@@ -940,7 +940,7 @@
     </div>
   </div>
 
-  <script src="palata.js?v=32"></script>  <!-- query = build: fresh HTML never runs a stale cached palata.js -->
+  <script src="palata.js?v=33"></script>  <!-- query = build: fresh HTML never runs a stale cached palata.js -->
   <script>
   const App = (() => {
     "use strict";
@@ -1287,11 +1287,13 @@
       const windWave = ensemble(mh, "wind_wave_height", MARINE_MODELS, PART_TRUST);
       const swell = ensemble(mh, "swell_wave_height", MARINE_MODELS, PART_TRUST);
       const swellP = ensemble(mh, "swell_wave_period", MARINE_MODELS, PART_TRUST);
-      const sst = mh["sea_surface_temperature_marine_best_match"] || [];
+      // Only best_match publishes SST today; never depend on one key name (a rename would silently kill the water card).
+      const sstKey = Object.keys(mh).find(k => k.indexOf("sea_surface_temperature") === 0 && Array.isArray(mh[k]) && mh[k].some(v => v != null));
+      const sst = sstKey ? mh[sstKey] : [];
       const temp = ensemble(wh, "temperature_2m", WX_MODELS, WX_TRUST);
       const wind = ensemble(wh, "wind_speed_10m", WX_MODELS, WX_TRUST);
       const wdir = ensembleDir(wh, "wind_direction_10m", WX_MODELS, WX_TRUST);
-      const uv = ensemble(wh, "uv_index", WX_MODELS, WX_TRUST);
+      const uv = ensemble(wh, "uv_index", WX_MODELS, WX_MODELS);   // ECMWF/ICON publish no UV here → in practice GFS; no trusted-median claim
       const wIdx = {}; wh.time.forEach((t, i) => { wIdx[t] = i; });
       const sun = {};
       (sunData.daily?.time || []).forEach((d, i) => {
@@ -1312,23 +1314,17 @@
           waveN: wave.cnt[i], windN: j != null ? wind.cnt[j] : 0,
         };
       });
-      return { hourly: tagHours(hourlyOut), sun, stale, fetchedAt };
+      const gridKm = Number.isFinite(marine.latitude) && Number.isFinite(marine.longitude) ? haversine(loc.lat, loc.lon, marine.latitude, marine.longitude) : null;
+      return { hourly: tagHours(hourlyOut), sun, stale, fetchedAt, gridKm };
     }
 
-    // Light single-model fetch (best_match) for the all-locations weekly alert scan.
+    // Light fetch for the all-locations weekly alert scan — the SHARED recipe (Palata.recipeUrls), so the
+    // 🔥 banner, the SEO beach pages and the push Worker all score exactly the inputs the beach page shows.
     async function fetchSingle(loc) {
-      const common = `latitude=${loc.lat}&longitude=${loc.lon}&timezone=Asia%2FJerusalem&forecast_days=7&past_days=7`;
+      const u = Palata.recipeUrls(loc.lat, loc.lon, { forecastDays: 7, pastDays: 7 });
       const ok = r => { if (!r.ok) throw new Error(`alert-scan fetch failed (${r.status})`); return r.json(); };
-      const [marine, weather] = await Promise.all([
-        fetch(`https://marine-api.open-meteo.com/v1/marine?${common}&hourly=wave_height,wind_wave_height,sea_surface_temperature`).then(ok),
-        fetch(`https://api.open-meteo.com/v1/forecast?${common}&hourly=wind_speed_10m`).then(ok),
-      ]);
-      const wIdx = {}; weather.hourly.time.forEach((t, i) => { wIdx[t] = i; });
-      return tagHours(marine.hourly.time.map((t, i) => { const j = wIdx[t]; return {
-        time: t, dateStr: t.slice(0, 10), hour: parseInt(t.slice(11, 13), 10),
-        waveHeight: marine.hourly.wave_height?.[i] ?? null, windWave: marine.hourly.wind_wave_height?.[i] ?? null,
-        seaTemp: marine.hourly.sea_surface_temperature?.[i] ?? null, wavePeriod: null,
-        windKmh: j != null ? weather.hourly.wind_speed_10m[j] : null }; }));
+      const [marine, weather] = await Promise.all([fetch(u.marine).then(ok), fetch(u.weather).then(ok)]);
+      return tagHours(Palata.blendHourly(marine, weather).hours.map(h => ({ ...h, wavePeriod: null })));
     }
 
 
@@ -1446,11 +1442,13 @@
     function buoyInfo(ref) {
       if (!buoy || !buoy.measured || buoy.measured.waveHeight == null || !buoy.station) return null;
       const m = buoy.measured, age = hoursSince(m.measuredAt);
-      if (age > 6) return null;
+      if (age > 9) return null;   // ISRAMAR publishes hourly but our mirrors lag 2–5 h; beyond 9 h it is history, not a reading
       const loc = allLocations()[LS.loc];
       if (!loc) return null;
       const dist = haversine(loc.lat, loc.lon, buoy.station.lat, buoy.station.lon);
-      if (dist > 150) return null;
+      const reach = buoy.station.reachKm || 60;   // Hs is alongshore-uniform on the open coast, not 150 km away
+      if (dist > reach) return null;
+      if (buoy.station.openCoast !== false && loc.lat > 32.75 && loc.lon > 34.93) return null;   // Haifa Bay is sheltered from an open-coast buoy
       const meas = m.waveHeight, fc = ref && ref.waveHeight != null ? ref.waveHeight : null;
       const kind = fc != null && meas - fc >= 0.3 ? "warn" : fc != null && fc - meas >= 0.3 ? "lower" : "ok";
       return { meas, fc, kind, dist: Math.round(dist), age: Math.round(age) };
@@ -2035,9 +2033,13 @@
     // by the buoy GitHub Action (same-origin, no CORS — same pattern as the jellyfish feed).
     async function loadBuoy() {
       try {
-        const res = await fetch("data/hadera-waves.json?v=" + Math.floor(Date.now() / 3600000), { cache: "no-cache" });
+        const loc = allLocations()[LS.loc] || BUILTIN.telaviv;
+        let res = null;
+        if (PUSH.apiUrl) { try { res = await fetch(`${PUSH.apiUrl}/buoy?lat=${loc.lat.toFixed(3)}&lon=${loc.lon.toFixed(3)}`); if (!res.ok) res = null; } catch (e) { res = null; } }
+        if (!res) res = await fetch("data/hadera-waves.json?v=" + Math.floor(Date.now() / 3600000), { cache: "no-cache" });
         if (!res.ok) return;
-        buoy = await res.json(); patchBuoyLine();
+        const b = await res.json();
+        if (b && b.measured) { buoy = b; patchBuoyLine(); }
       } catch (e) { console.warn("buoy feed failed", e); }
     }
     // Swap only the buoy sentence inside the hero instead of rebuilding the whole scene.
@@ -2062,7 +2064,8 @@
     function climCoords(loc) {
       // Nudge into open water so the archive grid cell isn't land-masked. Med coast: sea is to the west.
       // Eilat/Nuweiba (Red Sea, lat < 30.5): the gulf point resolves fine on its own.
-      return loc.lat >= 30.5 ? { lat: loc.lat, lon: loc.lon - 0.12 } : { lat: loc.lat, lon: loc.lon };
+      const israelMed = loc.lat >= 31.2 && loc.lat <= 33.3 && loc.lon >= 34.2 && loc.lon <= 35.3;
+      return israelMed ? { lat: loc.lat, lon: loc.lon - 0.12 } : { lat: loc.lat, lon: loc.lon };
     }
     async function loadClimatology() {
       const key = LS.loc, loc = allLocations()[key]; if (!loc) return;
@@ -2106,6 +2109,7 @@
 
     function renderStreak() { const s = streakCount(), b = $("streak"); if (s >= 1) { b.classList.add("on"); $("streakN").textContent = s; } else b.classList.remove("on"); }
     let dataStale = false;   // current view comes from the service-worker's cached fallback
+    let forecastGridKm = null;   // distance from the beach to the sea grid cell the marine model actually used
     function israelTimeOf(date) {
       const s = new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Jerusalem", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).format(date);
       return { dateStr: s.slice(0, 10), hour: parseInt(s.slice(11, 13), 10), minute: parseInt(s.slice(14, 16), 10) };
@@ -2117,7 +2121,7 @@
         ? `<span style="color:#f0a55a">⚠️ אין חיבור — מוצגת התחזית השמורה מ-${when}</span> · <a href="#" onclick="App.refresh();return false">נסה שוב</a>`
         : refreshFailed
         ? `<span style="color:#f0a55a">⚠️ הרענון נכשל — מוצגת התחזית מ-${when}</span> · <a href="#" onclick="App.refresh();return false">נסה שוב</a>`
-        : `עודכן לאחרונה ${when} · מקור: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>`;
+        : `עודכן לאחרונה ${when} · מקור: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>${forecastGridKm != null && forecastGridKm >= 8 ? ` · נקודת התחזית בים, כ-<span class="num">${Math.round(forecastGridKm)}</span> ק״מ מהחוף` : ""}`;
     }
     // renderHero() already draws the jellyfish chip — only the report list is rendered again here
     // (renderJelly() used to rebuild the hero a second time, restarting every wave animation).
@@ -2619,7 +2623,7 @@
     }
     const pad2 = pad;
     // Environment line for error reports: build, OS, file facts.
-    const BUILD = "v32";
+    const BUILD = "v33";
     function camEnv(file, extra) {
       const ua = navigator.userAgent, ios = ua.match(/OS (\d+)_(\d+)/), sfv = ua.match(/Version\/(\d+(?:\.\d+)?)/);
       const os = ios ? `iOS ${ios[1]}.${ios[2]}` : /Android/.test(ua) ? "Android" : "desktop";
@@ -2895,12 +2899,12 @@
       const seq = ++loadSeq, locKey = LS.loc;
       try {
         const loc = allLocations()[locKey] || BUILTIN.telaviv;
-        const { hourly: data, sun, stale, fetchedAt } = await fetchLocation(loc);
+        const { hourly: data, sun, stale, fetchedAt, gridKm } = await fetchLocation(loc);
         // The user may have switched beach while we awaited — never let the older response
         // overwrite the newer beach's view, and always cache under the key it was fetched for.
         dataCache[locKey] = data;
         if (seq !== loadSeq) return;
-        hourly = data; dailySun = sun; scoreReveal = true; dataStale = !!stale; refreshFailed = false;
+        hourly = data; dailySun = sun; scoreReveal = true; dataStale = !!stale; refreshFailed = false; forecastGridKm = gridKm;
         // A cached fallback keeps the page useful but is NOT "updated now": keep the real fetch time
         // for the footer and leave lastLoadTs old so the next focus retries the network.
         if (stale) { const d = fetchedAt ? new Date(fetchedAt) : null; lastUpdatedAt = d && !isNaN(d) ? israelTimeOf(d) : lastUpdatedAt; }

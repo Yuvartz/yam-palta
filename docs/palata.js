@@ -81,10 +81,63 @@
     body: `ב${beach} צפוי ים רגוע ⁦${pad(s)}:00–${pad(e)}:00⁩. נכין מגבת לבוקר?`,   // LRI…PDI: the range stays LTR inside RTL notification text
   });
 
+  // ---------- Forecast recipe (shared by the app's scan, the SEO beach pages and the push Worker) ----------
+  // One definition of WHICH models feed the index, so every surface scores the same inputs:
+  //   wave height  = median(Météo-France MFWAM, ECMWF-WAM)      wind waves = MFWAM (ECMWF has no partition)
+  //   wind 10 m    = median(ECMWF-IFS 0.25°, DWD ICON)          SST        = Open-Meteo best_match (the only model publishing it)
+  // The formula itself (scoreOf) is untouched; this only fixes the inputs and the trailing wind history.
+  const RECIPE = { waveModels: ["meteofrance_wave", "ecmwf_wam"], partModel: "meteofrance_wave", windModels: ["ecmwf_ifs025", "icon_seamless"] };
+  const median = vals => { const a = (vals || []).filter(v => v != null && isFinite(v)).sort((x, y) => x - y); if (!a.length) return null; const m = a.length >> 1; return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2; };
+  function recipeUrls(lat, lon, opts) {
+    const o = opts || {}, fd = o.forecastDays || 7, pd = o.pastDays == null ? 1 : o.pastDays;
+    const common = `latitude=${lat}&longitude=${lon}&timezone=Asia%2FJerusalem&forecast_days=${fd}&past_days=${pd}`;
+    return {
+      marine: `https://marine-api.open-meteo.com/v1/marine?${common}&hourly=wave_height,wind_wave_height,sea_surface_temperature&models=best_match,${RECIPE.waveModels.join(",")}`,
+      weather: `https://api.open-meteo.com/v1/forecast?${common}&hourly=wind_speed_10m&models=${RECIPE.windModels.join(",")}`,
+      sun: `https://api.open-meteo.com/v1/forecast?${common}&daily=sunrise,sunset`,
+    };
+  }
+  // First hourly column whose name starts with `base` and that has at least one real value — keys are
+  // suffixed per model (`wave_height_ecmwf_wam`, `sea_surface_temperature_marine_best_match`…).
+  const colsFor = (hourly, base, models) => models.map(m => hourly[`${base}_${m}`]).filter(Array.isArray);
+  const allCols = (hourly, base) => Object.keys(hourly).filter(k => k === base || k.indexOf(base + "_") === 0).map(k => hourly[k]).filter(Array.isArray);
+  const anyCol = (hourly, base) => allCols(hourly, base).find(c => c.some(v => v != null)) || null;
+  // marine/weather = raw Open-Meteo JSON from recipeUrls(). Returns plain hours with the four scoring inputs
+  // + seaTemp, plus `grid` = the sea cell the marine model actually used (the coast point is often land).
+  function blendHourly(marine, weather) {
+    const mh = marine && marine.hourly, wh = weather && weather.hourly;
+    if (!mh || !wh || !Array.isArray(mh.time) || !Array.isArray(wh.time)) throw new Error("open-meteo payload malformed");
+    const waveCols = colsFor(mh, "wave_height", RECIPE.waveModels), waveFb = allCols(mh, "wave_height");
+    const partCols = colsFor(mh, "wind_wave_height", [RECIPE.partModel]), partFb = allCols(mh, "wind_wave_height");
+    const sst = anyCol(mh, "sea_surface_temperature") || [];
+    const windCols = colsFor(wh, "wind_speed_10m", RECIPE.windModels), windFb = allCols(wh, "wind_speed_10m");
+    const wIdx = {}; wh.time.forEach((t, i) => { wIdx[t] = i; });
+    // trusted median for that hour; if none of the trusted models has a value, the median of whatever models do
+    const pick = (cols, fb, i) => { const v = median(cols.map(c => c[i])); return v != null ? v : median(fb.map(c => c[i])); };
+    const hours = mh.time.map((t, i) => { const j = wIdx[t]; return {
+      time: t, dateStr: t.slice(0, 10), hour: parseInt(t.slice(11, 13), 10),
+      waveHeight: pick(waveCols, waveFb, i), windWave: pick(partCols, partFb, i), seaTemp: sst[i] == null ? null : sst[i],
+      windKmh: j == null ? null : pick(windCols, windFb, j),
+    }; });
+    return { hours, grid: { lat: marine.latitude, lon: marine.longitude } };
+  }
+  // Attach `score` to each hour: wind history = trailing HISTORY_HOURS mean, chop = wind waves (or total height).
+  function scoreSeries(hours) {
+    const H = HISTORY_HOURS;
+    hours.forEach((h, i) => {
+      const wind = toKnots(h.windKmh);
+      const sl = hours.slice(Math.max(0, i - (H - 1)), i + 1).map(x => x.windKmh).filter(v => v != null);
+      const hist = sl.length ? toKnots(sl.reduce((a, b) => a + b, 0) / sl.length) : wind;
+      h.score = scoreOf(h.waveHeight, h.windWave != null ? h.windWave : h.waveHeight, wind, hist);
+    });
+    return hours;
+  }
+
   return {
     KMH_PER_KNOT, toKnots, clamp01,
     WEIGHTS, HISTORY_HOURS, chopScoreFn, windScoreFn, heightScoreFn, heightTierCap, scoreOf,
     TIERS, CALM_MIN, DELUXE_MIN,
     notifyCopy, eveningCopy,
+    RECIPE, median, recipeUrls, blendHourly, scoreSeries,
   };
 });

@@ -79,3 +79,26 @@ test("calmRunAt returns the run containing the index only", () => {
   assert.deepEqual(calmRunAt(sc, 7, Palata.CALM_MIN), { start: 6, end: 7, hours: 2 });
   assert.equal(calmRunAt(sc, 9, Palata.CALM_MIN), null);
 });
+
+// ---- shared forecast recipe (palata.js) ----
+test("blendHourly takes the median of the trusted models and falls back per hour", () => {
+  const marine = { latitude: 32.04, longitude: 34.71, hourly: {
+    time: ["2026-09-21T06:00", "2026-09-21T07:00"],
+    wave_height_meteofrance_wave: [0.4, null], wave_height_ecmwf_wam: [0.6, null], wave_height_best_match: [0.9, 0.7],
+    wind_wave_height_meteofrance_wave: [0.1, 0.2], sea_surface_temperature_best_match: [28.5, 28.4] } };
+  const weather = { hourly: { time: ["2026-09-21T06:00", "2026-09-21T07:00"], wind_speed_10m_ecmwf_ifs025: [10, 12], wind_speed_10m_icon_seamless: [14, null] } };
+  const { hours, grid } = Palata.blendHourly(marine, weather);
+  assert.equal(hours[0].waveHeight, 0.5);      // median(0.4, 0.6), best_match ignored when trusted models exist
+  assert.equal(hours[1].waveHeight, 0.7);      // both trusted null → best_match fallback
+  assert.equal(hours[0].windKmh, 12);          // median(10, 14)
+  assert.equal(hours[1].windKmh, 12);          // single model left
+  assert.equal(hours[0].seaTemp, 28.5); assert.equal(hours[0].windWave, 0.1);
+  assert.deepEqual(grid, { lat: 32.04, lon: 34.71 });
+  Palata.scoreSeries(hours);
+  assert.ok(hours.every(h => Number.isInteger(h.score)));
+});
+test("recipeUrls pins the models on every surface", () => {
+  const u = Palata.recipeUrls(32.08, 34.76, { forecastDays: 3, pastDays: 1 });
+  assert.match(u.marine, /models=best_match,meteofrance_wave,ecmwf_wam/); assert.match(u.weather, /models=ecmwf_ifs025,icon_seamless/);
+  assert.match(u.marine, /forecast_days=3&past_days=1/); assert.doesNotMatch(u.sun, /models=/);
+});

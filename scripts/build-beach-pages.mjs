@@ -32,23 +32,20 @@ const israelNow = () => { const s = new Intl.DateTimeFormat("sv-SE", { timeZone:
 const dayName = ds => HE_DAYS[new Date(ds + "T12:00:00Z").getUTCDay()];
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
+// Same recipe as the app and the push Worker (Palata.recipeUrls / blendHourly / scoreSeries): the static
+// page must show the number the app shows for that hour. Wave period is display-only, fetched on top.
 async function forecast(b) {
-  const common = `latitude=${b.lat}&longitude=${b.lon}&timezone=Asia%2FJerusalem&forecast_days=4&past_days=1`;
-  const [m, w] = await Promise.all([
-    fetch(`https://marine-api.open-meteo.com/v1/marine?${common}&hourly=wave_height,wind_wave_height,wave_period,sea_surface_temperature`).then(r => r.json()),
-    fetch(`https://api.open-meteo.com/v1/forecast?${common}&hourly=wind_speed_10m&daily=sunrise,sunset`).then(r => r.json()),
+  const u = Palata.recipeUrls(b.lat, b.lon, { forecastDays: 4, pastDays: 1 });
+  const j = r => { if (!r.ok) throw new Error(`open-meteo ${r.status}`); return r.json(); };
+  const [m, w, s, per] = await Promise.all([
+    fetch(u.marine).then(j), fetch(u.weather).then(j), fetch(u.sun).then(j),
+    fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${b.lat}&longitude=${b.lon}&timezone=Asia%2FJerusalem&forecast_days=4&past_days=1&hourly=wave_period&models=${Palata.RECIPE.waveModels.join(",")}`).then(j).catch(() => null),
   ]);
-  if (!m.hourly || !w.hourly) throw new Error("bad payload");
-  const wi = new Map(w.hourly.time.map((t, i) => [t, i]));
-  const hours = m.hourly.time.map((t, i) => { const j = wi.get(t); return { time: t, dateStr: t.slice(0, 10), hour: +t.slice(11, 13), waveHeight: m.hourly.wave_height?.[i] ?? null, windWave: m.hourly.wind_wave_height?.[i] ?? null, period: m.hourly.wave_period?.[i] ?? null, seaTemp: m.hourly.sea_surface_temperature?.[i] ?? null, windKmh: j != null ? w.hourly.wind_speed_10m?.[j] ?? null : null }; });
-  const H = Palata.HISTORY_HOURS;
-  hours.forEach((h, i) => {
-    const wind = Palata.toKnots(h.windKmh);
-    const sl = hours.slice(Math.max(0, i - (H - 1)), i + 1).map(x => x.windKmh).filter(v => v != null);
-    const hist = sl.length ? Palata.toKnots(sl.reduce((a, b) => a + b, 0) / sl.length) : wind;
-    h.score = Palata.scoreOf(h.waveHeight, h.windWave != null ? h.windWave : h.waveHeight, wind, hist);
-  });
-  const sun = {}; (w.daily?.time || []).forEach((d, i) => { sun[d] = { rise: w.daily.sunrise[i]?.slice(11, 16), set: w.daily.sunset[i]?.slice(11, 16) }; });
+  const { hours } = Palata.blendHourly(m, w);
+  const pIdx = new Map((per?.hourly?.time || []).map((t, i) => [t, i]));
+  hours.forEach(h => { const i = pIdx.get(h.time); h.period = i == null ? null : Palata.median(Palata.RECIPE.waveModels.map(k => per.hourly[`wave_period_${k}`]?.[i])); });
+  Palata.scoreSeries(hours);
+  const sun = {}; (s.daily?.time || []).forEach((d, i) => { sun[d] = { rise: s.daily.sunrise[i]?.slice(11, 16), set: s.daily.sunset[i]?.slice(11, 16) }; });
   return { hours, sun };
 }
 function daylight(h, sun) { const s = sun[h.dateStr]; const a = s && s.rise ? +s.rise.slice(0, 2) : 6, b = s && s.set ? +s.set.slice(0, 2) : 19; return h.hour >= a && h.hour < b; }

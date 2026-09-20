@@ -39,20 +39,38 @@ async function sendPush(env, sub, payload) {
   return res.status;   // 201 accepted; 404/410 gone
 }
 
-// ---------- forecast (single best_match model — same inputs the sender always used) ----------
+// ---------- forecast: the SHARED recipe (Palata.recipeUrls/blendHourly) → same model medians as the app ----------
 async function fetchForecast(lat, lon) {
-  const common = `latitude=${lat}&longitude=${lon}&timezone=Asia%2FJerusalem&forecast_days=3&past_days=1`;
-  const [m, w] = await Promise.all([
-    fetch(`https://marine-api.open-meteo.com/v1/marine?${common}&hourly=wave_height,wind_wave_height,sea_surface_temperature`, { cf: { cacheTtl: 600 } }),
-    fetch(`https://api.open-meteo.com/v1/forecast?${common}&hourly=wind_speed_10m`, { cf: { cacheTtl: 600 } }),
-  ]);
+  const u = Palata.recipeUrls(lat, lon, { forecastDays: 3, pastDays: 1 });
+  const [m, w] = await Promise.all([fetch(u.marine, { cf: { cacheTtl: 600 } }), fetch(u.weather, { cf: { cacheTtl: 600 } })]);
   if (!m.ok || !w.ok) throw new Error(`open-meteo ${m.status}/${w.status}`);
   const [mj, wj] = await Promise.all([m.json(), w.json()]);
-  if (!mj.hourly || !wj.hourly) throw new Error("open-meteo payload malformed");
-  const wIdx = new Map(wj.hourly.time.map((t, i) => [t, i]));
-  return mj.hourly.time.map((t, i) => { const j = wIdx.get(t); return {
-    time: t, waveHeight: mj.hourly.wave_height?.[i] ?? null, windWave: mj.hourly.wind_wave_height?.[i] ?? null,
-    seaTemp: mj.hourly.sea_surface_temperature?.[i] ?? null, windKmh: j != null ? wj.hourly.wind_speed_10m?.[j] ?? null : null }; });
+  return Palata.blendHourly(mj, wj).hours;
+}
+
+// ---------- ISRAMAR buoys: GET /buoy?lat&lon → nearest fresh station (15-min edge cache; the GitHub mirror lags hours) ----------
+const BUOYS = [
+  { id: "hadera", name: "מצוף חדרה", lat: 32.470, lon: 34.880, reachKm: 60, openCoast: true, src: "https://isramar.ocean.org.il/isramar2009/station/data/Hadera_Hs_Per.json", page: "https://isramar.ocean.org.il/isramar2009/station/HaderaRDI.aspx" },
+  { id: "shikmona", name: "מצוף שקמונה (חיפה)", lat: 32.830, lon: 34.950, reachKm: 25, openCoast: false, src: "https://isramar.ocean.org.il/isramar2009/station/data/ShikBuoy_HS_Per.json", page: "https://isramar.ocean.org.il/isramar2009/station/shikmonaBuoyM.aspx" },
+];
+const haversine = (a, b, c, d) => { const R = 6371, r = x => x * Math.PI / 180, x = Math.sin(r(c - a) / 2) ** 2 + Math.cos(r(a)) * Math.cos(r(c)) * Math.sin(r(d - b) / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(x)); };
+const pickParam = (params, name) => { const p = (params || []).find(x => x.name === name); const v = p && Array.isArray(p.values) ? Number(p.values[0]) : NaN; return Number.isFinite(v) && v >= 0 && v < 30 ? v : null; };
+const isoOf = dt => { const m = /(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})/.exec(dt || ""); return m ? `${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:00Z` : null; };
+async function readBuoy(st) {
+  const r = await fetch(st.src, { cf: { cacheTtl: 900, cacheEverything: true }, headers: { "user-agent": "YamPlata/1.0 (+https://yamplata.com)" } });
+  if (!r.ok) return null;
+  const raw = await r.json().catch(() => null); if (!raw) return null;
+  const measured = { waveHeight: pickParam(raw.parameters, "Significant wave height"), wavePeriod: pickParam(raw.parameters, "Peak wave period"), waveMax: pickParam(raw.parameters, "Maximal wave height"), measuredAt: isoOf(raw.datetime) };
+  if (measured.waveHeight == null || !measured.measuredAt) return null;
+  return { updated: new Date().toISOString(), source: `ISRAMAR — ${st.name}`, sourceUrl: st.page, station: { name: st.name, lat: st.lat, lon: st.lon, reachKm: st.reachKm, openCoast: st.openCoast }, measured };
+}
+async function nearestBuoy(lat, lon, maxAgeH = 9) {
+  const cands = BUOYS.map(st => ({ st, d: haversine(lat, lon, st.lat, st.lon) })).filter(c => c.d <= c.st.reachKm).sort((a, b) => a.d - b.d);
+  for (const c of cands) {
+    const b = await readBuoy(c.st).catch(() => null);
+    if (b && (Date.now() - Date.parse(b.measured.measuredAt)) / 36e5 <= maxAgeH) return { ...b, distanceKm: Math.round(c.d) };
+  }
+  return null;
 }
 
 // ---------- API ----------
@@ -74,6 +92,12 @@ async function handleFetch(req, env) {
       break;
     }
     return json({ url: cur }, 200, headers);
+  }
+  if (url.pathname === "/buoy" && req.method === "GET") {
+    const lat = Number(url.searchParams.get("lat")), lon = Number(url.searchParams.get("lon"));
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) return json({ error: "bad coords" }, 400, headers);
+    const b = await nearestBuoy(lat, lon);
+    return b ? json(b, 200, { ...headers, "cache-control": "public, max-age=300" }) : json({ error: "no fresh buoy in reach" }, 404, headers);
   }
   if (url.pathname === "/health") {
     const list = await env.SUBS.list({ prefix: "sub:", limit: 1000 });
