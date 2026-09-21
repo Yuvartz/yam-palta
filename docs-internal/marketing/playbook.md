@@ -5,7 +5,7 @@ Distilled from `docs-internal/codex-marketing-plan-2026-09-20.md` (Astra's full 
 
 ## Brand in one breath
 - **Product**: yamplata.com, Hebrew PWA. A 0–10 "Palata index" of how FLAT the sea is, per beach, hour by hour, a week ahead, with push alerts when it goes flat. For swimmers, snorkelers, SUP, parents, floaters. The opposite of a surf app.
-- **Name**: always **YAM PLATA** in Latin letters, ים פלטה in Hebrew. Handle everywhere: **@yamplata**.
+- **Name**: always **YAM PLATA** in Latin letters, ים פלטה in Hebrew. Handle everywhere: **@yamplata** if free; on 2026-09-21 `@yamplata` was already taken on TikTok (a private person), so check every network first and pick ONE consistent fallback (e.g. `@yam.plata` or `@yamplata.app`) before opening any account.
 - **Tagline (owner's, locked)**: הם מחפשים גלים. אנחנו מחפשים פלטה. פחות גלים. יותר ים.
 - **Tiers**: פלטה דלוקס (≥9.8) · ים פלטה (≥9.0) · כמעט פלטה (≥8.0) · גלים קלים · יש גלים · גלים גדולים · וואלאק סוער. 8.0 is "the bar".
 - **Voice rules** (Astra): פלטה היא הרצון, הנתונים מסבירים מתי · עוקצים גולשים בחיבה, בלי להבטיח חוף בלעדיהם · משפטים קצרים, עברית של חוף · מזמינים למים, לעולם לא מבטיחים בטיחות · מבדילים בין תחזית, מדידה וחוסר נתונים.
