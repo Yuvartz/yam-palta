@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0a0e16" />
+<title>לוח הבקרה · YAM PLATA</title>
+<link rel="icon" href="/favicon.ico" />
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet" />
+<style>
+  /* Owner's control panel. Reads only public/live data: the app's own forecast recipe (Open-Meteo), the
+     data feeds in /data, the push Worker's aggregate /health and /buoy, and GoatCounter with a token that
+     stays in THIS browser's localStorage. Nothing here is written anywhere. */
+  :root { --bg: #0a0e16; --card: #141b2a; --line: rgba(148,178,255,.10); --text: #e6edf6; --muted: #8a98ad; --calm: #2dd4bf; --gold: #ffd479; --ok: #2dd4bf; --warn: #f0a55a; --bad: #f06a6a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: radial-gradient(1200px 600px at 80% -10%, rgba(45,212,191,.10), transparent 60%), radial-gradient(900px 500px at 0% 40%, rgba(183,156,255,.08), transparent 60%), var(--bg); color: var(--text); font-family: Heebo, system-ui, sans-serif; line-height: 1.5; padding: 20px 16px 60px; }
+  .num { font-family: "JetBrains Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+  header h1 { margin: 0; font-size: 26px; font-weight: 900; display: flex; align-items: center; gap: 12px; }
+  header h1 img { width: 44px; height: 44px; border-radius: 12px; }
+  header h1 span { font-family: "JetBrains Mono", monospace; letter-spacing: 3px; font-size: 16px; color: var(--muted); font-weight: 700; }
+  .meta { color: var(--muted); font-size: 13px; }
+  .btn { background: linear-gradient(180deg, rgba(45,212,191,.18), rgba(45,212,191,.06)); border: 1px solid rgba(45,212,191,.45); color: var(--calm); padding: 9px 16px; border-radius: 12px; font: inherit; font-weight: 800; cursor: pointer; }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-bottom: 18px; }
+  .card { background: linear-gradient(180deg, rgba(20,27,42,.95), rgba(20,27,42,.75)); border: 1px solid var(--line); border-radius: 20px; padding: 16px 18px; box-shadow: 0 20px 50px rgba(0,0,0,.25); position: relative; }
+  .card h3 { margin: 0 0 8px; font-size: 14px; color: #aab8ce; font-weight: 800; letter-spacing: .4px; display: flex; align-items: center; gap: 8px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); box-shadow: 0 0 0 3px rgba(255,255,255,.04); flex: 0 0 auto; }
+  .dot.ok { background: var(--ok); box-shadow: 0 0 12px rgba(45,212,191,.6); } .dot.warn { background: var(--warn); box-shadow: 0 0 12px rgba(240,165,90,.5); } .dot.bad { background: var(--bad); box-shadow: 0 0 12px rgba(240,106,106,.5); }
+  .big { font-size: 34px; font-weight: 800; line-height: 1.1; margin: 4px 0 2px; }
+  .sub { color: var(--muted); font-size: 13px; }
+  .sub b { color: var(--text); font-weight: 700; }
+  section { margin-bottom: 26px; }
+  section > h2 { font-size: 17px; font-weight: 900; margin: 0 0 10px; display: flex; align-items: center; gap: 10px; }
+  section > h2::before { content: ""; width: 4px; height: 16px; border-radius: 99px; background: linear-gradient(180deg, var(--calm), #b79cff); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { padding: 9px 8px; border-bottom: 1px solid rgba(255,255,255,.06); text-align: right; vertical-align: middle; white-space: nowrap; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; }
+  tr:last-child td { border-bottom: 0; }
+  .score { font-family: "JetBrains Mono", monospace; font-weight: 800; font-size: 20px; direction: ltr; unicode-bidi: isolate; }
+  .tier { font-weight: 800; font-size: 13px; }
+  .bars { display: inline-flex; align-items: flex-end; gap: 2px; height: 26px; direction: rtl; vertical-align: middle; }
+  .bars i { display: block; width: 6px; border-radius: 2px 2px 1px 1px; min-height: 2px; opacity: .95; }
+  .bars i.best { outline: 1px solid #fff4; }
+  .tablecard { padding: 6px 10px; overflow-x: auto; }
+  .kv { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 13px; }
+  .kv span:first-child { color: var(--muted); }
+  input[type=password], input[type=text] { width: 100%; background: rgba(255,255,255,.04); border: 1px solid var(--line); color: var(--text); border-radius: 10px; padding: 9px 12px; font: inherit; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .links a { display: inline-block; margin: 4px 0 4px 8px; padding: 7px 12px; border-radius: 10px; background: rgba(255,255,255,.04); border: 1px solid var(--line); color: var(--text); text-decoration: none; font-size: 13px; }
+  .links a:hover { border-color: rgba(45,212,191,.5); color: var(--calm); }
+  .err { color: var(--bad); font-size: 12px; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 760px) { .two { grid-template-columns: 1fr; } .big { font-size: 28px; } }
+  .skeleton { color: var(--muted); }
+  .path { direction: ltr; unicode-bidi: isolate; font-family: "JetBrains Mono", monospace; font-size: 12px; color: #c9d3e0; }
+  footer { color: var(--muted); font-size: 12px; margin-top: 20px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><img src="/img/ui/logo-tile.png" alt="" /> לוח הבקרה <span>YAM PLATA</span></h1>
+    <div class="row"><span class="meta" id="stamp">טוען…</span><button class="btn" id="refresh">רענון</button></div>
+  </header>
+
+  <section>
+    <h2>מצב המערכת</h2>
+    <div class="grid">
+      <div class="card" id="cSite"><h3><i class="dot"></i> האתר</h3><div class="big skeleton">…</div><div class="sub"></div></div>
+      <div class="card" id="cPush"><h3><i class="dot"></i> התראות (Worker)</h3><div class="big skeleton">…</div><div class="sub"></div></div>
+      <div class="card" id="cBuoy"><h3><i class="dot"></i> מצוף חדרה</h3><div class="big skeleton">…</div><div class="sub"></div></div>
+      <div class="card" id="cJelly"><h3><i class="dot"></i> מדוזות</h3><div class="big skeleton">…</div><div class="sub"></div></div>
+      <div class="card" id="cPages"><h3><i class="dot"></i> עמודי חופים (SEO)</h3><div class="big skeleton">…</div><div class="sub"></div></div>
+      <div class="card" id="cEn"><h3><i class="dot"></i> גרסה אנגלית</h3><div class="big skeleton">…</div><div class="sub"></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>הים עכשיו <span class="meta" id="seaMeta"></span></h2>
+    <div class="card tablecard">
+      <table id="sea"><thead><tr><th>חוף</th><th>מדד עכשיו</th><th>דרגה</th><th>גל</th><th>רוח</th><th>מים</th><th>מחר בבוקר</th><th>מחר 06–19</th></tr></thead><tbody><tr><td colspan="8" class="skeleton">טוען תחזיות מ-Open-Meteo, אותו מתכון כמו באפליקציה…</td></tr></tbody></table>
+    </div>
+  </section>
+
+  <div class="two">
+    <section>
+      <h2>מנויים להתראות</h2>
+      <div class="card" id="cSubs"><div class="kv skeleton">טוען…</div></div>
+    </section>
+    <section>
+      <h2>ריצת ההתראות האחרונה</h2>
+      <div class="card" id="cCron"><div class="kv skeleton">טוען…</div></div>
+    </section>
+  </div>
+
+  <section>
+    <h2>אנליטיקס (GoatCounter)</h2>
+    <div class="card" id="cGc">
+      <div class="row" id="gcAuth">
+        <input type="password" id="gcToken" placeholder="הדבק כאן API token מ-GoatCounter (הגדרות ← API tokens, הרשאת Read statistics). נשמר רק בדפדפן הזה." />
+        <button class="btn" id="gcSave">שמור</button>
+        <a class="meta" href="https://yuvartz.goatcounter.com/user/api" target="_blank" rel="noopener">איפה מייצרים token?</a>
+      </div>
+      <div id="gcBody" class="skeleton" style="margin-top:10px"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>קישורים מהירים</h2>
+    <div class="card links">
+      <a href="https://yamplata.com/" target="_blank" rel="noopener">האפליקציה</a>
+      <a href="https://yamplata.com/en/" target="_blank" rel="noopener">English</a>
+      <a href="https://yuvartz.goatcounter.com/" target="_blank" rel="noopener">GoatCounter</a>
+      <a href="https://search.google.com/search-console" target="_blank" rel="noopener">Search Console</a>
+      <a href="https://dash.cloudflare.com/" target="_blank" rel="noopener">Cloudflare (דומיין + Worker)</a>
+      <a href="https://github.com/Yuvartz/yam-palta/actions" target="_blank" rel="noopener">GitHub Actions (פידים)</a>
+      <a href="https://yam-palata-push.yam-palata-push.workers.dev/health" target="_blank" rel="noopener">Worker /health</a>
+      <a href="https://yamplata.com/sitemap.xml" target="_blank" rel="noopener">sitemap.xml</a>
+      <a href="https://isramar.ocean.org.il/isramar2009/station/HaderaRDI.aspx" target="_blank" rel="noopener">ISRAMAR חדרה</a>
+    </div>
+  </section>
+  <footer>הלוח קורא נתונים בלבד ולא משנה דבר. תחזיות: Open-Meteo (אותו מתכון כמו באפליקציה). מצוף: ISRAMAR דרך ה-Worker. הטוקן של GoatCounter נשמר רק במכשיר הזה.</footer>
+</div>
+
+<script src="/palata.js?v=33"></script>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const PUSH_API = "https://yam-palata-push.yam-palata-push.workers.dev";
+  const GC = "https://yuvartz.goatcounter.com";
+  const BEACHES = [
+    { key: "akko", name: "עכו", lat: 32.9270, lon: 35.0690 }, { key: "haifa", name: "חיפה", lat: 32.8275, lon: 34.9897 },
+    { key: "caesarea", name: "קיסריה", lat: 32.4860, lon: 34.8820 }, { key: "netanya", name: "נתניה", lat: 32.3215, lon: 34.8532 },
+    { key: "herzliya", name: "הרצליה", lat: 32.1624, lon: 34.7990 }, { key: "telaviv", name: "תל אביב", lat: 32.0809, lon: 34.7610 },
+    { key: "batyam", name: "בת ים", lat: 32.0170, lon: 34.7370 }, { key: "ashdod", name: "אשדוד", lat: 31.8044, lon: 34.6473 },
+    { key: "ashkelon", name: "אשקלון", lat: 31.6699, lon: 34.5738 }, { key: "eilat", name: "אילת", lat: 29.48, lon: 34.93 },
+  ];
+  const ANCHORS = [[0, "#f06a6a"], [20, "#ec7a5a"], [40, "#f0a55a"], [60, "#e9c46a"], [80, "#8ee3c8"], [90, "#2dd4bf"], [98, "#ffd479"], [100, "#ffd479"]];
+  const scoreColor = s => { if (s == null) return "#8a98ad"; const v = Math.max(0, Math.min(100, s)); for (let i = 0; i < ANCHORS.length - 1; i++) { const [a, ca] = ANCHORS[i], [b, cb] = ANCHORS[i + 1]; if (v <= b) { if (v === a) return ca; if (v === b) return cb; const t = (v - a) / (b - a); return `color-mix(in oklab, ${ca} ${Math.round((1 - t) * 100)}%, ${cb} ${Math.round(t * 100)}%)`; } } return "#ffd479"; };
+  const esc = s => s == null ? "" : String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const pad = n => String(n).padStart(2, "0");
+  const fmt = s => (s / 10).toFixed(1);
+  const tierOf = s => Palata.TIERS.find(t => s >= t.min) || Palata.TIERS[Palata.TIERS.length - 1];
+  const israelNow = () => { const s = new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Jerusalem", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date()); const [d, hm] = s.split(" "); const [h, m] = hm.split(":").map(Number); return { dateStr: d, hour: h === 24 ? 0 : h, minute: m }; };
+  const addDays = (ds, n) => { const d = new Date(ds + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+  const ago = iso => { if (!iso) return null; const h = (Date.now() - Date.parse(iso)) / 36e5; return h; };
+  const agoText = iso => { const h = ago(iso); if (h == null || isNaN(h)) return "—"; if (h < 1) return `לפני ${Math.round(h * 60)} דק׳`; if (h < 48) return `לפני ${h.toFixed(h < 10 ? 1 : 0)} שע׳`; return `לפני ${Math.round(h / 24)} ימים`; };
+  const fmtIL = iso => { const d = new Date(iso); if (isNaN(d)) return "—"; return new Intl.DateTimeFormat("he-IL", { timeZone: "Asia/Jerusalem", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(d); };
+  const setCard = (id, state, big, sub) => { const c = $(id); c.querySelector(".dot").className = "dot " + state; const b = c.querySelector(".big"); b.className = "big"; b.innerHTML = big; c.querySelector(".sub").innerHTML = sub || ""; };
+  const stateByAge = (h, okH, warnH) => h == null || isNaN(h) ? "bad" : h <= okH ? "ok" : h <= warnH ? "warn" : "bad";
+  const withTimeout = (p, ms = 15000) => Promise.race([p, new Promise((_, r) => setTimeout(() => r(new Error("timeout")), ms))]);
+  const getJson = async (url, opts) => { const r = await withTimeout(fetch(url, opts)); if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); };
+
+  // ---- system cards ----
+  async function loadSite() {
+    try {
+      const t0 = performance.now(); const txt = await (await withTimeout(fetch("/sw.js", { cache: "no-store" }))).text(); const ms = Math.round(performance.now() - t0);
+      const v = (txt.match(/VERSION = "(v\d+)"/) || [])[1] || "?";
+      setCard("cSite", "ok", `<span class="num">${esc(v)}</span>`, `yamplata.com עונה · <span class="num">${ms}</span> ms · Service Worker ${esc(v)}`);
+    } catch (e) { setCard("cSite", "bad", "אין תגובה", esc(e.message)); }
+  }
+  async function loadHealth() {
+    try {
+      const h = await getJson(`${PUSH_API}/health`, { cache: "no-store" });
+      const lc = h.lastCron, age = lc ? ago(lc.at) : null;
+      setCard("cPush", h.configured ? (lc ? stateByAge(age, 0.6, 2) : "warn") : "bad", `<span class="num">${h.subscribers}</span> <span class="sub">מנויים</span>`, `${h.configured ? "מפתחות VAPID מוגדרים" : "חסרים מפתחות VAPID"}${lc ? ` · ריצה אחרונה ${agoText(lc.at)}` : " · אין עדיין נתוני ריצה (פרסו את ה-Worker המעודכן)"}`);
+      const by = h.byBeach || {}; const rows = Object.entries(by).sort((a, b) => b[1] - a[1]);
+      $("cSubs").innerHTML = rows.length ? `<div class="kv">${rows.map(([n, c]) => `<span>${esc(n)}</span><b class="num">${c}</b>`).join("")}</div>` : `<div class="sub">${h.subscribers} מנויים · פירוט לפי חוף יופיע אחרי פריסת ה-Worker המעודכן</div>`;
+      $("cCron").innerHTML = lc ? `<div class="kv"><span>מתי</span><b>${fmtIL(lc.at)} (${agoText(lc.at)})</b><span>מנויים שנבדקו</span><b class="num">${lc.subscribers}</b><span>חופים שנמשכו</span><b class="num">${lc.beaches}</b><span>נשלחו בריצה</span><b class="num">${lc.sent}</b><span>נשלחו היום</span><b class="num">${lc.sentToday}</b><span>הוסרו (מנוי מת)</span><b class="num">${lc.dropped}</b><span>שגיאות</span><b class="num" style="color:${lc.errors ? "var(--bad)" : "inherit"}">${lc.errors}</b></div>` : `<div class="sub">ה-Worker רץ כל 15 דקות. פרטי הריצה יופיעו כאן אחרי הפריסה הבאה (<code>npx wrangler deploy</code>).</div>`;
+    } catch (e) { setCard("cPush", "bad", "לא זמין", esc(e.message)); $("cSubs").innerHTML = $("cCron").innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+  }
+  async function loadBuoy() {
+    try {
+      let b = null; try { b = await getJson(`${PUSH_API}/buoy?lat=32.08&lon=34.76`); } catch (e) { b = await getJson("/data/hadera-waves.json?v=" + Math.floor(Date.now() / 36e5), { cache: "no-store" }); }
+      const age = ago(b.measured.measuredAt);
+      setCard("cBuoy", stateByAge(age, 6, 9), `<span class="num">${b.measured.waveHeight.toFixed(2)}</span> <span class="sub">מ׳</span>`, `נמדד ${fmtIL(b.measured.measuredAt)} (${agoText(b.measured.measuredAt)})${b.measured.wavePeriod != null ? ` · מחזור <span class="num">${b.measured.wavePeriod}</span> שנ׳` : ""}${b.measured.waveMax != null ? ` · מקס׳ <span class="num">${b.measured.waveMax.toFixed(2)}</span> מ׳` : ""} · ${esc(b.station && b.station.name || "")}`);
+    } catch (e) { setCard("cBuoy", "bad", "אין נתון", esc(e.message)); }
+  }
+  async function loadJelly() {
+    try {
+      const j = await getJson("/data/jellyfish.json?v=" + Math.floor(Date.now() / 36e5), { cache: "no-store" });
+      const recent = (j.reports || []).filter(r => { const t = Date.parse(r.date); return !isNaN(t) && Date.now() - t <= 48 * 36e5; });
+      const located = recent.filter(r => r.lat != null).length;
+      const age = ago(j.updated);
+      setCard("cJelly", stateByAge(age, 6, 24), `<span class="num">${recent.length}</span> <span class="sub">דיווחים ב-48 שע׳</span>`, `<span class="num">${located}</span> עם מיקום מזוהה · הפיד עודכן ${agoText(j.updated)} · סה״כ <span class="num">${j.count || (j.reports || []).length}</span> בקובץ`);
+    } catch (e) { setCard("cJelly", "bad", "אין נתון", esc(e.message)); }
+  }
+  async function loadPages() {
+    try {
+      const xml = await (await withTimeout(fetch("/sitemap.xml", { cache: "no-store" }))).text();
+      const urls = (xml.match(/<loc>/g) || []).length, lastmod = (xml.match(/<lastmod>([^<]+)<\/lastmod>/) || [])[1];
+      const page = await (await withTimeout(fetch("/tel-aviv/", { cache: "no-store" }))).text();
+      const upd = (page.match(/עודכן ([0-9.]+ [0-9:]+)/) || [])[1];
+      const today = israelNow().dateStr;
+      setCard("cPages", lastmod === today ? "ok" : "warn", `<span class="num">${urls}</span> <span class="sub">כתובות במפת האתר</span>`, `עמוד תל אביב נבנה <span class="num">${esc(upd || "?")}</span> · lastmod <span class="num">${esc(lastmod || "?")}</span> · נבנה כל 3 שעות ב-GitHub Actions`);
+    } catch (e) { setCard("cPages", "bad", "שגיאה", esc(e.message)); }
+  }
+  async function loadEn() {
+    try {
+      const r = await withTimeout(fetch("/en/", { cache: "no-store" })); const html = await r.text();
+      const n = (html.match(/<tr><td><a href="\/en\//g) || []).length;
+      setCard("cEn", r.ok ? "ok" : "bad", `<span class="num">${r.status}</span> <span class="sub">/en/</span>`, `<span class="num">${n}</span> חופים בטבלה האנגלית · hreflang he/en בכל עמוד`);
+    } catch (e) { setCard("cEn", "bad", "שגיאה", esc(e.message)); }
+  }
+
+  // ---- the sea now (same recipe as the app) ----
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  async function loadSea() {
+    const now = israelNow(), tomorrow = addDays(now.dateStr, 1), tb = $("sea").querySelector("tbody");
+    const rows = [];
+    for (const b of BEACHES) {
+      try {
+        const u = Palata.recipeUrls(b.lat, b.lon, { forecastDays: 3, pastDays: 1 });
+        const [m, w] = await Promise.all([getJson(u.marine), getJson(u.weather)]);
+        const { hours } = Palata.blendHourly(m, w); Palata.scoreSeries(hours);
+        const cur = hours.find(h => h.dateStr === now.dateStr && h.hour === now.hour) || null;
+        const morn = hours.filter(h => h.dateStr === tomorrow && h.hour >= 6 && h.hour <= 11 && h.score != null);
+        const best = morn.reduce((a, h) => (!a || h.score > a.score ? h : a), null);
+        const day = hours.filter(h => h.dateStr === tomorrow && h.hour >= 6 && h.hour <= 19);
+        rows.push({ b, cur, best, day });
+      } catch (e) { rows.push({ b, err: e.message }); }
+      tb.innerHTML = rows.map(r => {
+        if (r.err) return `<tr><td>${esc(r.b.name)}</td><td colspan="7" class="err">${esc(r.err)}</td></tr>`;
+        const c = r.cur, t = c && c.score != null ? tierOf(c.score) : null;
+        const bars = r.day.map(h => `<i class="${r.best && h.hour === r.best.hour ? "best" : ""}" title="${pad(h.hour)}:00 · ${h.score == null ? "—" : fmt(h.score)}" style="height:${h.score == null ? 2 : Math.max(2, Math.round(26 * h.score / 100))}px;background:${scoreColor(h.score)}"></i>`).join("");
+        return `<tr><td><b>${esc(r.b.name)}</b></td>
+          <td><span class="score" style="color:${scoreColor(c && c.score)}">${c && c.score != null ? fmt(c.score) : "—"}</span></td>
+          <td class="tier" style="color:${scoreColor(c && c.score)}">${t ? esc(t.label) : "—"}</td>
+          <td class="num">${c && c.waveHeight != null ? c.waveHeight.toFixed(2) + " מ׳" : "—"}</td>
+          <td class="num">${c && c.windKmh != null ? Math.round(Palata.toKnots(c.windKmh)) + " קשר" : "—"}</td>
+          <td class="num">${c && c.seaTemp != null ? Math.round(c.seaTemp) + "°" : "—"}</td>
+          <td>${r.best ? `<span class="score" style="font-size:16px;color:${scoreColor(r.best.score)}">${fmt(r.best.score)}</span> <span class="sub num">${pad(r.best.hour)}:00</span>` : "—"}</td>
+          <td><span class="bars">${bars}</span></td></tr>`;
+      }).join("");
+      await sleep(120);
+    }
+    $("seaMeta").textContent = `· ${now.dateStr.slice(8, 10)}.${now.dateStr.slice(5, 7)} ${pad(now.hour)}:${pad(now.minute)} · ${rows.filter(r => !r.err).length}/${BEACHES.length} חופים`;
+  }
+
+  // ---- GoatCounter (token stays in this browser) ----
+  const gcToken = () => { try { return localStorage.getItem("yp-panel-gc") || ""; } catch (e) { return ""; } };
+  $("gcSave").onclick = () => { try { localStorage.setItem("yp-panel-gc", $("gcToken").value.trim()); } catch (e) {} loadGc(); };
+  const day = d => d.toISOString().slice(0, 10);
+  async function gc(path) { return getJson(`${GC}/api/v0/${path}`, { headers: { Authorization: "Bearer " + gcToken() } }); }
+  async function loadGc() {
+    const tok = gcToken(); const body = $("gcBody");
+    if (!tok) { body.innerHTML = `<div class="sub">בלי טוקן אפשר לפתוח את <a href="${GC}" target="_blank" rel="noopener">הדשבורד של GoatCounter</a>. עם טוקן (הרשאת קריאה בלבד) המספרים יופיעו כאן.</div>`; return; }
+    $("gcToken").value = "••••••••"; body.className = ""; body.innerHTML = `<span class="skeleton">טוען…</span>`;
+    try {
+      const now = new Date(), d1 = new Date(now - 864e5), d7 = new Date(now - 7 * 864e5), d30 = new Date(now - 30 * 864e5);
+      const [t1, t7, t30, hits] = await Promise.all([
+        gc(`stats/total?start=${day(now)}&end=${day(now)}`), gc(`stats/total?start=${day(d7)}&end=${day(now)}`), gc(`stats/total?start=${day(d30)}&end=${day(now)}`),
+        gc(`stats/hits?start=${day(d7)}&end=${day(now)}&limit=40`),
+      ]);
+      const list = (hits.hits || []);
+      const pages = list.filter(h => !h.event).slice(0, 8), events = list.filter(h => h.event).slice(0, 10);
+      const evName = { launch: "פתיחות", beach: "החלפת חוף", share: "שיתופים", camera: "צילומים", notifications: "התראות הופעלו", "push-registered": "נרשמו לפוש", "maps-link": "קישור מפות", "support-click": "לחצו לתמוך", "camera-error": "שגיאות מצלמה", "camera-photo": "תמונות עם מדד" };
+      body.innerHTML = `
+        <div class="grid" style="margin:8px 0 12px">
+          <div class="card"><h3>היום</h3><div class="big num">${t1.total ?? "—"}</div><div class="sub">ביקורים</div></div>
+          <div class="card"><h3>7 ימים</h3><div class="big num">${t7.total ?? "—"}</div><div class="sub">ביקורים · <span class="num">${t7.total_events ?? 0}</span> אירועים</div></div>
+          <div class="card"><h3>30 ימים</h3><div class="big num">${t30.total ?? "—"}</div><div class="sub">ביקורים</div></div>
+        </div>
+        <div class="two">
+          <div><h3 style="margin:0 0 6px;color:#aab8ce;font-size:13px">עמודים, 7 ימים</h3><table>${pages.map(p => `<tr><td class="path">${esc(p.path)}</td><td class="num">${p.count}</td></tr>`).join("") || "<tr><td class='sub'>אין עדיין</td></tr>"}</table></div>
+          <div><h3 style="margin:0 0 6px;color:#aab8ce;font-size:13px">אירועים באפליקציה, 7 ימים</h3><table>${events.map(p => `<tr><td>${esc(evName[p.path] || p.path)}</td><td class="num">${p.count}</td></tr>`).join("") || "<tr><td class='sub'>אין עדיין</td></tr>"}</table></div>
+        </div>
+        <div class="sub" style="margin-top:8px">מקור: GoatCounter API · <a href="${GC}" target="_blank" rel="noopener">לדשבורד המלא</a> · <a href="#" id="gcForget">שכח טוקן</a></div>`;
+      $("gcForget").onclick = ev => { ev.preventDefault(); try { localStorage.removeItem("yp-panel-gc"); } catch (e) {} $("gcToken").value = ""; loadGc(); };
+    } catch (e) { body.innerHTML = `<span class="err">GoatCounter: ${esc(e.message)} (טוקן לא תקין, או שחסרה הרשאת Read statistics)</span>`; }
+  }
+
+  async function refreshAll() {
+    $("refresh").disabled = true; $("stamp").textContent = "מרענן…";
+    await Promise.all([loadSite(), loadHealth(), loadBuoy(), loadJelly(), loadPages(), loadEn(), loadGc(), loadSea()]);
+    const n = israelNow(); $("stamp").textContent = `עודכן ${pad(n.hour)}:${pad(n.minute)} · שעון ישראל`; $("refresh").disabled = false;
+  }
+  $("refresh").onclick = refreshAll;
+  refreshAll();
+  setInterval(refreshAll, 15 * 60 * 1000);
+})();
+</script>
+</body>
+</html>

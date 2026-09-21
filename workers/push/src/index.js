@@ -101,7 +101,11 @@ async function handleFetch(req, env) {
   }
   if (url.pathname === "/health") {
     const list = await env.SUBS.list({ prefix: "sub:", limit: 1000 });
-    return json({ ok: true, subscribers: list.keys.length, configured: !!(env.VAPID_PRIVATE_KEY && env.VAPID_SUBJECT) }, 200, headers);
+    // Aggregates only (no endpoints, no keys): subscribers per beach name + last cron run, for the owner's panel.
+    const byBeach = {};
+    for (const { name: k } of list.keys.slice(0, 300)) { const rec = await env.SUBS.get(k, "json"); const n = rec && rec.beach && rec.beach.name; if (n) byBeach[n] = (byBeach[n] || 0) + 1; }
+    const lastCron = await env.SUBS.get("meta:cron", "json");
+    return json({ ok: true, subscribers: list.keys.length, byBeach, lastCron, configured: !!(env.VAPID_PRIVATE_KEY && env.VAPID_SUBJECT) }, 200, { ...headers, "cache-control": "no-store" });
   }
   if (req.method !== "POST") return json({ error: "method" }, 405, headers);
   if (!originOk) return json({ error: "origin not allowed" }, 403);
@@ -169,6 +173,12 @@ async function runScheduled(env, ctx) {
     } catch (err) { errors++; console.warn("subscriber failed", rec.beach && rec.beach.key, err && err.message); }
   }
   console.log(`cron ${now.dateStr} ${now.hour}:${String(now.minute).padStart(2, "0")} subs=${list.keys.length} beaches=${forecasts.size} sent=${sent} dropped=${dropped} errors=${errors}`);
+  // Run metadata for the owner's control panel (/health): when the cron last ran and what it did. Aggregates only.
+  try {
+    const prev = (await env.SUBS.get("meta:cron", "json")) || {};
+    const day = now.dateStr, sentToday = (prev.day === day ? (prev.sentToday || 0) : 0) + sent;
+    await env.SUBS.put("meta:cron", JSON.stringify({ at: new Date().toISOString(), day, subscribers: list.keys.length, beaches: forecasts.size, sent, dropped, errors, sentToday }));
+  } catch (e) { console.warn("meta:cron write failed", e && e.message); }
 }
 
 export default {

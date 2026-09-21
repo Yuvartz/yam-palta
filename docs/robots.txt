@@ -1,3 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /panel/
+
 Sitemap: https://yamplata.com/sitemap.xml
