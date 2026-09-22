@@ -273,19 +273,31 @@ async function runScheduled(env, ctx) {
     const fkey = `${rec.beach.lat.toFixed(2)},${rec.beach.lon.toFixed(2)}`;
     try {
       if (!forecasts.has(fkey)) forecasts.set(fkey, scoreHours(await fetchForecast(rec.beach.lat, rec.beach.lon), Palata));
-      const { events, state } = decide({ scored: forecasts.get(fkey), now, state: rec.state || {}, beach: rec.beach, Palata, appUrl: env.APP_URL });
-      let gone = false;
+      const prevState = rec.state || {};
+      const { events, state } = decide({ scored: forecasts.get(fkey), now, state: prevState, beach: rec.beach, Palata, appUrl: env.APP_URL });
+      // decide() optimistically marks every event as sent. Only ids the push service actually ACCEPTED may be
+      // remembered, otherwise a 429/500 silently burns the notification and it is never retried.
+      const acked = new Set(prevState.sent || []);
+      let gone = false, failed = false;
       for (const e of events) {
-        const status = await sendPush(env, rec.sub, { title: e.title, body: e.body, tag: e.tag, url: e.url });
+        let status = 0;
+        try { status = await sendPush(env, rec.sub, { title: e.title, body: e.body, tag: e.tag, url: e.url }); }
+        catch (err) { failed = true; errors++; console.warn("push threw", rec.beach.key, e.type, err && err.message); continue; }
         if (status === 404 || status === 410) { gone = true; break; }
-        if (status >= 200 && status < 300) sent++; else { errors++; console.warn("push status", status, rec.beach.key, e.type); }
+        if (status >= 200 && status < 300) {
+          sent++; acked.add(e.id);
+          // the deluxe-of-the-day marker rides along with an onset event; keep them consistent
+          if (e.type === "onset") for (const id of state.sent || []) if (id.startsWith(`${rec.beach.key}:deluxe:`)) acked.add(id);
+        } else { failed = true; errors++; console.warn("push status", status, rec.beach.key, e.type); }
       }
       if (gone) { await env.SUBS.delete(k); dropped++; continue; }
+      // A transient failure keeps the previous transition state, so the next run can try again.
+      const nextState = { ...(failed ? prevState : state), sent: [...acked].slice(-Palata.SENT_KEEP_HINT) };
       // Write only when the part of the state that decide() actually reads has changed. Comparing the whole
       // object would always differ (it carries a lastSeen timestamp), which is what blew the KV write quota:
       // 96 cron runs/day × every subscriber against a 1000 writes/day free tier.
-      if (stateSignature(rec.state, Palata) !== stateSignature(state, Palata)) {
-        rec.state = state; rec.updatedAt = new Date().toISOString();
+      if (stateSignature(rec.state, Palata) !== stateSignature(nextState, Palata)) {
+        rec.state = nextState; rec.updatedAt = new Date().toISOString();
         await env.SUBS.put(k, JSON.stringify(rec));
       }
     } catch (err) { errors++; console.warn("subscriber failed", rec.beach && rec.beach.key, err && err.message); }

@@ -201,7 +201,7 @@ function indexEn(results, now) {
 }
 
 const now = israelNow();
-const built = [];
+const built = [], failures = [];
 for (const b of BEACHES) {
   try {
     const { hours, sun } = await forecast(b);
@@ -212,12 +212,15 @@ for (const b of BEACHES) {
     await writeFile(`docs/${b.slug}/index.html`, page(b, cur, days, now, BEACHES.filter(o => o !== b)), "utf8");
     await writeFile(`docs/en/${b.slug}/index.html`, pageEn(b, cur, days, now, BEACHES.filter(o => o !== b)), "utf8");
     built.push({ b, cur }); console.log("built", b.slug, cur && cur.score != null ? (cur.score / 10).toFixed(1) : "—");
-  } catch (e) { console.warn("failed", b.slug, e.message); }
+  } catch (e) { console.warn("failed", b.slug, e.message); failures.push(b.slug); }
 }
 if (built.length) { await mkdir("docs/en", { recursive: true }); await writeFile("docs/en/index.html", indexEn(built, now), "utf8"); }
+if (!built.length) { console.error("no beach built — refusing to rewrite the sitemap"); process.exit(1); }
 const today = new Date().toISOString().slice(0, 10);
 const alt = (slug) => `<xhtml:link rel="alternate" hreflang="he" href="${SITE}/${slug ? slug + "/" : ""}"/><xhtml:link rel="alternate" hreflang="en" href="${SITE}/en/${slug ? slug + "/" : ""}"/>`;
 const u = (loc, pri, slug) => `<url><loc>${loc}</loc>${alt(slug)}<changefreq>hourly</changefreq><priority>${pri}</priority><lastmod>${today}</lastmod></url>`;
 const urls = [u(`${SITE}/`, "1.0", ""), u(`${SITE}/en/`, "0.9", ""), ...BEACHES.flatMap(b => [u(`${SITE}/${b.slug}/`, "0.8", b.slug), u(`${SITE}/en/${b.slug}/`, "0.7", b.slug)])];
 await writeFile("docs/sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n  ${urls.join("\n  ")}\n</urlset>\n`, "utf8");
 console.log(`sitemap: ${urls.length} urls; built ${built.length}/${BEACHES.length} beaches (he + en) + /en/`);
+// A green job that quietly produced nothing is how a dead feed hides: make the run fail.
+if (failures.length) { console.error(`FAILED beaches: ${failures.join(", ")}`); process.exitCode = 1; }

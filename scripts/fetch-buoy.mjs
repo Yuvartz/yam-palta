@@ -49,6 +49,7 @@ async function main() {
 
   const out = {
     updated: new Date().toISOString(),
+    checkedAt: new Date().toISOString(),   // advances on every successful run, even when the measurement is unchanged
     source: "ISRAMAR — Hadera buoy",
     sourceUrl: "https://isramar.ocean.org.il/isramar2009/station/HaderaRDI.aspx",
     station: STATION,

@@ -94,11 +94,12 @@ async function main() {
     }
   }
   mkdirSync("docs/data", { recursive: true });
-  const out = { updated: new Date().toISOString(), source: "https://www.meduzot.co.il/list", count: reports.length, reports };
+  const out = { updated: new Date().toISOString(), checkedAt: new Date().toISOString(), source: "https://www.meduzot.co.il/list", count: reports.length, reports };
   // keep the timestamp stable if reports are unchanged, so we don't create noise commits
   if (existsSync(OUT)) {
     try {
       const prev = JSON.parse(readFileSync(OUT, "utf8"));
+      if (prev && prev.updated && JSON.stringify(prev.reports) === JSON.stringify(out.reports)) out.updated = prev.updated;
       if (JSON.stringify(prev.reports) === JSON.stringify(reports)) { console.log("no change"); return; }
     } catch (e) {}
   }

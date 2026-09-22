@@ -141,5 +141,6 @@
     TIERS, CALM_MIN, DELUXE_MIN,
     notifyCopy, eveningCopy,
     RECIPE, median, recipeUrls, blendHourly, scoreSeries,
+    SENT_KEEP_HINT: 40,   // how many notification ids a subscriber keeps (mirrors SENT_KEEP in the push policy)
   };
 });
