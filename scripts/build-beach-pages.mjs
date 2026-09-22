@@ -18,11 +18,21 @@ const ldJson = v => JSON.stringify(v).replace(/</g, "\\u003c");
 
 // Same recipe as the app and the push Worker (Palata.recipeUrls / blendHourly / scoreSeries): the static
 // page must show the number the app shows for that hour. Wave period is display-only, fetched on top.
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+// Open-Meteo's free tier answers 503/429 to bursts (seen 2026-09-22: 3 of 10 beaches). Retry with backoff.
+async function getJson(url, tries = 4) {
+  for (let i = 0; ; i++) {
+    const r = await fetch(url, { signal: AbortSignal.timeout(20000) }).catch(() => null);
+    if (r && r.ok) return r.json();
+    if (i >= tries - 1) throw new Error(`open-meteo ${r ? r.status : "network"}`);
+    await sleep(1500 * (i + 1) + Math.random() * 500);
+  }
+}
 async function forecast(b) {
   const u = Palata.recipeUrls(b.lat, b.lon, { forecastDays: 4, pastDays: 1 });
   const j = r => { if (!r.ok) throw new Error(`open-meteo ${r.status}`); return r.json(); };
   const [m, w, s, per] = await Promise.all([
-    fetch(u.marine).then(j), fetch(u.weather).then(j), fetch(u.sun).then(j),
+    getJson(u.marine), getJson(u.weather), getJson(u.sun),
     fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${b.lat}&longitude=${b.lon}&timezone=Asia%2FJerusalem&forecast_days=4&past_days=1&hourly=wave_period&models=${Palata.RECIPE.waveModels.join(",")}`).then(j).catch(() => null),
   ]);
   const { hours } = Palata.blendHourly(m, w);
@@ -223,4 +233,8 @@ const urls = [u(`${SITE}/`, "1.0", ""), u(`${SITE}/en/`, "0.9", ""), ...BEACHES.
 await writeFile("docs/sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n  ${urls.join("\n  ")}\n</urlset>\n`, "utf8");
 console.log(`sitemap: ${urls.length} urls; built ${built.length}/${BEACHES.length} beaches (he + en) + /en/`);
 // A green job that quietly produced nothing is how a dead feed hides: make the run fail.
-if (failures.length) { console.error(`FAILED beaches: ${failures.join(", ")}`); process.exitCode = 1; }
+if (failures.length) {
+  // ::warning:: shows up on the Actions run summary without skipping the commit step. The failed beaches
+  // keep yesterday's page (nothing is written for them), the other pages still go live.
+  console.log(`::warning::beach pages not refreshed this run: ${failures.join(", ")} (kept previous version)`);
+}
