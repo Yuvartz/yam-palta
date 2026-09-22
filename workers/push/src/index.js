@@ -11,7 +11,7 @@
 
 import { buildPushPayload } from "@block65/webcrypto-web-push";
 import PalataMod from "../../../docs/palata.js";   // UMD; the bundler exposes module.exports as the default
-import { decide, israelParts, scoreHours, stateSignature } from "./policy.js";
+import { decide, israelParts, scoreHours, stateSignature, commitSends } from "./policy.js";
 
 const Palata = PalataMod && PalataMod.scoreOf ? PalataMod : globalThis.Palata;   // shared scoring + copy
 if (!Palata || !Palata.scoreOf) throw new Error("palata.js did not load");
@@ -275,24 +275,19 @@ async function runScheduled(env, ctx) {
       if (!forecasts.has(fkey)) forecasts.set(fkey, scoreHours(await fetchForecast(rec.beach.lat, rec.beach.lon), Palata));
       const prevState = rec.state || {};
       const { events, state } = decide({ scored: forecasts.get(fkey), now, state: prevState, beach: rec.beach, Palata, appUrl: env.APP_URL });
-      // decide() optimistically marks every event as sent. Only ids the push service actually ACCEPTED may be
-      // remembered, otherwise a 429/500 silently burns the notification and it is never retried.
-      const acked = new Set(prevState.sent || []);
-      let gone = false, failed = false;
+      // Send, recording an outcome per event; commitSends() (policy.js, unit-tested) decides what is remembered.
+      const outcomes = [];
+      let gone = false;
       for (const e of events) {
         let status = 0;
         try { status = await sendPush(env, rec.sub, { title: e.title, body: e.body, tag: e.tag, url: e.url }); }
-        catch (err) { failed = true; errors++; console.warn("push threw", rec.beach.key, e.type, err && err.message); continue; }
+        catch (err) { outcomes.push("fail"); errors++; console.warn("push threw", rec.beach.key, e.type, err && err.message); continue; }
         if (status === 404 || status === 410) { gone = true; break; }
-        if (status >= 200 && status < 300) {
-          sent++; acked.add(e.id);
-          // the deluxe-of-the-day marker rides along with an onset event; keep them consistent
-          if (e.type === "onset") for (const id of state.sent || []) if (id.startsWith(`${rec.beach.key}:deluxe:`)) acked.add(id);
-        } else { failed = true; errors++; console.warn("push status", status, rec.beach.key, e.type); }
+        if (status >= 200 && status < 300) { outcomes.push("ok"); sent++; }
+        else { outcomes.push("fail"); errors++; console.warn("push status", status, rec.beach.key, e.type); }
       }
       if (gone) { await env.SUBS.delete(k); dropped++; continue; }
-      // A transient failure keeps the previous transition state, so the next run can try again.
-      const nextState = { ...(failed ? prevState : state), sent: [...acked].slice(-Palata.SENT_KEEP_HINT) };
+      const nextState = commitSends({ prevState, decided: state, events, outcomes, beachKey: rec.beach.key, dateStr: now.dateStr });
       // Write only when the part of the state that decide() actually reads has changed. Comparing the whole
       // object would always differ (it carries a lastSeen timestamp), which is what blew the KV write quota:
       // 96 cron runs/day × every subscriber against a 1000 writes/day free tier.

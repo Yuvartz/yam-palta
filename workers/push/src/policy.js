@@ -54,6 +54,28 @@ export const isQuiet = hour => hour >= QUIET_START || hour < QUIET_END;
  * @param {object} args.Palata
  * @returns {{ events: Array<{id,type,title,body,tag,url}>, state: object }}
  */
+// After the sends: which state do we store? decide() optimistically marks every event as sent, but only
+// events the push service ACCEPTED may be remembered. outcomes[i] is "ok" | "fail" for events[i].
+//  - an accepted event is remembered; an accepted deluxe ONSET also remembers the day's deluxe marker, which
+//    decide() adds alongside it (otherwise a dip and a return to ≥ 9.8 would send a second deluxe today);
+//  - a failed onset/deluxe keeps the previous transition state (lastCalm/lastScore) so the next run retries;
+//  - a failed EVENING does not: its retry depends on its own id only, and reverting lastCalm there made the
+//    next hour's run announce the same calm spell again under a new hourly onset id.
+export function commitSends({ prevState, decided, events, outcomes, beachKey, dateStr }) {
+  const prev = prevState || {};
+  const acked = new Set(prev.sent || []);
+  let retryTransition = false;
+  events.forEach((e, i) => {
+    if (outcomes[i] === "ok") {
+      acked.add(e.id);
+      if (e.type === "deluxe" && e.id.startsWith(`${beachKey}:onset:`)) acked.add(`${beachKey}:deluxe:${dateStr}`);
+    } else if (e.type !== "evening") {
+      retryTransition = true;
+    }
+  });
+  return { ...(retryTransition ? prev : decided), sent: [...acked].slice(-SENT_KEEP) };
+}
+
 // decide() reads only three things out of the stored state: whether we were calm, whether the previous
 // score had already reached deluxe, and the ids already sent. Two states with the same signature produce
 // identical decisions, so the cron can skip the KV write when the signature is unchanged (the free tier

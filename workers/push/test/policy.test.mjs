@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
-import { decide, scoreHours, calmRunAt, isQuiet, stateSignature } from "../src/policy.js";
+import { decide, scoreHours, calmRunAt, isQuiet, stateSignature, commitSends } from "../src/policy.js";
 const Palata = createRequire(import.meta.url)("../../../docs/palata.js");
 
 const beach = { key: "telaviv", name: "תל אביב" };
@@ -124,4 +124,51 @@ test("signature changes exactly when a decision input changes", () => {
   assert.notEqual(sig(base), sig({ ...base, lastScore: Palata.DELUXE_MIN }));      // crossed the deluxe line
   assert.notEqual(sig(base), sig({ ...base, sent: ["telaviv:onset:2026-09-21"] })); // a push was recorded
   assert.equal(sig(base), sig({ ...base, lastScore: 79, lastSeen: "whenever" }));  // still below deluxe → same decisions
+});
+
+// ---- what gets remembered after a send (regressions found by Astra on 2026-09-23) ----
+const flat = { wave: 0.10, chop: 0.03, wind: 2 };       // well above the calm bar
+const mirror = { wave: 0.05, chop: 0.0, wind: 0 };      // deluxe
+function run(sc, now, prevState, outcomeFor) {
+  const r = decide({ scored: sc, now, state: prevState, beach, Palata, appUrl: APP });
+  const outcomes = r.events.map(e => outcomeFor(e));
+  return { events: r.events, state: commitSends({ prevState, decided: r.state, events: r.events, outcomes, beachKey: beach.key, dateStr: now.dateStr }) };
+}
+
+test("evening failure after an accepted onset does not re-announce the same calm spell next hour", () => {
+  const spec = {}; for (let h = 19; h <= 23; h++) spec[h] = flat;
+  const today = day("2026-09-23", spec), tomorrow = day("2026-09-24", { 6: flat, 7: flat, 8: flat });
+  const sc = scoreHours([...today, ...tomorrow], Palata);
+  const r1 = run(sc, { dateStr: "2026-09-23", hour: 19, minute: 45 }, { lastCalm: false, lastScore: null, sent: [] },
+    e => (e.type === "evening" ? "fail" : "ok"));
+  assert.deepEqual(r1.events.map(e => e.type).sort(), ["evening", "onset"]);
+  assert.equal(r1.state.lastCalm, true, "an unrelated evening failure must not revert the calm transition");
+  assert.ok(r1.state.sent.some(id => id.includes(":onset:")) && !r1.state.sent.some(id => id.includes(":evening:")));
+  const r2 = run(sc, { dateStr: "2026-09-23", hour: 20, minute: 0 }, r1.state, () => "ok");
+  assert.equal(r2.events.filter(e => e.type === "onset" || e.type === "deluxe").length, 0, "no second onset for the same spell");
+});
+
+test("a failed onset is retried on the next run", () => {
+  const sc = scoreHours(day("2026-09-23", { 8: flat, 9: flat, 10: flat }), Palata);
+  const r1 = run(sc, { dateStr: "2026-09-23", hour: 8, minute: 0 }, { lastCalm: false, lastScore: null, sent: [] }, () => "fail");
+  assert.equal(r1.events.length, 1);
+  assert.equal(r1.state.lastCalm, false); assert.equal(r1.state.sent.length, 0);
+  const r2 = run(sc, { dateStr: "2026-09-23", hour: 8, minute: 15 }, r1.state, () => "ok");
+  assert.equal(r2.events.length, 1, "the onset is attempted again");
+  assert.equal(r2.state.lastCalm, true);
+});
+
+test("an accepted deluxe onset also remembers the day's deluxe marker (no second deluxe after a dip)", () => {
+  // Calm wind history from midnight so 10:00 genuinely reaches deluxe; 11:00 dips below 9.8 (0.15 m caps at 97)
+  // while staying calm; 12:00 is mirror again. The stored state still says "not calm", so 10:00 is an onset.
+  const spec = {}; for (let h = 0; h <= 13; h++) spec[h] = mirror;
+  spec[11] = { wave: 0.15, chop: 0.03, wind: 2 };
+  const sc = scoreHours(day("2026-09-23", spec), Palata);
+  assert.ok(sc[10].score >= Palata.DELUXE_MIN && sc[11].score < Palata.DELUXE_MIN && sc[11].score >= Palata.CALM_MIN);
+  const r1 = run(sc, { dateStr: "2026-09-23", hour: 10, minute: 0 }, { lastCalm: false, lastScore: null, sent: [] }, () => "ok");
+  assert.equal(r1.events[0].type, "deluxe");
+  assert.ok(r1.state.sent.includes("telaviv:deluxe:2026-09-23"));
+  const r2 = run(sc, { dateStr: "2026-09-23", hour: 11, minute: 0 }, r1.state, () => "ok");
+  const r3 = run(sc, { dateStr: "2026-09-23", hour: 12, minute: 0 }, r2.state, () => "ok");
+  assert.equal(r3.events.filter(e => e.type === "deluxe").length, 0, "deluxe already announced today");
 });
