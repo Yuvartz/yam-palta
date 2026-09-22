@@ -142,6 +142,7 @@
   const scoreColor = s => { if (s == null) return "#8a98ad"; const v = Math.max(0, Math.min(100, s)); for (let i = 0; i < ANCHORS.length - 1; i++) { const [a, ca] = ANCHORS[i], [b, cb] = ANCHORS[i + 1]; if (v <= b) { if (v === a) return ca; if (v === b) return cb; const t = (v - a) / (b - a); return `color-mix(in oklab, ${ca} ${Math.round((1 - t) * 100)}%, ${cb} ${Math.round(t * 100)}%)`; } } return "#ffd479"; };
   const esc = s => s == null ? "" : String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const pad = n => String(n).padStart(2, "0");
+  const num = v => Number.isFinite(Number(v)) ? String(Number(v)) : "—";   // JSON from the Worker is data, not markup
   const fmt = s => (s / 10).toFixed(1);
   const tierOf = s => Palata.TIERS.find(t => s >= t.min) || Palata.TIERS[Palata.TIERS.length - 1];
   const israelNow = () => { const s = new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Jerusalem", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date()); const [d, hm] = s.split(" "); const [h, m] = hm.split(":").map(Number); return { dateStr: d, hour: h === 24 ? 0 : h, minute: m }; };
@@ -166,10 +167,10 @@
     try {
       const h = await getJson(`${PUSH_API}/health`, { cache: "no-store" });
       const lc = h.lastCron, age = lc ? ago(lc.at) : null;
-      setCard("cPush", h.configured ? (lc ? stateByAge(age, 0.6, 2) : "warn") : "bad", `<span class="num">${h.subscribers}</span> <span class="sub">מנויים</span>`, `${h.configured ? "מפתחות VAPID מוגדרים" : "חסרים מפתחות VAPID"}${lc ? ` · ריצה אחרונה ${agoText(lc.at)}` : " · אין עדיין נתוני ריצה (פרסו את ה-Worker המעודכן)"}`);
+      setCard("cPush", h.configured ? (lc ? stateByAge(age, 0.6, 2) : "warn") : "bad", `<span class="num">${num(h.subscribers)}</span> <span class="sub">מנויים</span>`, `${h.configured ? "מפתחות VAPID מוגדרים" : "חסרים מפתחות VAPID"}${lc ? ` · ריצה אחרונה ${agoText(lc.at)}` : " · אין עדיין נתוני ריצה (פרסו את ה-Worker המעודכן)"}`);
       const by = h.byBeach || {}; const rows = Object.entries(by).sort((a, b) => b[1] - a[1]);
-      $("cSubs").innerHTML = rows.length ? `<div class="kv">${rows.map(([n, c]) => `<span>${esc(n)}</span><b class="num">${c}</b>`).join("")}</div>` : `<div class="sub">${h.subscribers} מנויים · פירוט לפי חוף יופיע אחרי פריסת ה-Worker המעודכן</div>`;
-      $("cCron").innerHTML = lc ? `<div class="kv"><span>מתי</span><b>${fmtIL(lc.at)} (${agoText(lc.at)})</b><span>מנויים שנבדקו</span><b class="num">${lc.subscribers}</b><span>חופים שנמשכו</span><b class="num">${lc.beaches}</b><span>נשלחו בריצה</span><b class="num">${lc.sent}</b><span>נשלחו היום</span><b class="num">${lc.sentToday}</b><span>הוסרו (מנוי מת)</span><b class="num">${lc.dropped}</b><span>שגיאות</span><b class="num" style="color:${lc.errors ? "var(--bad)" : "inherit"}">${lc.errors}</b></div>` : `<div class="sub">ה-Worker רץ כל 15 דקות. פרטי הריצה יופיעו כאן אחרי הפריסה הבאה (<code>npx wrangler deploy</code>).</div>`;
+      $("cSubs").innerHTML = rows.length ? `<div class="kv">${rows.map(([n, c]) => `<span>${esc(n)}</span><b class="num">${num(c)}</b>`).join("")}</div>` : `<div class="sub">${num(h.subscribers)} מנויים · פירוט לפי חוף יופיע אחרי פריסת ה-Worker המעודכן</div>`;
+      $("cCron").innerHTML = lc ? `<div class="kv"><span>מתי</span><b>${fmtIL(lc.at)} (${agoText(lc.at)})</b><span>מנויים שנבדקו</span><b class="num">${num(lc.subscribers)}</b><span>חופים שנמשכו</span><b class="num">${num(lc.beaches)}</b><span>נשלחו בריצה</span><b class="num">${num(lc.sent)}</b><span>נשלחו היום</span><b class="num">${num(lc.sentToday)}</b><span>הוסרו (מנוי מת)</span><b class="num">${num(lc.dropped)}</b><span>שגיאות</span><b class="num" style="color:${lc.errors ? "var(--bad)" : "inherit"}">${num(lc.errors)}</b></div>` : `<div class="sub">ה-Worker רץ כל 15 דקות. פרטי הריצה יופיעו כאן אחרי הפריסה הבאה (<code>npx wrangler deploy</code>).</div>`;
     } catch (e) { setCard("cPush", "bad", "לא זמין", esc(e.message)); $("cSubs").innerHTML = $("cCron").innerHTML = `<span class="err">${esc(e.message)}</span>`; }
   }
   async function loadBuoy() {
@@ -185,7 +186,7 @@
       const recent = (j.reports || []).filter(r => { const t = Date.parse(r.date); return !isNaN(t) && Date.now() - t <= 48 * 36e5; });
       const located = recent.filter(r => r.lat != null).length;
       const age = ago(j.updated);
-      setCard("cJelly", stateByAge(age, 6, 24), `<span class="num">${recent.length}</span> <span class="sub">דיווחים ב-48 שע׳</span>`, `<span class="num">${located}</span> עם מיקום מזוהה · הפיד עודכן ${agoText(j.updated)} · סה״כ <span class="num">${j.count || (j.reports || []).length}</span> בקובץ`);
+      setCard("cJelly", stateByAge(age, 6, 24), `<span class="num">${num(recent.length)}</span> <span class="sub">דיווחים ב-48 שע׳</span>`, `<span class="num">${located}</span> עם מיקום מזוהה · הפיד עודכן ${agoText(j.updated)} · סה״כ <span class="num">${j.count || (j.reports || []).length}</span> בקובץ`);
     } catch (e) { setCard("cJelly", "bad", "אין נתון", esc(e.message)); }
   }
   async function loadPages() {
@@ -195,7 +196,7 @@
       const page = await (await withTimeout(fetch("/tel-aviv/", { cache: "no-store" }))).text();
       const upd = (page.match(/עודכן ([0-9.]+ [0-9:]+)/) || [])[1];
       const today = israelNow().dateStr;
-      setCard("cPages", lastmod === today ? "ok" : "warn", `<span class="num">${urls}</span> <span class="sub">כתובות במפת האתר</span>`, `עמוד תל אביב נבנה <span class="num">${esc(upd || "?")}</span> · lastmod <span class="num">${esc(lastmod || "?")}</span> · נבנה כל 3 שעות ב-GitHub Actions`);
+      setCard("cPages", lastmod === today ? "ok" : "warn", `<span class="num">${num(urls)}</span> <span class="sub">כתובות במפת האתר</span>`, `עמוד תל אביב נבנה <span class="num">${esc(upd || "?")}</span> · lastmod <span class="num">${esc(lastmod || "?")}</span> · נבנה כל 3 שעות ב-GitHub Actions`);
     } catch (e) { setCard("cPages", "bad", "שגיאה", esc(e.message)); }
   }
   async function loadEn() {
@@ -260,13 +261,13 @@
       const evName = { launch: "פתיחות", beach: "החלפת חוף", share: "שיתופים", camera: "צילומים", notifications: "התראות הופעלו", "push-registered": "נרשמו לפוש", "maps-link": "קישור מפות", "support-click": "לחצו לתמוך", "camera-error": "שגיאות מצלמה", "camera-photo": "תמונות עם מדד" };
       body.innerHTML = `
         <div class="grid" style="margin:8px 0 12px">
-          <div class="card"><h3>היום</h3><div class="big num">${t1.total ?? "—"}</div><div class="sub">ביקורים</div></div>
-          <div class="card"><h3>7 ימים</h3><div class="big num">${t7.total ?? "—"}</div><div class="sub">ביקורים · <span class="num">${t7.total_events ?? 0}</span> אירועים</div></div>
-          <div class="card"><h3>30 ימים</h3><div class="big num">${t30.total ?? "—"}</div><div class="sub">ביקורים</div></div>
+          <div class="card"><h3>היום</h3><div class="big num">${num(t1.total)}</div><div class="sub">ביקורים</div></div>
+          <div class="card"><h3>7 ימים</h3><div class="big num">${num(t7.total)}</div><div class="sub">ביקורים · <span class="num">${num(t7.total_events)}</span> אירועים</div></div>
+          <div class="card"><h3>30 ימים</h3><div class="big num">${num(t30.total)}</div><div class="sub">ביקורים</div></div>
         </div>
         <div class="two">
-          <div><h3 style="margin:0 0 6px;color:#aab8ce;font-size:13px">עמודים, 7 ימים</h3><table>${pages.map(p => `<tr><td class="path">${esc(p.path)}</td><td class="num">${p.count}</td></tr>`).join("") || "<tr><td class='sub'>אין עדיין</td></tr>"}</table></div>
-          <div><h3 style="margin:0 0 6px;color:#aab8ce;font-size:13px">אירועים באפליקציה, 7 ימים</h3><table>${events.map(p => `<tr><td>${esc(evName[p.path] || p.path)}</td><td class="num">${p.count}</td></tr>`).join("") || "<tr><td class='sub'>אין עדיין</td></tr>"}</table></div>
+          <div><h3 style="margin:0 0 6px;color:#aab8ce;font-size:13px">עמודים, 7 ימים</h3><table>${pages.map(p => `<tr><td class="path">${esc(p.path)}</td><td class="num">${num(p.count)}</td></tr>`).join("") || "<tr><td class='sub'>אין עדיין</td></tr>"}</table></div>
+          <div><h3 style="margin:0 0 6px;color:#aab8ce;font-size:13px">אירועים באפליקציה, 7 ימים</h3><table>${events.map(p => `<tr><td>${esc(evName[p.path] || p.path)}</td><td class="num">${num(p.count)}</td></tr>`).join("") || "<tr><td class='sub'>אין עדיין</td></tr>"}</table></div>
         </div>
         <div class="sub" style="margin-top:8px">מקור: GoatCounter API · <a href="${GC}" target="_blank" rel="noopener">לדשבורד המלא</a> · <a href="#" id="gcForget">שכח טוקן</a></div>`;
       $("gcForget").onclick = ev => { ev.preventDefault(); try { localStorage.removeItem("yp-panel-gc"); } catch (e) {} $("gcToken").value = ""; loadGc(); };
