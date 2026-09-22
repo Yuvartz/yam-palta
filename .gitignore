@@ -35,3 +35,11 @@ workers/push/.vapid-private.txt
 tools/video/node_modules/
 tools/video/out/
 tools/video/frames/
+
+# secrets and local config (belt and braces — never commit any of these)
+.env*
+!.env.example
+.dev.vars*
+*.local.txt
+.vapid-*
+.claude/settings.local.json

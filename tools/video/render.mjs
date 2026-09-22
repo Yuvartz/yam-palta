@@ -24,7 +24,13 @@ const arg = (k, d) => { const i = process.argv.indexOf(`--${k}`); return i > -1 
 const REGION = arg("region", "israel"), TARGET = arg("target", "tomorrow"), DURATION = +arg("duration", 15), FPS = +arg("fps", 30);
 const OUT = path.resolve(here, arg("out", "out")), PREVIEW = !!arg("preview", false), TOP_N = +arg("beaches", 3);
 const SITE = "https://yamplata.com";
-for (const [n, v] of [["duration", DURATION], ["fps", FPS], ["beaches", TOP_N]]) if (!Number.isFinite(v) || v <= 0 || v > 600) { console.error(`bad --${n}`); process.exit(2); }
+// Validate every CLI value: REGION and TARGET end up in the output file name, and the frames directory is
+// deleted recursively — "--target x/../.." must never walk out of tools/video/frames.
+if (!Object.prototype.hasOwnProperty.call(REGIONS, REGION)) { console.error(`unknown region ${REGION}; one of ${Object.keys(REGIONS).join(", ")}`); process.exit(2); }
+if (!["now", "tomorrow"].includes(TARGET)) { console.error('bad --target (use "now" or "tomorrow")'); process.exit(2); }
+if (!Number.isFinite(DURATION) || DURATION < 1 || DURATION > 120) { console.error("bad --duration"); process.exit(2); }
+if (!Number.isInteger(FPS) || FPS < 1 || FPS > 60) { console.error("bad --fps"); process.exit(2); }
+if (!Number.isInteger(TOP_N) || TOP_N < 1 || TOP_N > 27) { console.error("bad --beaches"); process.exit(2); }
 const R = REGIONS[REGION]; if (!R) { console.error(`unknown region ${REGION}; one of ${Object.keys(REGIONS).join(", ")}`); process.exit(2); }
 const tierOf = s => Palata.TIERS.find(t => s >= t.min) || Palata.TIERS[Palata.TIERS.length - 1];
 const fmt = s => (s / 10).toFixed(1);
@@ -136,7 +142,8 @@ async function main() {
   console.log("poster", poster);
   if (PREVIEW) { await browser.close(); return; }
 
-  const frames = path.join(here, "frames", stamp);
+  const framesRoot = path.resolve(here, "frames"), frames = path.resolve(framesRoot, stamp);
+  if (path.dirname(frames) !== framesRoot) throw new Error("unsafe frames path");
   await rm(frames, { recursive: true, force: true }); await mkdir(frames, { recursive: true });
   const n = Math.round(DURATION * FPS);
   for (let i = 0; i < n; i++) {

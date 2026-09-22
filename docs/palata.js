@@ -87,7 +87,9 @@
   //   wind 10 m    = median(ECMWF-IFS 0.25°, DWD ICON)          SST        = Open-Meteo best_match (the only model publishing it)
   // The formula itself (scoreOf) is untouched; this only fixes the inputs and the trailing wind history.
   const RECIPE = { waveModels: ["meteofrance_wave", "ecmwf_wam"], partModel: "meteofrance_wave", windModels: ["ecmwf_ifs025", "icon_seamless"] };
-  const median = vals => { const a = (vals || []).filter(v => v != null && isFinite(v)).sort((x, y) => x - y); if (!a.length) return null; const m = a.length >> 1; return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2; };
+  // Numbers only: the global isFinite() accepts "0.6", and ("0.4"+"0.6")/2 silently produces nonsense.
+  const numOrNull = v => { const n = typeof v === "number" ? v : NaN; return Number.isFinite(n) ? n : null; };
+  const median = vals => { const a = (vals || []).map(numOrNull).filter(v => v !== null).sort((x, y) => x - y); if (!a.length) return null; const m = a.length >> 1; return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2; };
   function recipeUrls(lat, lon, opts) {
     const o = opts || {}, fd = o.forecastDays || 7, pd = o.pastDays == null ? 1 : o.pastDays, tz = encodeURIComponent(o.timezone || "Asia/Jerusalem");   // "auto" = the beach's own clock
     const common = `latitude=${lat}&longitude=${lon}&timezone=${tz}&forecast_days=${fd}&past_days=${pd}`;
@@ -99,9 +101,9 @@
   }
   // First hourly column whose name starts with `base` and that has at least one real value — keys are
   // suffixed per model (`wave_height_ecmwf_wam`, `sea_surface_temperature_marine_best_match`…).
-  const colsFor = (hourly, base, models) => models.map(m => hourly[`${base}_${m}`]).filter(Array.isArray);
+  const colsFor = (hourly, base, models) => models.map(m => (Object.prototype.hasOwnProperty.call(hourly, `${base}_${m}`) ? hourly[`${base}_${m}`] : null)).filter(Array.isArray);
   const allCols = (hourly, base) => Object.keys(hourly).filter(k => k === base || k.indexOf(base + "_") === 0).map(k => hourly[k]).filter(Array.isArray);
-  const anyCol = (hourly, base) => allCols(hourly, base).find(c => c.some(v => v != null)) || null;
+  const anyCol = (hourly, base) => allCols(hourly, base).find(c => c.some(v => numOrNull(v) !== null)) || null;
   // marine/weather = raw Open-Meteo JSON from recipeUrls(). Returns plain hours with the four scoring inputs
   // + seaTemp, plus `grid` = the sea cell the marine model actually used (the coast point is often land).
   function blendHourly(marine, weather) {
@@ -116,7 +118,7 @@
     const pick = (cols, fb, i) => { const v = median(cols.map(c => c[i])); return v != null ? v : median(fb.map(c => c[i])); };
     const hours = mh.time.map((t, i) => { const j = wIdx[t]; return {
       time: t, dateStr: t.slice(0, 10), hour: parseInt(t.slice(11, 13), 10),
-      waveHeight: pick(waveCols, waveFb, i), windWave: pick(partCols, partFb, i), seaTemp: sst[i] == null ? null : sst[i],
+      waveHeight: pick(waveCols, waveFb, i), windWave: pick(partCols, partFb, i), seaTemp: numOrNull(sst[i]),
       windKmh: j == null ? null : pick(windCols, windFb, j),
     }; });
     return { hours, grid: { lat: marine.latitude, lon: marine.longitude }, timezone: marine.timezone || null, utcOffsetSeconds: marine.utc_offset_seconds == null ? null : marine.utc_offset_seconds };

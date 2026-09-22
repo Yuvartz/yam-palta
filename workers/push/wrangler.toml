@@ -17,7 +17,9 @@ crons = ["*/15 * * * *"]   # every 15 minutes, UTC; the policy converts to Israe
 [[kv_namespaces]]
 binding = "SUBS"
 id = "3b1b295d9b2346afb08d42b7d00bfbb6"
-preview_id = "3b1b295d9b2346afb08d42b7d00bfbb6"   # NOTE: same namespace as production — `wrangler dev --remote` writes real records
+# preview_id intentionally left unset: pointing it at the production namespace meant `wrangler dev --remote`
+# wrote real subscriber records. Create a throwaway one when you need it:
+#   npx wrangler kv namespace create SUBS --preview   → paste the id here as preview_id
 
 [vars]
 APP_URL = "https://yamplata.com/"

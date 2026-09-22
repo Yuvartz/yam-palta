@@ -11,7 +11,7 @@
 //   • Google Fonts: cache-first (immutable files).
 // Bump VERSION on any shell change — activate cleans older yp-* caches (only ours: Cache Storage
 // is shared by every project on this GitHub Pages origin).
-const VERSION = "v34";
+const VERSION = "v35";
 const PREFIX = "yp-";
 const SHELL_CACHE = `${PREFIX}shell-${VERSION}`;
 const API_CACHE = `${PREFIX}api-${VERSION}`;
@@ -110,8 +110,10 @@ self.addEventListener("fetch", e => {
         // served a 10-minute-old page right after a deploy — "I tested and it's still broken".
         const res = await fetch(req, { cache: "no-cache" });
         if (res && res.ok) {
-          const copy = res.clone();
-          e.waitUntil(caches.open(SHELL_CACHE).then(c => c.put("./", copy)));
+          // Only the app itself may become the offline shell: /panel/, /tel-aviv/ and /en/ are different
+          // pages, and caching them under "./" served the wrong page when the network came back down.
+          const isShell = new URL(req.url).pathname === new URL("./", self.registration.scope).pathname;
+          if (isShell) { const copy = res.clone(); e.waitUntil(caches.open(SHELL_CACHE).then(c => c.put("./", copy))); }
           return res;
         }
         return (await caches.match(req)) || (await caches.match("./")) || res;
@@ -133,7 +135,7 @@ self.addEventListener("fetch", e => {
   }
 
   // Forecast + archive APIs: last successful forecast is the offline fallback.
-  if (url.hostname.endsWith("open-meteo.com")) { e.respondWith(networkFirst(e, req, API_CACHE, API_CACHE_MAX)); return; }
+  if (url.hostname === "api.open-meteo.com" || url.hostname === "marine-api.open-meteo.com" || url.hostname === "archive-api.open-meteo.com") { e.respondWith(networkFirst(e, req, API_CACHE, API_CACHE_MAX)); return; }
 
   // Web fonts.
   if (url.hostname === "fonts.googleapis.com" || url.hostname === "fonts.gstatic.com") {
@@ -176,7 +178,13 @@ self.addEventListener("pushsubscriptionchange", e => {
 // Tap → the beach the alert was about (?b=key). Reuse an open window when there is one.
 self.addEventListener("notificationclick", e => {
   e.notification.close();
-  const target = new URL((e.notification.data && e.notification.data.url) || "./", self.registration.scope).href;
+  // The payload comes from the server, but a notification must never be able to open another origin.
+  const scope = new URL(self.registration.scope);
+  let target = scope.href;
+  try {
+    const want = new URL((e.notification.data && e.notification.data.url) || "./", scope);
+    if (want.origin === scope.origin && want.href.startsWith(scope.href)) target = want.href;
+  } catch (err) {}
   e.waitUntil((async () => {
     const list = await clients.matchAll({ type: "window", includeUncontrolled: true });
     const mine = list.filter(c => c.url.startsWith(self.registration.scope));

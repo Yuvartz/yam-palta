@@ -53,13 +53,17 @@ function decodeKey(value, bytes) {
     return out.length === bytes ? out : null;
   } catch (e) { return null; }
 }
-function validSub(s) {
+async function validSub(s) {
   if (!s || !pushEndpoint(s.endpoint) || !s.keys) return false;
   const auth = decodeKey(s.keys.auth, 16), pub = decodeKey(s.keys.p256dh, 65);
-  return !!(auth && pub && pub[0] === 4);
+  if (!auth || !pub || pub[0] !== 4) return false;
+  // The right length and a 0x04 prefix do not make a point that is actually on the curve — let WebCrypto decide.
+  try { await crypto.subtle.importKey("raw", pub, { name: "ECDH", namedCurve: "P-256" }, false, []); return true; }
+  catch (e) { return false; }
 }
-// Proof of ownership for management actions: the caller must know the subscription's own `auth` secret, which only
-// the browser that created it has. Compared in constant time.
+// Proof of ownership for management actions: the caller must know the subscription's own `auth` secret, which
+// only the browser that created it has. The compare has no early exit; JS/JIT cannot promise true constant time,
+// and this guards a 16-byte secret against endpoint leakage rather than against timing attacks.
 function sameAuth(a, b) {
   const x = decodeKey(a, 16), y = decodeKey(b, 16);
   if (!x || !y) return false;
@@ -70,7 +74,7 @@ const validBeach = b => b && typeof b.key === "string" && b.key.length <= 40 && 
   && Number.isFinite(b.lat) && Number.isFinite(b.lon) && Math.abs(b.lat) <= 90 && Math.abs(b.lon) <= 180;
 
 async function sendPush(env, sub, payload) {
-  if (!validSub(sub)) throw new Error("invalid subscription");   // also guards records already in KV
+  if (!(await validSub(sub))) throw new Error("invalid subscription");   // also guards records already in KV
   const vapid = { subject: env.VAPID_SUBJECT, publicKey: env.VAPID_PUBLIC_KEY, privateKey: env.VAPID_PRIVATE_KEY };
   const init = await buildPushPayload({ data: JSON.stringify(payload), options: { ttl: 3600, urgency: "high", topic: (payload.tag || "yp").slice(0, 32).replace(/[^A-Za-z0-9_-]/g, "") } }, sub, vapid);
   // redirect:"error" — a push service must answer directly; a redirect would send our request elsewhere.
@@ -96,7 +100,7 @@ const haversine = (a, b, c, d) => { const R = 6371, r = x => x * Math.PI / 180, 
 const pickParam = (params, name) => { const p = (params || []).find(x => x.name === name); const v = p && Array.isArray(p.values) ? Number(p.values[0]) : NaN; return Number.isFinite(v) && v >= 0 && v < 30 ? v : null; };
 const isoOf = dt => { const m = /(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})/.exec(dt || ""); return m ? `${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:00Z` : null; };
 async function readBuoy(st) {
-  const r = await fetch(st.src, { cf: { cacheTtl: 900, cacheEverything: true }, headers: { "user-agent": "YamPlata/1.0 (+https://yamplata.com)" } });
+  const r = await fetch(st.src, { cf: { cacheTtl: 900, cacheEverything: true }, headers: { "user-agent": "YamPlata/1.0 (+https://yamplata.com)" }, redirect: "error", signal: AbortSignal.timeout(8000) });
   if (!r.ok) return null;
   const raw = await r.json().catch(() => null); if (!raw) return null;
   const measured = { waveHeight: pickParam(raw.parameters, "Significant wave height"), wavePeriod: pickParam(raw.parameters, "Peak wave period"), waveMax: pickParam(raw.parameters, "Maximal wave height"), measuredAt: isoOf(raw.datetime) };
@@ -112,10 +116,46 @@ async function nearestBuoy(lat, lon, maxAgeH = 9) {
   return null;
 }
 
+// Read at most `max` BYTES and parse JSON. Stops pulling as soon as the limit is passed, so an attacker
+// cannot make us buffer a large body before we reject it.
+async function readJsonLimited(req, max = 4096) {
+  if (!req.body) return { error: 400 };
+  const reader = req.body.getReader(), chunks = [];
+  let size = 0;
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > max) { await reader.cancel(); return { error: 413 }; }
+      chunks.push(value);
+    }
+  } catch (e) { return { error: 400 }; }
+  finally { try { reader.releaseLock(); } catch (e) {} }
+  const buf = new Uint8Array(size); let at = 0;
+  for (const c of chunks) { buf.set(c, at); at += c.byteLength; }
+  try {
+    const body = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(buf));
+    if (!body || typeof body !== "object" || Array.isArray(body)) return { error: 400 };
+    return { body };
+  } catch (e) { return { error: 400 }; }
+}
+
 // ---------- API ----------
 async function handleFetch(req, env) {
   const url = new URL(req.url), { ok: originOk, headers } = cors(req, env);
   if (req.method === "OPTIONS") return new Response(null, { status: originOk ? 204 : 403, headers });
+  // Rate-limit everything that costs a KV operation or an outbound request — GET routes included, since
+  // /expand, /buoy and /health were reachable before any limit. A limiter that errors fails CLOSED.
+  const clientIp = req.headers.get("CF-Connecting-IP") || "unknown";
+  async function limited(binding, key) {
+    if (!binding || typeof binding.limit !== "function") return false;   // binding not configured (local dev)
+    try { return !(await binding.limit({ key })).success; }
+    catch (e) { console.warn("rate limiter error → refusing", e && e.message); return true; }
+  }
+  if (req.method === "GET" && /^\/(expand|buoy|health)$/.test(url.pathname)) {
+    if (await limited(env.WRITE_LIMIT, `${clientIp}:get`)) return json({ error: "rate limited" }, 429, { ...headers, "retry-after": "60" });
+  }
   // GET /expand?u=<short maps link> → { url } after following redirects. Browsers cannot expand
   // maps.app.goo.gl links themselves (no CORS), and that is what the Google Maps app shares.
   if (url.pathname === "/expand" && req.method === "GET") {
@@ -137,38 +177,33 @@ async function handleFetch(req, env) {
     return json({ url: cur }, 200, headers);
   }
   if (url.pathname === "/buoy" && req.method === "GET") {
-    const lat = Number(url.searchParams.get("lat")), lon = Number(url.searchParams.get("lon"));
-    if (!Number.isFinite(lat) || !Number.isFinite(lon)) return json({ error: "bad coords" }, 400, headers);
+    const latRaw = url.searchParams.get("lat"), lonRaw = url.searchParams.get("lon");
+    const lat = Number(latRaw), lon = Number(lonRaw);
+    if (latRaw === null || lonRaw === null || latRaw === "" || lonRaw === "" || !Number.isFinite(lat) || !Number.isFinite(lon)
+      || Math.abs(lat) > 90 || Math.abs(lon) > 180) return json({ error: "bad coords" }, 400, headers);
     const b = await nearestBuoy(lat, lon);
     return b ? json(b, 200, { ...headers, "cache-control": "public, max-age=300" }) : json({ error: "no fresh buoy in reach" }, 404, headers);
   }
   if (url.pathname === "/health") {
-    // Aggregates only (never endpoints or keys). byBeach comes from the cron's own pass, so a /health call
-    // costs one KV read instead of one per subscriber.
+    if (req.method !== "GET") return json({ error: "method" }, 405, headers);
+    // Counts only. Beach names are NOT published here: a subscriber can type any name they like when they
+    // add a custom beach, so the per-beach breakdown is personal data, not a safe public aggregate.
     const list = await env.SUBS.list({ prefix: "sub:", limit: 1000 });
-    const lastCron = await env.SUBS.get("meta:cron", "json");
-    return json({ ok: true, subscribers: list.keys.length, byBeach: (lastCron && lastCron.byBeach) || {}, lastCron, configured: !!(env.VAPID_PRIVATE_KEY && env.VAPID_SUBJECT) }, 200, { ...headers, "cache-control": "no-store" });
+    const c = await env.SUBS.get("meta:cron", "json");
+    const lastCron = c ? { at: c.at, day: c.day, subscribers: c.subscribers, beaches: c.beaches, sent: c.sent, dropped: c.dropped, errors: c.errors, sentToday: c.sentToday } : null;
+    return json({ ok: true, subscribers: list.keys.length, beaches: (c && c.beaches) || 0, lastCron, configured: !!(env.VAPID_PRIVATE_KEY && env.VAPID_SUBJECT) }, 200, { ...headers, "cache-control": "no-store" });
   }
   if (req.method !== "POST") return json({ error: "method" }, 405, headers);
   if (!originOk) return json({ error: "origin not allowed" }, 403);
-  // Optional bindings (see wrangler.toml [[ratelimits]]): absent binding → no limit, never a crash.
-  const ip = req.headers.get("CF-Connecting-IP") || "unknown";
-  const limiter = url.pathname === "/test" ? env.TEST_LIMIT : env.WRITE_LIMIT;
-  if (limiter && typeof limiter.limit === "function") {
-    const key = url.pathname === "/test" ? `${ip}:test` : ip;
-    try { if (!(await limiter.limit({ key })).success) return json({ error: "rate limited" }, 429, { ...headers, "retry-after": "60" }); }
-    catch (e) { console.warn("rate limiter failed open", e && e.message); }
-  }
-  const len = Number(req.headers.get("content-length") || 0);
-  if (len > 4096) return json({ error: "payload too large" }, 413, headers);
-  let raw; try { raw = await req.text(); } catch (e) { return json({ error: "bad body" }, 400, headers); }
-  if (raw.length > 4096) return json({ error: "payload too large" }, 413, headers);
-  let body; try { body = JSON.parse(raw); } catch (e) { return json({ error: "bad json" }, 400, headers); }
-  if (!body || typeof body !== "object") return json({ error: "bad json" }, 400, headers);
+  if (await limited(env.WRITE_LIMIT, clientIp)) return json({ error: "rate limited" }, 429, { ...headers, "retry-after": "60" });
+  if (Number(req.headers.get("content-length") || 0) > 4096) return json({ error: "payload too large" }, 413, headers);
+  const parsed = await readJsonLimited(req);
+  if (parsed.error) return json({ error: parsed.error === 413 ? "payload too large" : "bad json" }, parsed.error, headers);
+  const body = parsed.body;
 
   if (url.pathname === "/subscribe") {
     const { subscription: sub, beach } = body;
-    if (!validSub(sub)) return json({ error: "bad subscription" }, 400, headers);
+    if (!(await validSub(sub))) return json({ error: "bad subscription" }, 400, headers);
     if (!validBeach(beach)) return json({ error: "bad beach" }, 400, headers);
     const k = await keyFor(sub.endpoint), now = new Date().toISOString();
     const prev = await env.SUBS.get(k, "json");
@@ -191,7 +226,7 @@ async function handleFetch(req, env) {
   }
   if (url.pathname === "/rotate") {
     const { oldEndpoint, subscription: sub } = body;
-    if (!validSub(sub) || !pushEndpoint(oldEndpoint)) return json({ error: "bad rotate" }, 400, headers);
+    if (!(await validSub(sub)) || !pushEndpoint(oldEndpoint)) return json({ error: "bad rotate" }, 400, headers);
     const oldK = await keyFor(oldEndpoint), prev = await env.SUBS.get(oldK, "json");
     if (!prev) return json({ ok: false, error: "unknown old endpoint" }, 404, headers);
     if (!sameAuth(body.oldAuth, prev.sub && prev.sub.keys && prev.sub.keys.auth)) return json({ error: "forbidden" }, 403, headers);
@@ -211,6 +246,10 @@ async function handleFetch(req, env) {
     if (!rec) return json({ ok: false, error: "not subscribed" }, 404, headers);
     // Knowing an endpoint is not enough to make us push to it: prove you are the browser that registered it.
     if (!sameAuth(body.auth, rec.sub && rec.sub.keys && rec.sub.keys.auth)) return json({ error: "forbidden" }, 403, headers);
+    // Per-IP is not enough for /test (it sends a real push): limit the subscription itself too.
+    const sk = await keyFor(body.endpoint);
+    if (await limited(env.TEST_LIMIT, `${clientIp}:test`) || await limited(env.TEST_LIMIT, `sub:${sk}`))
+      return json({ error: "rate limited" }, 429, { ...headers, "retry-after": "60" });
     const c = Palata.notifyCopy(false, rec.beach.name, null, null, 85);
     const status = await sendPush(env, rec.sub, { title: "🔔 בדיקה · " + c.title, body: "זו התראת בדיקה מהשרת — אם קיבלת אותה, ההתראות האמיתיות יגיעו גם כשהאפליקציה סגורה.", tag: "yp-test", url: `${env.APP_URL}?b=${encodeURIComponent(rec.beach.key)}` });
     return json({ ok: status >= 200 && status < 300, status }, 200, headers);
@@ -224,11 +263,9 @@ async function runScheduled(env, ctx) {
   const list = await env.SUBS.list({ prefix: "sub:", limit: 1000 });
   const forecasts = new Map();   // "lat,lon" → scored hours (one Open-Meteo call per beach)
   let sent = 0, dropped = 0, errors = 0;
-  const byBeach = {};
   for (const { name: k } of list.keys) {
     if (k === "meta:cron") continue;
     const rec = await env.SUBS.get(k, "json"); if (!rec || !rec.sub || !rec.beach) continue;
-    if (rec.beach.name) byBeach[rec.beach.name] = (byBeach[rec.beach.name] || 0) + 1;
     const fkey = `${rec.beach.lat.toFixed(2)},${rec.beach.lon.toFixed(2)}`;
     try {
       if (!forecasts.has(fkey)) forecasts.set(fkey, scoreHours(await fetchForecast(rec.beach.lat, rec.beach.lon), Palata));
@@ -254,7 +291,7 @@ async function runScheduled(env, ctx) {
   try {
     const prev = (await env.SUBS.get("meta:cron", "json")) || {};
     const day = now.dateStr, sentToday = (prev.day === day ? (prev.sentToday || 0) : 0) + sent;
-    await env.SUBS.put("meta:cron", JSON.stringify({ at: new Date().toISOString(), day, subscribers: list.keys.length, beaches: forecasts.size, sent, dropped, errors, sentToday, byBeach }));
+    await env.SUBS.put("meta:cron", JSON.stringify({ at: new Date().toISOString(), day, subscribers: list.keys.length, beaches: forecasts.size, sent, dropped, errors, sentToday }));
   } catch (e) { console.warn("meta:cron write failed", e && e.message); }
 }
 

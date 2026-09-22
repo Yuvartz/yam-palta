@@ -23,7 +23,7 @@
    ```bash
    npx wrangler kv namespace create SUBS
    ```
-   הפלט מכיל `id = "…"`. הדבק אותו ב-`wrangler.toml` בשני המקומות (`id` ו-`preview_id`) במקום `REPLACE_WITH_KV_NAMESPACE_ID`.
+# (preview_id is only needed for `wrangler dev --remote`; create a SEPARATE namespace for it, never the production one)
 4. **סודות** (המפתח הפרטי מ-`VAPID-KEYS.local.txt` — לא נכנס ל-git לעולם):
    ```bash
    npx wrangler secret put VAPID_PRIVATE_KEY

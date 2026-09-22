@@ -100,7 +100,7 @@
     <h2>אנליטיקס (GoatCounter)</h2>
     <div class="card" id="cGc">
       <div class="row" id="gcAuth">
-        <input type="password" id="gcToken" placeholder="הדבק כאן API token מ-GoatCounter (הגדרות ← API tokens, הרשאת Read statistics). נשמר רק בדפדפן הזה." />
+        <input type="password" id="gcToken" placeholder="API token מ-GoatCounter, הרשאת Read statistics בלבד. נשמר בזיכרון הלשונית בלבד ולא נשמר בדפדפן." autocomplete="off" />
         <button class="btn" id="gcSave">שמור</button>
         <a class="meta" href="https://yuvartz.goatcounter.com/user/api" target="_blank" rel="noopener">איפה מייצרים token?</a>
       </div>
@@ -122,10 +122,10 @@
       <a href="https://isramar.ocean.org.il/isramar2009/station/HaderaRDI.aspx" target="_blank" rel="noopener">ISRAMAR חדרה</a>
     </div>
   </section>
-  <footer>הלוח קורא נתונים בלבד ולא משנה דבר. תחזיות: Open-Meteo (אותו מתכון כמו באפליקציה). מצוף: ISRAMAR דרך ה-Worker. הטוקן של GoatCounter נשמר רק במכשיר הזה.</footer>
+  <footer>הלוח קורא נתונים בלבד ולא משנה דבר. תחזיות: Open-Meteo (אותו מתכון כמו באפליקציה). מצוף: ISRAMAR דרך ה-Worker. הטוקן של GoatCounter נשאר בזיכרון הלשונית בלבד.</footer>
 </div>
 
-<script src="/palata.js?v=34"></script>
+<script src="/palata.js?v=35"></script>
 <script>
 (() => {
   const $ = id => document.getElementById(id);
@@ -168,8 +168,8 @@
       const h = await getJson(`${PUSH_API}/health`, { cache: "no-store" });
       const lc = h.lastCron, age = lc ? ago(lc.at) : null;
       setCard("cPush", h.configured ? (lc ? stateByAge(age, 0.6, 2) : "warn") : "bad", `<span class="num">${num(h.subscribers)}</span> <span class="sub">מנויים</span>`, `${h.configured ? "מפתחות VAPID מוגדרים" : "חסרים מפתחות VAPID"}${lc ? ` · ריצה אחרונה ${agoText(lc.at)}` : " · אין עדיין נתוני ריצה (פרסו את ה-Worker המעודכן)"}`);
-      const by = h.byBeach || {}; const rows = Object.entries(by).sort((a, b) => b[1] - a[1]);
-      $("cSubs").innerHTML = rows.length ? `<div class="kv">${rows.map(([n, c]) => `<span>${esc(n)}</span><b class="num">${num(c)}</b>`).join("")}</div>` : `<div class="sub">${num(h.subscribers)} מנויים · פירוט לפי חוף יופיע אחרי פריסת ה-Worker המעודכן</div>`;
+      // The server deliberately does not expose per-beach names (a custom beach name is personal data).
+      $("cSubs").innerHTML = `<div class="kv"><span>מנויים פעילים</span><b class="num">${num(h.subscribers)}</b><span>חופים שונים</span><b class="num">${num(h.beaches)}</b></div><div class="sub" style="margin-top:8px">פירוט לפי שם חוף לא נחשף ב-API הציבורי, כדי לא לפרסם שמות חופים שמשתמשים הגדירו בעצמם.</div>`;
       $("cCron").innerHTML = lc ? `<div class="kv"><span>מתי</span><b>${fmtIL(lc.at)} (${agoText(lc.at)})</b><span>מנויים שנבדקו</span><b class="num">${num(lc.subscribers)}</b><span>חופים שנמשכו</span><b class="num">${num(lc.beaches)}</b><span>נשלחו בריצה</span><b class="num">${num(lc.sent)}</b><span>נשלחו היום</span><b class="num">${num(lc.sentToday)}</b><span>הוסרו (מנוי מת)</span><b class="num">${num(lc.dropped)}</b><span>שגיאות</span><b class="num" style="color:${lc.errors ? "var(--bad)" : "inherit"}">${num(lc.errors)}</b></div>` : `<div class="sub">ה-Worker רץ כל 15 דקות. פרטי הריצה יופיעו כאן אחרי הפריסה הבאה (<code>npx wrangler deploy</code>).</div>`;
     } catch (e) { setCard("cPush", "bad", "לא זמין", esc(e.message)); $("cSubs").innerHTML = $("cCron").innerHTML = `<span class="err">${esc(e.message)}</span>`; }
   }
@@ -177,7 +177,7 @@
     try {
       let b = null; try { b = await getJson(`${PUSH_API}/buoy?lat=32.08&lon=34.76`); } catch (e) { b = await getJson("/data/hadera-waves.json?v=" + Math.floor(Date.now() / 36e5), { cache: "no-store" }); }
       const age = ago(b.measured.measuredAt);
-      setCard("cBuoy", stateByAge(age, 6, 9), `<span class="num">${b.measured.waveHeight.toFixed(2)}</span> <span class="sub">מ׳</span>`, `נמדד ${fmtIL(b.measured.measuredAt)} (${agoText(b.measured.measuredAt)})${b.measured.wavePeriod != null ? ` · מחזור <span class="num">${b.measured.wavePeriod}</span> שנ׳` : ""}${b.measured.waveMax != null ? ` · מקס׳ <span class="num">${b.measured.waveMax.toFixed(2)}</span> מ׳` : ""} · ${esc(b.station && b.station.name || "")}`);
+      setCard("cBuoy", stateByAge(age, 6, 9), `<span class="num">${b.measured.waveHeight.toFixed(2)}</span> <span class="sub">מ׳</span>`, `נמדד ${fmtIL(b.measured.measuredAt)} (${agoText(b.measured.measuredAt)})${b.measured.wavePeriod != null ? ` · מחזור <span class="num">${num(b.measured.wavePeriod)}</span> שנ׳` : ""}${b.measured.waveMax != null ? ` · מקס׳ <span class="num">${b.measured.waveMax.toFixed(2)}</span> מ׳` : ""} · ${esc(b.station && b.station.name || "")}`);
     } catch (e) { setCard("cBuoy", "bad", "אין נתון", esc(e.message)); }
   }
   async function loadJelly() {
@@ -186,7 +186,7 @@
       const recent = (j.reports || []).filter(r => { const t = Date.parse(r.date); return !isNaN(t) && Date.now() - t <= 48 * 36e5; });
       const located = recent.filter(r => r.lat != null).length;
       const age = ago(j.updated);
-      setCard("cJelly", stateByAge(age, 6, 24), `<span class="num">${num(recent.length)}</span> <span class="sub">דיווחים ב-48 שע׳</span>`, `<span class="num">${located}</span> עם מיקום מזוהה · הפיד עודכן ${agoText(j.updated)} · סה״כ <span class="num">${j.count || (j.reports || []).length}</span> בקובץ`);
+      setCard("cJelly", stateByAge(age, 6, 24), `<span class="num">${num(recent.length)}</span> <span class="sub">דיווחים ב-48 שע׳</span>`, `<span class="num">${located}</span> עם מיקום מזוהה · הפיד עודכן ${agoText(j.updated)} · סה״כ <span class="num">${num(j.count ?? (j.reports || []).length)}</span> בקובץ`);
     } catch (e) { setCard("cJelly", "bad", "אין נתון", esc(e.message)); }
   }
   async function loadPages() {
@@ -242,14 +242,18 @@
   }
 
   // ---- GoatCounter (token stays in this browser) ----
-  const gcToken = () => { try { return localStorage.getItem("yp-panel-gc") || ""; } catch (e) { return ""; } };
-  $("gcSave").onclick = () => { try { localStorage.setItem("yp-panel-gc", $("gcToken").value.trim()); } catch (e) {} loadGc(); };
+  // The token is NOT persisted: localStorage on this origin is readable by any script that ever runs on
+  // yamplata.com, and a stored analytics token would outlive the tab. Kept in memory, re-entered per session.
+  let gcTokenValue = "";
+  try { localStorage.removeItem("yp-panel-gc"); } catch (e) {}
+  const gcToken = () => gcTokenValue;
+  $("gcSave").onclick = () => { const v = $("gcToken").value.trim(); if (!v) return; gcTokenValue = v; $("gcToken").value = ""; loadGc(); };
   const day = d => d.toISOString().slice(0, 10);
   async function gc(path) { return getJson(`${GC}/api/v0/${path}`, { headers: { Authorization: "Bearer " + gcToken() } }); }
   async function loadGc() {
     const tok = gcToken(); const body = $("gcBody");
-    if (!tok) { body.innerHTML = `<div class="sub">בלי טוקן אפשר לפתוח את <a href="${GC}" target="_blank" rel="noopener">הדשבורד של GoatCounter</a>. עם טוקן (הרשאת קריאה בלבד) המספרים יופיעו כאן.</div>`; return; }
-    $("gcToken").value = "••••••••"; body.className = ""; body.innerHTML = `<span class="skeleton">טוען…</span>`;
+    if (!tok) { body.innerHTML = `<div class="sub">בלי טוקן אפשר לפתוח את <a href="${GC}" target="_blank" rel="noopener">הדשבורד של GoatCounter</a>. עם טוקן (הרשאת Read statistics בלבד) המספרים יופיעו כאן עד סגירת הלשונית.</div>`; return; }
+    body.className = ""; body.innerHTML = `<span class="skeleton">טוען…</span>`;
     try {
       const now = new Date(), d1 = new Date(now - 864e5), d7 = new Date(now - 7 * 864e5), d30 = new Date(now - 30 * 864e5);
       const [t1, t7, t30, hits] = await Promise.all([
@@ -270,7 +274,7 @@
           <div><h3 style="margin:0 0 6px;color:#aab8ce;font-size:13px">אירועים באפליקציה, 7 ימים</h3><table>${events.map(p => `<tr><td>${esc(evName[p.path] || p.path)}</td><td class="num">${num(p.count)}</td></tr>`).join("") || "<tr><td class='sub'>אין עדיין</td></tr>"}</table></div>
         </div>
         <div class="sub" style="margin-top:8px">מקור: GoatCounter API · <a href="${GC}" target="_blank" rel="noopener">לדשבורד המלא</a> · <a href="#" id="gcForget">שכח טוקן</a></div>`;
-      $("gcForget").onclick = ev => { ev.preventDefault(); try { localStorage.removeItem("yp-panel-gc"); } catch (e) {} $("gcToken").value = ""; loadGc(); };
+      $("gcForget").onclick = ev => { ev.preventDefault(); gcTokenValue = ""; $("gcToken").value = ""; loadGc(); };
     } catch (e) { body.innerHTML = `<span class="err">GoatCounter: ${esc(e.message)} (טוקן לא תקין, או שחסרה הרשאת Read statistics)</span>`; }
   }
 
