@@ -185,8 +185,10 @@
       const j = await getJson("/data/jellyfish.json?v=" + Math.floor(Date.now() / 36e5), { cache: "no-store" });
       const recent = (j.reports || []).filter(r => { const t = Date.parse(r.date); return !isNaN(t) && Date.now() - t <= 48 * 36e5; });
       const located = recent.filter(r => r.lat != null).length;
-      const age = ago(j.updated);
-      setCard("cJelly", stateByAge(age, 6, 24), `<span class="num">${num(recent.length)}</span> <span class="sub">דיווחים ב-48 שע׳</span>`, `<span class="num">${located}</span> עם מיקום מזוהה · הפיד עודכן ${agoText(j.updated)} · סה״כ <span class="num">${num(j.count ?? (j.reports || []).length)}</span> בקובץ`);
+      // Health tracks whether the SCRAPE ran (checkedAt), not whether the content changed: an unchanged
+      // feed is normal, a feed that stopped being fetched is not, and they used to look identical here.
+      const checked = j.checkedAt || j.updated, age = ago(checked);
+      setCard("cJelly", stateByAge(age, 8, 26), `<span class="num">${num(recent.length)}</span> <span class="sub">דיווחים ב-48 שע׳</span>`, `<span class="num">${num(located)}</span> עם מיקום מזוהה · נבדק ${agoText(checked)} · תוכן השתנה ${agoText(j.updated)} · סה״כ <span class="num">${num(j.count ?? (j.reports || []).length)}</span>`);
     } catch (e) { setCard("cJelly", "bad", "אין נתון", esc(e.message)); }
   }
   async function loadPages() {
