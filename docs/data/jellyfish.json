@@ -1,9 +1,24 @@
 {
-  "updated": "2026-09-22T15:14:33.018Z",
-  "checkedAt": "2026-09-22T15:14:33.018Z",
+  "updated": "2026-09-22T19:21:58.828Z",
+  "checkedAt": "2026-09-22T19:21:58.829Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25929",
+      "location": "תל אביב צפון - הירקון, מציצים, הילטון ומרינה תל אביב",
+      "lat": 32.085,
+      "lon": 34.766,
+      "date": "2026-09-22T20:00+03:00",
+      "dateText": "22.09.2026",
+      "time": "20:00",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": "אין מדוזות",
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25929"
+    },
     {
       "id": "25927",
       "location": "בת ים וראשון לציון",
@@ -1188,21 +1203,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25840"
-    },
-    {
-      "id": "25839",
-      "location": "בת גלים",
-      "lat": 32.827,
-      "lon": 34.987,
-      "date": "2026-08-30T17:45+03:00",
-      "dateText": "30.08.2026",
-      "time": "17:45",
-      "activity": "הליכה על החוף",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25839"
     }
   ]
 }
