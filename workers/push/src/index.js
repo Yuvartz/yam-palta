@@ -77,8 +77,10 @@ async function sendPush(env, sub, payload) {
   if (!(await validSub(sub))) throw new Error("invalid subscription");   // also guards records already in KV
   const vapid = { subject: env.VAPID_SUBJECT, publicKey: env.VAPID_PUBLIC_KEY, privateKey: env.VAPID_PRIVATE_KEY };
   const init = await buildPushPayload({ data: JSON.stringify(payload), options: { ttl: 3600, urgency: "high", topic: (payload.tag || "yp").slice(0, 32).replace(/[^A-Za-z0-9_-]/g, "") } }, sub, vapid);
-  // redirect:"error" — a push service must answer directly; a redirect would send our request elsewhere.
-  const res = await fetch(sub.endpoint, { ...init, redirect: "error", signal: AbortSignal.timeout(8000) });
+  // A push service must answer directly. Workers only supports redirect follow|manual, so take manual and
+  // treat any 3xx as a failure rather than letting our request be sent somewhere else.
+  const res = await fetch(sub.endpoint, { ...init, redirect: "manual", signal: AbortSignal.timeout(8000) });
+  if (res.status >= 300 && res.status < 400) throw new Error(`push endpoint redirected (${res.status})`);
   return res.status;   // 201 accepted; 404/410 gone
 }
 
@@ -100,8 +102,8 @@ const haversine = (a, b, c, d) => { const R = 6371, r = x => x * Math.PI / 180, 
 const pickParam = (params, name) => { const p = (params || []).find(x => x.name === name); const v = p && Array.isArray(p.values) ? Number(p.values[0]) : NaN; return Number.isFinite(v) && v >= 0 && v < 30 ? v : null; };
 const isoOf = dt => { const m = /(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})/.exec(dt || ""); return m ? `${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:00Z` : null; };
 async function readBuoy(st) {
-  const r = await fetch(st.src, { cf: { cacheTtl: 900, cacheEverything: true }, headers: { "user-agent": "YamPlata/1.0 (+https://yamplata.com)" }, redirect: "error", signal: AbortSignal.timeout(8000) });
-  if (!r.ok) return null;
+  const r = await fetch(st.src, { cf: { cacheTtl: 900, cacheEverything: true }, headers: { "user-agent": "YamPlata/1.0 (+https://yamplata.com)" }, redirect: "manual", signal: AbortSignal.timeout(8000) });
+  if (!r.ok) return null;   // a 3xx is not ok either, so a redirected station feed is simply skipped
   const raw = await r.json().catch(() => null); if (!raw) return null;
   const measured = { waveHeight: pickParam(raw.parameters, "Significant wave height"), wavePeriod: pickParam(raw.parameters, "Peak wave period"), waveMax: pickParam(raw.parameters, "Maximal wave height"), measuredAt: isoOf(raw.datetime) };
   if (measured.waveHeight == null || !measured.measuredAt) return null;
@@ -250,8 +252,10 @@ async function handleFetch(req, env) {
     const sk = await keyFor(body.endpoint);
     if (await limited(env.TEST_LIMIT, `${clientIp}:test`) || await limited(env.TEST_LIMIT, `sub:${sk}`))
       return json({ error: "rate limited" }, 429, { ...headers, "retry-after": "60" });
+    let status;
     const c = Palata.notifyCopy(false, rec.beach.name, null, null, 85);
-    const status = await sendPush(env, rec.sub, { title: "🔔 בדיקה · " + c.title, body: "זו התראת בדיקה מהשרת — אם קיבלת אותה, ההתראות האמיתיות יגיעו גם כשהאפליקציה סגורה.", tag: "yp-test", url: `${env.APP_URL}?b=${encodeURIComponent(rec.beach.key)}` });
+    try { status = await sendPush(env, rec.sub, { title: "🔔 בדיקה · " + c.title, body: "זו התראת בדיקה מהשרת — אם קיבלת אותה, ההתראות האמיתיות יגיעו גם כשהאפליקציה סגורה.", tag: "yp-test", url: `${env.APP_URL}?b=${encodeURIComponent(rec.beach.key)}` });
+    } catch (e) { console.warn("test push failed", e && e.message); return json({ ok: false, error: String(e && e.message || e).slice(0, 200) }, 502, headers); }
     return json({ ok: status >= 200 && status < 300, status }, 200, headers);
   }
   return json({ error: "not found" }, 404, headers);
