@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
-import { decide, scoreHours, calmRunAt, isQuiet } from "../src/policy.js";
+import { decide, scoreHours, calmRunAt, isQuiet, stateSignature } from "../src/policy.js";
 const Palata = createRequire(import.meta.url)("../../../docs/palata.js");
 
 const beach = { key: "telaviv", name: "תל אביב" };
@@ -101,4 +101,27 @@ test("recipeUrls pins the models on every surface", () => {
   const u = Palata.recipeUrls(32.08, 34.76, { forecastDays: 3, pastDays: 1 });
   assert.match(u.marine, /models=best_match,meteofrance_wave,ecmwf_wam/); assert.match(u.weather, /models=ecmwf_ifs025,icon_seamless/);
   assert.match(u.marine, /forecast_days=3&past_days=1/); assert.doesNotMatch(u.sun, /models=/);
+});
+
+// ---- KV write-skipping is safe only if decide() ignores the fields we do not persist ----
+test("states that share a signature produce identical decisions", () => {
+  const sc = scoreHours(day("2026-09-21", { 8: calm, 9: calm, 10: calm }), Palata);
+  const now = { dateStr: "2026-09-21", hour: 8, minute: 5 };
+  const a = { lastCalm: false, lastScore: 61, lastSeen: "2026-09-21T08:05", sent: [] };
+  const b = { lastCalm: false, lastScore: 74, lastSeen: "2026-09-20T23:59", sent: [] };   // differs only where decide() does not look
+  assert.equal(stateSignature(a, Palata), stateSignature(b, Palata));
+  const ra = decide({ scored: sc, now, state: a, beach, Palata, appUrl: APP });
+  const rb = decide({ scored: sc, now, state: b, beach, Palata, appUrl: APP });
+  // The body text is chosen at random from the copy pool, so compare the decision itself.
+  const decision = r => r.events.map(e => [e.id, e.type, e.tag, e.url, e.title]);
+  assert.deepEqual(decision(ra), decision(rb));
+  assert.equal(stateSignature(ra.state, Palata), stateSignature(rb.state, Palata));
+});
+test("signature changes exactly when a decision input changes", () => {
+  const base = { lastCalm: false, lastScore: 50, sent: [] };
+  const sig = st => stateSignature(st, Palata);
+  assert.notEqual(sig(base), sig({ ...base, lastCalm: true }));                    // calm flipped
+  assert.notEqual(sig(base), sig({ ...base, lastScore: Palata.DELUXE_MIN }));      // crossed the deluxe line
+  assert.notEqual(sig(base), sig({ ...base, sent: ["telaviv:onset:2026-09-21"] })); // a push was recorded
+  assert.equal(sig(base), sig({ ...base, lastScore: 79, lastSeen: "whenever" }));  // still below deluxe → same decisions
 });

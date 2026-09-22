@@ -11,7 +11,7 @@
 
 import { buildPushPayload } from "@block65/webcrypto-web-push";
 import PalataMod from "../../../docs/palata.js";   // UMD; the bundler exposes module.exports as the default
-import { decide, israelParts, scoreHours } from "./policy.js";
+import { decide, israelParts, scoreHours, stateSignature } from "./policy.js";
 
 const Palata = PalataMod && PalataMod.scoreOf ? PalataMod : globalThis.Palata;   // shared scoring + copy
 if (!Palata || !Palata.scoreOf) throw new Error("palata.js did not load");
@@ -240,10 +240,13 @@ async function runScheduled(env, ctx) {
         if (status >= 200 && status < 300) sent++; else { errors++; console.warn("push status", status, rec.beach.key, e.type); }
       }
       if (gone) { await env.SUBS.delete(k); dropped++; continue; }
-      // Only write when something actually changed: the free KV tier allows 1000 writes/day and the cron
-      // runs 96 times a day, so an unconditional write caps us at ~10 subscribers.
-      const before = JSON.stringify(rec.state || {}), after = JSON.stringify(state);
-      if (before !== after) { rec.state = state; rec.updatedAt = new Date().toISOString(); await env.SUBS.put(k, JSON.stringify(rec)); }
+      // Write only when the part of the state that decide() actually reads has changed. Comparing the whole
+      // object would always differ (it carries a lastSeen timestamp), which is what blew the KV write quota:
+      // 96 cron runs/day × every subscriber against a 1000 writes/day free tier.
+      if (stateSignature(rec.state, Palata) !== stateSignature(state, Palata)) {
+        rec.state = state; rec.updatedAt = new Date().toISOString();
+        await env.SUBS.put(k, JSON.stringify(rec));
+      }
     } catch (err) { errors++; console.warn("subscriber failed", rec.beach && rec.beach.key, err && err.message); }
   }
   console.log(`cron ${now.dateStr} ${now.hour}:${String(now.minute).padStart(2, "0")} subs=${list.keys.length} beaches=${forecasts.size} sent=${sent} dropped=${dropped} errors=${errors}`);

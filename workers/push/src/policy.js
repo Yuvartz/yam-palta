@@ -54,6 +54,16 @@ export const isQuiet = hour => hour >= QUIET_START || hour < QUIET_END;
  * @param {object} args.Palata
  * @returns {{ events: Array<{id,type,title,body,tag,url}>, state: object }}
  */
+// decide() reads only three things out of the stored state: whether we were calm, whether the previous
+// score had already reached deluxe, and the ids already sent. Two states with the same signature produce
+// identical decisions, so the cron can skip the KV write when the signature is unchanged (the free tier
+// allows 1000 writes/day and the cron runs 96 times a day). lastSeen/lastScore are diagnostics only.
+export function stateSignature(state, Palata) {
+  const st = state || {};
+  const deluxeAlready = st.lastScore != null && st.lastScore >= Palata.DELUXE_MIN;
+  return JSON.stringify([!!st.lastCalm, deluxeAlready, st.sent || []]);
+}
+
 export function decide({ scored, now, state, beach, Palata, appUrl }) {
   const sent = new Set(state.sent || []);
   const events = [];
