@@ -11,7 +11,7 @@
 //   • Google Fonts: cache-first (immutable files).
 // Bump VERSION on any shell change — activate cleans older yp-* caches (only ours: Cache Storage
 // is shared by every project on this GitHub Pages origin).
-const VERSION = "v33";
+const VERSION = "v34";
 const PREFIX = "yp-";
 const SHELL_CACHE = `${PREFIX}shell-${VERSION}`;
 const API_CACHE = `${PREFIX}api-${VERSION}`;
@@ -169,7 +169,7 @@ self.addEventListener("pushsubscriptionchange", e => {
   if (!opts || !opts.applicationServerKey) return;
   e.waitUntil(self.registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: opts.applicationServerKey })
     .then(sub => PUSH_API && e.oldSubscription ? fetch(PUSH_API + "/rotate", { method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ oldEndpoint: e.oldSubscription.endpoint, subscription: sub.toJSON() }) }) : null)
+      body: JSON.stringify({ oldEndpoint: e.oldSubscription.endpoint, oldAuth: e.oldSubscription.toJSON().keys.auth, subscription: sub.toJSON() }) }) : null)
     .catch(() => {}));
 });
 

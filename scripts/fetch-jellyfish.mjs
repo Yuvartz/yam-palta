@@ -58,7 +58,6 @@ function parse(html) {
   const reports = [];
   for (const block of parts) {
     const id = grab(block, /data-link="\/observation\/(\d+)"/) || grab(block, /\/observation\/(\d+)/);
-    const reporter = grab(block, /class="under red_text">([^<]+)<\/a>/);
     const dateText = grab(block, /(\d{1,2}\.\d{1,2}\.\d{4})/);
     const time = grab(block, /(\d{1,2}:\d{2})/);
     const location = grab(block, /class="under">\s*([^<]+?)\s*<\/a>/);
@@ -70,7 +69,7 @@ function parse(html) {
     if (!location && !dateText) continue;
     const [lat, lon] = geocode(location);
     reports.push({
-      id, reporter, location, lat, lon,
+      id, location, lat, lon,   // reporter name deliberately not published (the app never shows it)
       date: toISO(dateText, time), dateText, time,
       activity, distance, quantity, species, diameter: diameter ? clean(diameter) : null,
       url: id ? `https://www.meduzot.co.il/observation/${id}` : "https://www.meduzot.co.il/list",
@@ -81,7 +80,7 @@ function parse(html) {
 }
 
 async function main() {
-  const res = await fetch(LIST_URL, { headers: { "User-Agent": "yam-palata/1.0 (+github pages personal app)" } });
+  const res = await fetch(LIST_URL, { headers: { "User-Agent": "yam-palata/1.0 (+github pages personal app)" }, redirect: "error", signal: AbortSignal.timeout(20000) });
   if (!res.ok) throw new Error("fetch failed: " + res.status);
   const html = await res.text();
   const reports = parse(html);

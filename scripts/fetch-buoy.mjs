@@ -31,7 +31,7 @@ function toISO(dt) {
 }
 
 async function main() {
-  const res = await fetch(SRC, { headers: { "User-Agent": "yam-palata/1.0 (+github pages personal app)" } });
+  const res = await fetch(SRC, { headers: { "User-Agent": "yam-palata/1.0 (+github pages personal app)" }, redirect: "error", signal: AbortSignal.timeout(20000) });
   if (!res.ok) throw new Error("fetch failed: " + res.status);
   const raw = await res.json();
 

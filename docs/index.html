@@ -940,7 +940,7 @@
     </div>
   </div>
 
-  <script src="palata.js?v=33"></script>  <!-- query = build: fresh HTML never runs a stale cached palata.js -->
+  <script src="palata.js?v=34"></script>  <!-- query = build: fresh HTML never runs a stale cached palata.js -->
   <script>
   const App = (() => {
     "use strict";
@@ -1457,7 +1457,9 @@
     // Attribution: the measurement is © ISRAMAR / IOLR — always name and link the source.
     function buoyCreditHTML(ref) {
       const b = buoyInfo(ref); if (!b) return "";
-      const stn = `<a href="${esc(buoy.sourceUrl || "https://isramar.ocean.org.il/")}" target="_blank" rel="noopener">${esc(buoy.station.name)} (ISRAMAR)</a>`;
+      // The feed is ours, but never let a URL from data become a javascript:/data: link.
+      const safeUrl = u => { try { const x = new URL(u, location.href); return x.protocol === "https:" || x.protocol === "http:" ? x.href : null; } catch (e) { return null; } };
+      const stn = `<a href="${esc(safeUrl(buoy.sourceUrl) || "https://isramar.ocean.org.il/")}" target="_blank" rel="noopener">${esc(buoy.station.name)} (ISRAMAR)</a>`;
       const when = b.age <= 0 ? "בשעה האחרונה" : `לפני ${b.age} שע׳`, where = `${b.dist} ק״מ מכאן`;
       if (b.kind === "warn") return `${ic("alert", "color:#f0a55a")} המצוף מודד ${b.meas.toFixed(1)} מ׳ (${when}, ${where}) — גבוה מהתחזית ${b.fc.toFixed(1)} מ׳ · ${stn}`;
       if (b.kind === "lower") return `${ic("buoy")} המצוף מודד ${b.meas.toFixed(1)} מ׳ (${when}, ${where}) — נמוך מהתחזית ${b.fc.toFixed(1)} מ׳ · ${stn}`;
@@ -2353,7 +2355,7 @@
     let qrLibPromise = null;
     function loadQrLib() {
       if (window.qrcode) return Promise.resolve();
-      if (!qrLibPromise) qrLibPromise = new Promise((res, rej) => { const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"; s.async = true; s.onload = res; s.onerror = () => { qrLibPromise = null; rej(new Error("qr lib")); }; document.head.appendChild(s); });
+      if (!qrLibPromise) qrLibPromise = new Promise((res, rej) => { const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"; s.integrity = "sha512-ZDSPMa/JM1D+7kdg2x3BsruQ6T/JpJo3jWDWkCZsP+5yVyp1KfESqLI+7RqB5k24F7p2cV7i2YHh/890y6P6Sw=="; s.crossOrigin = "anonymous"; s.async = true; s.onload = res; s.onerror = () => { qrLibPromise = null; rej(new Error("qr lib")); }; document.head.appendChild(s); });
       return qrLibPromise;
     }
     async function share() {
@@ -2623,7 +2625,7 @@
     }
     const pad2 = pad;
     // Environment line for error reports: build, OS, file facts.
-    const BUILD = "v33";
+    const BUILD = "v34";
     function camEnv(file, extra) {
       const ua = navigator.userAgent, ios = ua.match(/OS (\d+)_(\d+)/), sfv = ua.match(/Version\/(\d+(?:\.\d+)?)/);
       const os = ios ? `iOS ${ios[1]}.${ios[2]}` : /Android/.test(ua) ? "Android" : "desktop";
@@ -2705,7 +2707,10 @@
         // Real round trip: server → push service → this device's service worker. Proves the whole path.
         toast("שולח התראת בדיקה מהשרת… נעלו את המסך אם רוצים לראות אותה על מסך הנעילה", true);
         try {
-          const res = await fetch(PUSH.apiUrl + "/test", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ endpoint: rec.endpoint }) });
+          // The server requires the subscription's own auth secret, so only this device can ask for its own test.
+          const reg = await navigator.serviceWorker.ready, live = await reg.pushManager.getSubscription();
+          if (!live || live.endpoint !== rec.endpoint) { toast("ההרשמה להתראות השתנתה. כבו והפעילו את ההתראות מחדש."); return; }
+          const res = await fetch(PUSH.apiUrl + "/test", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ endpoint: live.endpoint, auth: live.toJSON().keys.auth }) });
           const j = await res.json().catch(() => ({}));
           if (!res.ok || !j.ok) { toast(`השרת לא הצליח לשלוח (${j.error || j.status || res.status}). נסו לכבות ולהפעיל את ההתראות מחדש.`); Track.event("push-test", "fail"); }
           else Track.event("push-test", "sent");
@@ -2802,7 +2807,7 @@
         else if (pushSupported()) btn.textContent = "🔔 לחצו להפעיל התראות גם כשהאפליקציה סגורה";
         else btn.textContent = "✅ התראות פעילות (כשהאפליקציה פתוחה)";
         if (help) help.innerHTML = live
-          ? `נעדכן מ-8.0 ב${rec.name || beachName}: ביום, עד פעמיים, וב-19:00 הצצה למחר · <a href="#" onclick="App.testNotification();return false">בדיקת התראה מהשרת</a> · <a href="#" onclick="App.disableNotifications();return false">כיבוי</a>`
+          ? `נעדכן מ-8.0 ב${esc(rec.name || beachName)}: ביום, עד פעמיים, וב-19:00 הצצה למחר · <a href="#" onclick="App.testNotification();return false">בדיקת התראה מהשרת</a> · <a href="#" onclick="App.disableNotifications();return false">כיבוי</a>`
           : `${pushSupported() ? (pushLastError ? `ההרשמה לא הצליחה: ${esc(pushLastError)} · ` : "") : "כרגע ההתראות תלויות בכך שהאפליקציה פועלת · "}<a href="#" onclick="App.testNotification();return false">שלח התראת בדיקה</a>`;
       }
       else if (Notification.permission === "denied") { btn.textContent = "🔕 התראות חסומות בדפדפן"; if (help) help.textContent = "להפעלה: הגדרות האתר בדפדפן ← התראות ← אפשר. אחר כך רעננו."; }
@@ -2843,7 +2848,7 @@
       try {
         const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription();
         if (sub) {
-          if (PUSH.apiUrl) fetch(PUSH.apiUrl + "/unsubscribe", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ endpoint: sub.endpoint }) }).catch(() => {});
+          if (PUSH.apiUrl) fetch(PUSH.apiUrl + "/unsubscribe", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ endpoint: sub.endpoint, auth: sub.toJSON().keys.auth }) }).catch(() => {});
           await sub.unsubscribe();
         }
       } catch (e) { console.warn("unsubscribe failed", e); }

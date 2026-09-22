@@ -13,6 +13,8 @@ import { BEACHES as ALL_BEACHES, TIER_EN, pad, dayName, dayNameEn, israelNow } f
 const BEACHES = ALL_BEACHES.filter(b => b.pages !== false);   // static pages only for beaches the app has as presets
 const alternates = (slug) => { const he = slug ? `${SITE}/${slug}/` : `${SITE}/`, en = slug ? `${SITE}/en/${slug}/` : `${SITE}/en/`; return `<link rel="alternate" hreflang="he" href="${he}" /><link rel="alternate" hreflang="en" href="${en}" /><link rel="alternate" hreflang="x-default" href="${he}" />`; };
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+// JSON-LD sits inside <script>: escape "<" so no value can end the block early.
+const ldJson = v => JSON.stringify(v).replace(/</g, "\\u003c");
 
 // Same recipe as the app and the push Worker (Palata.recipeUrls / blendHourly / scoreSeries): the static
 // page must show the number the app shows for that hour. Wave period is display-only, fetched on top.
@@ -64,8 +66,8 @@ ${alternates(b.slug)}
 <meta name="twitter:card" content="summary_large_image" /><meta name="twitter:title" content="${esc(title)}" /><meta name="twitter:description" content="${esc(desc)}" /><meta name="twitter:image" content="${SITE}/og-image.png" />
 <meta name="theme-color" content="#0a0e16" />
 <link rel="icon" href="/favicon.ico" /><link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-<script type="application/ld+json">${JSON.stringify(ld)}</script>
-<script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "ים פלטה", item: SITE + "/" }, { "@type": "ListItem", position: 2, name: b.name, item: `${SITE}/${b.slug}/` }] })}</script>
+<script type="application/ld+json">${ldJson(ld)}</script>
+<script type="application/ld+json">${ldJson({ "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "ים פלטה", item: SITE + "/" }, { "@type": "ListItem", position: 2, name: b.name, item: `${SITE}/${b.slug}/` }] })}</script>
 <style>
 :root{--bg:#0a0e16;--card:#141b2a;--text:#e6edf6;--muted:#8a98ad;--calm:#2dd4bf;--gold:#ffd479}
 *{box-sizing:border-box}body{margin:0;font-family:Heebo,system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;padding:20px 16px 40px}
@@ -123,7 +125,7 @@ ${alternates(path.replace(/^\/en\//, "").replace(/\/$/, ""))}
 <meta name="twitter:card" content="summary_large_image" /><meta name="twitter:title" content="${esc(title)}" /><meta name="twitter:description" content="${esc(desc)}" /><meta name="twitter:image" content="${SITE}/og-image.png" />
 <meta name="theme-color" content="#0a0e16" />
 <link rel="icon" href="/favicon.ico" /><link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-${ld.map(o => `<script type="application/ld+json">${JSON.stringify(o)}</script>`).join("\n")}
+${ld.map(o => `<script type="application/ld+json">${ldJson(o)}</script>`).join("\n")}
 <style>${CSS_EN}</style>
 </head>
 <body><div class="wrap">`;

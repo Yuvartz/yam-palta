@@ -17,13 +17,25 @@ crons = ["*/15 * * * *"]   # every 15 minutes, UTC; the policy converts to Israe
 [[kv_namespaces]]
 binding = "SUBS"
 id = "3b1b295d9b2346afb08d42b7d00bfbb6"
-preview_id = "3b1b295d9b2346afb08d42b7d00bfbb6"
+preview_id = "3b1b295d9b2346afb08d42b7d00bfbb6"   # NOTE: same namespace as production — `wrangler dev --remote` writes real records
 
 [vars]
 APP_URL = "https://yamplata.com/"
 VAPID_PUBLIC_KEY = "BO4TStlec2oXqIQcRZLKGFBEQmzXwM6RMw_B9IS6elX5HQ6Xyj3KXOC6v4sEZcwtpVGen8iW8o7hFql64sM0pgM"
 # Origins allowed to call the API (comma-separated). Add the custom domain when it goes live.
 ALLOWED_ORIGINS = "https://yamplata.com,https://www.yamplata.com,https://yuvartz.github.io,http://localhost:5050,http://127.0.0.1:5050"
+
+# Per-IP rate limits (Cloudflare bindings). The code treats them as optional: if a binding is missing the
+# request is served normally, so removing this block never breaks the Worker.
+[[ratelimits]]
+name = "WRITE_LIMIT"
+namespace_id = "1001"
+simple = { limit = 20, period = 60 }   # subscribe / unsubscribe / rotate
+
+[[ratelimits]]
+name = "TEST_LIMIT"
+namespace_id = "1002"
+simple = { limit = 3, period = 60 }    # /test sends a real push per call, so keep it tight
 
 [observability]
 enabled = true

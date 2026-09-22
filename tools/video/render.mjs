@@ -24,6 +24,7 @@ const arg = (k, d) => { const i = process.argv.indexOf(`--${k}`); return i > -1 
 const REGION = arg("region", "israel"), TARGET = arg("target", "tomorrow"), DURATION = +arg("duration", 15), FPS = +arg("fps", 30);
 const OUT = path.resolve(here, arg("out", "out")), PREVIEW = !!arg("preview", false), TOP_N = +arg("beaches", 3);
 const SITE = "https://yamplata.com";
+for (const [n, v] of [["duration", DURATION], ["fps", FPS], ["beaches", TOP_N]]) if (!Number.isFinite(v) || v <= 0 || v > 600) { console.error(`bad --${n}`); process.exit(2); }
 const R = REGIONS[REGION]; if (!R) { console.error(`unknown region ${REGION}; one of ${Object.keys(REGIONS).join(", ")}`); process.exit(2); }
 const tierOf = s => Palata.TIERS.find(t => s >= t.min) || Palata.TIERS[Palata.TIERS.length - 1];
 const fmt = s => (s / 10).toFixed(1);

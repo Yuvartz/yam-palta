@@ -22,20 +22,59 @@ async function sha256(s) { const b = await crypto.subtle.digest("SHA-256", new T
 const keyFor = async endpoint => "sub:" + (await sha256(endpoint));
 const json = (data, status = 200, headers = {}) => new Response(JSON.stringify(data), { status, headers: { "content-type": "application/json; charset=utf-8", ...headers } });
 
+// Map shorteners and map hosts we are willing to follow, at every hop of the redirect chain.
+function mapsHostOk(u) {
+  return u.protocol === "https:" && !u.username && !u.password && !u.port
+    && /^(maps\.app\.goo\.gl|goo\.gl|g\.co|maps\.google\.com|www\.google\.com|google\.com|maps\.apple\.com|waze\.com|www\.waze\.com|ul\.waze\.com)$/.test(u.hostname);
+}
 function cors(req, env) {
   const origin = req.headers.get("Origin") || "";
   const allowed = (env.ALLOWED_ORIGINS || "").split(",").map(s => s.trim()).filter(Boolean);
   const ok = allowed.includes(origin);
   return { ok, headers: ok ? { "access-control-allow-origin": origin, "access-control-allow-methods": "POST, GET, OPTIONS", "access-control-allow-headers": "content-type", "access-control-max-age": "86400", "vary": "Origin" } : {} };
 }
-const validSub = s => s && typeof s.endpoint === "string" && /^https:\/\//.test(s.endpoint) && s.keys && typeof s.keys.p256dh === "string" && typeof s.keys.auth === "string";
+// A push endpoint must belong to a real browser push service: otherwise anyone could register an endpoint
+// they control and make this Worker POST to it (outbound-request abuse). Keep this list tight.
+function pushEndpoint(value) {
+  if (typeof value !== "string" || value.length > 2048) return null;
+  let u; try { u = new URL(value); } catch (e) { return null; }
+  const h = u.hostname;
+  const allowed = h === "fcm.googleapis.com" || h === "updates.push.services.mozilla.com"
+    || h.endsWith(".push.apple.com") || h.endsWith(".notify.windows.com") || h.endsWith(".push.services.mozilla.com");
+  if (u.protocol !== "https:" || !allowed || u.username || u.password || u.port || u.hash) return null;
+  return u;
+}
+// base64url → bytes, with the exact length the Web Push spec requires (auth 16, p256dh 65 uncompressed point).
+function decodeKey(value, bytes) {
+  if (typeof value !== "string" || value.length > 200 || !/^[A-Za-z0-9_-]+=*$/.test(value)) return null;
+  try {
+    const t = value.replace(/-/g, "+").replace(/_/g, "/").replace(/=+$/, "");
+    const out = Uint8Array.from(atob(t + "=".repeat((4 - t.length % 4) % 4)), c => c.charCodeAt(0));
+    return out.length === bytes ? out : null;
+  } catch (e) { return null; }
+}
+function validSub(s) {
+  if (!s || !pushEndpoint(s.endpoint) || !s.keys) return false;
+  const auth = decodeKey(s.keys.auth, 16), pub = decodeKey(s.keys.p256dh, 65);
+  return !!(auth && pub && pub[0] === 4);
+}
+// Proof of ownership for management actions: the caller must know the subscription's own `auth` secret, which only
+// the browser that created it has. Compared in constant time.
+function sameAuth(a, b) {
+  const x = decodeKey(a, 16), y = decodeKey(b, 16);
+  if (!x || !y) return false;
+  let diff = 0; for (let i = 0; i < 16; i++) diff |= x[i] ^ y[i];
+  return diff === 0;
+}
 const validBeach = b => b && typeof b.key === "string" && b.key.length <= 40 && typeof b.name === "string" && b.name.length <= 60
   && Number.isFinite(b.lat) && Number.isFinite(b.lon) && Math.abs(b.lat) <= 90 && Math.abs(b.lon) <= 180;
 
 async function sendPush(env, sub, payload) {
+  if (!validSub(sub)) throw new Error("invalid subscription");   // also guards records already in KV
   const vapid = { subject: env.VAPID_SUBJECT, publicKey: env.VAPID_PUBLIC_KEY, privateKey: env.VAPID_PRIVATE_KEY };
   const init = await buildPushPayload({ data: JSON.stringify(payload), options: { ttl: 3600, urgency: "high", topic: (payload.tag || "yp").slice(0, 32).replace(/[^A-Za-z0-9_-]/g, "") } }, sub, vapid);
-  const res = await fetch(sub.endpoint, init);
+  // redirect:"error" — a push service must answer directly; a redirect would send our request elsewhere.
+  const res = await fetch(sub.endpoint, { ...init, redirect: "error", signal: AbortSignal.timeout(8000) });
   return res.status;   // 201 accepted; 404/410 gone
 }
 
@@ -82,13 +121,17 @@ async function handleFetch(req, env) {
   if (url.pathname === "/expand" && req.method === "GET") {
     if (!originOk) return json({ error: "origin not allowed" }, 403);
     let target; try { target = new URL(url.searchParams.get("u") || ""); } catch (e) { return json({ error: "bad url" }, 400, headers); }
-    const okHost = /^(maps\.app\.goo\.gl|goo\.gl|g\.co|maps\.google\.com|www\.google\.com|google\.com|maps\.apple\.com|waze\.com|www\.waze\.com|ul\.waze\.com)$/.test(target.hostname);
-    if (target.protocol !== "https:" || !okHost) return json({ error: "host not allowed" }, 400, headers);
+    if (!mapsHostOk(target)) return json({ error: "host not allowed" }, 400, headers);
     let cur = target.toString();
     for (let hop = 0; hop < 6; hop++) {
-      const r = await fetch(cur, { redirect: "manual", headers: { "user-agent": "Mozilla/5.0 (compatible; YamPalata/1.0)" } });
+      const r = await fetch(cur, { redirect: "manual", headers: { "user-agent": "Mozilla/5.0 (compatible; YamPalata/1.0)" }, signal: AbortSignal.timeout(8000) });
       const loc = r.headers.get("location");
-      if (r.status >= 300 && r.status < 400 && loc) { cur = new URL(loc, cur).toString(); continue; }
+      if (r.status >= 300 && r.status < 400 && loc) {
+        let next; try { next = new URL(loc, cur); } catch (e) { return json({ error: "bad redirect" }, 400, headers); }
+        // Every hop is checked, not only the first: a shortener could otherwise walk us to any host.
+        if (!mapsHostOk(next)) return json({ error: "redirect target not allowed" }, 400, headers);
+        cur = next.toString(); continue;
+      }
       break;
     }
     return json({ url: cur }, 200, headers);
@@ -100,16 +143,28 @@ async function handleFetch(req, env) {
     return b ? json(b, 200, { ...headers, "cache-control": "public, max-age=300" }) : json({ error: "no fresh buoy in reach" }, 404, headers);
   }
   if (url.pathname === "/health") {
+    // Aggregates only (never endpoints or keys). byBeach comes from the cron's own pass, so a /health call
+    // costs one KV read instead of one per subscriber.
     const list = await env.SUBS.list({ prefix: "sub:", limit: 1000 });
-    // Aggregates only (no endpoints, no keys): subscribers per beach name + last cron run, for the owner's panel.
-    const byBeach = {};
-    for (const { name: k } of list.keys.slice(0, 300)) { const rec = await env.SUBS.get(k, "json"); const n = rec && rec.beach && rec.beach.name; if (n) byBeach[n] = (byBeach[n] || 0) + 1; }
     const lastCron = await env.SUBS.get("meta:cron", "json");
-    return json({ ok: true, subscribers: list.keys.length, byBeach, lastCron, configured: !!(env.VAPID_PRIVATE_KEY && env.VAPID_SUBJECT) }, 200, { ...headers, "cache-control": "no-store" });
+    return json({ ok: true, subscribers: list.keys.length, byBeach: (lastCron && lastCron.byBeach) || {}, lastCron, configured: !!(env.VAPID_PRIVATE_KEY && env.VAPID_SUBJECT) }, 200, { ...headers, "cache-control": "no-store" });
   }
   if (req.method !== "POST") return json({ error: "method" }, 405, headers);
   if (!originOk) return json({ error: "origin not allowed" }, 403);
-  let body; try { body = await req.json(); } catch (e) { return json({ error: "bad json" }, 400, headers); }
+  // Optional bindings (see wrangler.toml [[ratelimits]]): absent binding → no limit, never a crash.
+  const ip = req.headers.get("CF-Connecting-IP") || "unknown";
+  const limiter = url.pathname === "/test" ? env.TEST_LIMIT : env.WRITE_LIMIT;
+  if (limiter && typeof limiter.limit === "function") {
+    const key = url.pathname === "/test" ? `${ip}:test` : ip;
+    try { if (!(await limiter.limit({ key })).success) return json({ error: "rate limited" }, 429, { ...headers, "retry-after": "60" }); }
+    catch (e) { console.warn("rate limiter failed open", e && e.message); }
+  }
+  const len = Number(req.headers.get("content-length") || 0);
+  if (len > 4096) return json({ error: "payload too large" }, 413, headers);
+  let raw; try { raw = await req.text(); } catch (e) { return json({ error: "bad body" }, 400, headers); }
+  if (raw.length > 4096) return json({ error: "payload too large" }, 413, headers);
+  let body; try { body = JSON.parse(raw); } catch (e) { return json({ error: "bad json" }, 400, headers); }
+  if (!body || typeof body !== "object") return json({ error: "bad json" }, 400, headers);
 
   if (url.pathname === "/subscribe") {
     const { subscription: sub, beach } = body;
@@ -117,6 +172,9 @@ async function handleFetch(req, env) {
     if (!validBeach(beach)) return json({ error: "bad beach" }, 400, headers);
     const k = await keyFor(sub.endpoint), now = new Date().toISOString();
     const prev = await env.SUBS.get(k, "json");
+    // Re-registering an endpoint is fine, but only from the browser that owns it (same auth + p256dh).
+    if (prev && prev.sub && (!sameAuth(sub.keys.auth, prev.sub.keys && prev.sub.keys.auth) || sub.keys.p256dh !== (prev.sub.keys && prev.sub.keys.p256dh)))
+      return json({ error: "forbidden" }, 403, headers);
     const rec = { sub: { endpoint: sub.endpoint, keys: { p256dh: sub.keys.p256dh, auth: sub.keys.auth } }, beach: { key: beach.key, name: beach.name, lat: +beach.lat, lon: +beach.lon },
       state: prev && prev.beach && prev.beach.key === beach.key ? prev.state : { lastCalm: false, lastScore: null, sent: [] },   // new beach → fresh transition state
       createdAt: prev ? prev.createdAt : now, updatedAt: now };
@@ -124,24 +182,35 @@ async function handleFetch(req, env) {
     return json({ ok: true, id: k.slice(4, 16), beach: rec.beach.key }, 200, headers);
   }
   if (url.pathname === "/unsubscribe") {
-    if (typeof body.endpoint !== "string") return json({ error: "bad endpoint" }, 400, headers);
-    await env.SUBS.delete(await keyFor(body.endpoint));
+    if (!pushEndpoint(body.endpoint)) return json({ error: "bad endpoint" }, 400, headers);
+    const k = await keyFor(body.endpoint), rec = await env.SUBS.get(k, "json");
+    if (!rec) return json({ ok: true }, 200, headers);   // already gone: idempotent, reveals nothing
+    if (!sameAuth(body.auth, rec.sub && rec.sub.keys && rec.sub.keys.auth)) return json({ error: "forbidden" }, 403, headers);
+    await env.SUBS.delete(k);
     return json({ ok: true }, 200, headers);
   }
   if (url.pathname === "/rotate") {
     const { oldEndpoint, subscription: sub } = body;
-    if (!validSub(sub) || typeof oldEndpoint !== "string") return json({ error: "bad rotate" }, 400, headers);
+    if (!validSub(sub) || !pushEndpoint(oldEndpoint)) return json({ error: "bad rotate" }, 400, headers);
     const oldK = await keyFor(oldEndpoint), prev = await env.SUBS.get(oldK, "json");
     if (!prev) return json({ ok: false, error: "unknown old endpoint" }, 404, headers);
+    if (!sameAuth(body.oldAuth, prev.sub && prev.sub.keys && prev.sub.keys.auth)) return json({ error: "forbidden" }, 403, headers);
+    const newK = await keyFor(sub.endpoint);
+    const occupied = newK === oldK ? prev : await env.SUBS.get(newK, "json");
+    if (occupied && occupied !== prev && (!sameAuth(sub.keys.auth, occupied.sub && occupied.sub.keys && occupied.sub.keys.auth) || sub.keys.p256dh !== (occupied.sub && occupied.sub.keys && occupied.sub.keys.p256dh)))
+      return json({ error: "conflict" }, 409, headers);
     prev.sub = { endpoint: sub.endpoint, keys: { p256dh: sub.keys.p256dh, auth: sub.keys.auth } }; prev.updatedAt = new Date().toISOString();
-    await env.SUBS.put(await keyFor(sub.endpoint), JSON.stringify(prev)); await env.SUBS.delete(oldK);
+    await env.SUBS.put(newK, JSON.stringify(prev));
+    if (newK !== oldK) await env.SUBS.delete(oldK);   // same endpoint → don't delete what we just wrote
     return json({ ok: true }, 200, headers);
   }
   if (url.pathname === "/test") {
-    if (typeof body.endpoint !== "string") return json({ error: "bad endpoint" }, 400, headers);
+    if (!pushEndpoint(body.endpoint)) return json({ error: "bad endpoint" }, 400, headers);
     if (!env.VAPID_PRIVATE_KEY || !env.VAPID_SUBJECT) return json({ ok: false, error: "server not configured (VAPID secrets missing)" }, 503, headers);
     const rec = await env.SUBS.get(await keyFor(body.endpoint), "json");
     if (!rec) return json({ ok: false, error: "not subscribed" }, 404, headers);
+    // Knowing an endpoint is not enough to make us push to it: prove you are the browser that registered it.
+    if (!sameAuth(body.auth, rec.sub && rec.sub.keys && rec.sub.keys.auth)) return json({ error: "forbidden" }, 403, headers);
     const c = Palata.notifyCopy(false, rec.beach.name, null, null, 85);
     const status = await sendPush(env, rec.sub, { title: "🔔 בדיקה · " + c.title, body: "זו התראת בדיקה מהשרת — אם קיבלת אותה, ההתראות האמיתיות יגיעו גם כשהאפליקציה סגורה.", tag: "yp-test", url: `${env.APP_URL}?b=${encodeURIComponent(rec.beach.key)}` });
     return json({ ok: status >= 200 && status < 300, status }, 200, headers);
@@ -155,8 +224,11 @@ async function runScheduled(env, ctx) {
   const list = await env.SUBS.list({ prefix: "sub:", limit: 1000 });
   const forecasts = new Map();   // "lat,lon" → scored hours (one Open-Meteo call per beach)
   let sent = 0, dropped = 0, errors = 0;
+  const byBeach = {};
   for (const { name: k } of list.keys) {
+    if (k === "meta:cron") continue;
     const rec = await env.SUBS.get(k, "json"); if (!rec || !rec.sub || !rec.beach) continue;
+    if (rec.beach.name) byBeach[rec.beach.name] = (byBeach[rec.beach.name] || 0) + 1;
     const fkey = `${rec.beach.lat.toFixed(2)},${rec.beach.lon.toFixed(2)}`;
     try {
       if (!forecasts.has(fkey)) forecasts.set(fkey, scoreHours(await fetchForecast(rec.beach.lat, rec.beach.lon), Palata));
@@ -168,8 +240,10 @@ async function runScheduled(env, ctx) {
         if (status >= 200 && status < 300) sent++; else { errors++; console.warn("push status", status, rec.beach.key, e.type); }
       }
       if (gone) { await env.SUBS.delete(k); dropped++; continue; }
-      rec.state = state; rec.updatedAt = new Date().toISOString();
-      await env.SUBS.put(k, JSON.stringify(rec));
+      // Only write when something actually changed: the free KV tier allows 1000 writes/day and the cron
+      // runs 96 times a day, so an unconditional write caps us at ~10 subscribers.
+      const before = JSON.stringify(rec.state || {}), after = JSON.stringify(state);
+      if (before !== after) { rec.state = state; rec.updatedAt = new Date().toISOString(); await env.SUBS.put(k, JSON.stringify(rec)); }
     } catch (err) { errors++; console.warn("subscriber failed", rec.beach && rec.beach.key, err && err.message); }
   }
   console.log(`cron ${now.dateStr} ${now.hour}:${String(now.minute).padStart(2, "0")} subs=${list.keys.length} beaches=${forecasts.size} sent=${sent} dropped=${dropped} errors=${errors}`);
@@ -177,7 +251,7 @@ async function runScheduled(env, ctx) {
   try {
     const prev = (await env.SUBS.get("meta:cron", "json")) || {};
     const day = now.dateStr, sentToday = (prev.day === day ? (prev.sentToday || 0) : 0) + sent;
-    await env.SUBS.put("meta:cron", JSON.stringify({ at: new Date().toISOString(), day, subscribers: list.keys.length, beaches: forecasts.size, sent, dropped, errors, sentToday }));
+    await env.SUBS.put("meta:cron", JSON.stringify({ at: new Date().toISOString(), day, subscribers: list.keys.length, beaches: forecasts.size, sent, dropped, errors, sentToday, byBeach }));
   } catch (e) { console.warn("meta:cron write failed", e && e.message); }
 }
 
