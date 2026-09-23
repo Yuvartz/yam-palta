@@ -1,9 +1,24 @@
 {
-  "updated": "2026-09-23T20:49:23.671Z",
-  "checkedAt": "2026-09-23T20:49:23.671Z",
+  "updated": "2026-09-23T23:18:53.334Z",
+  "checkedAt": "2026-09-23T23:18:53.335Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25937",
+      "location": "נמל חיפה והחוף השקט",
+      "lat": 32.83,
+      "lon": 34.98,
+      "date": "2026-09-23T23:51+03:00",
+      "dateText": "23.09.2026",
+      "time": "23:51",
+      "activity": "דיג מסירה",
+      "distance": "200- 1 ק\"מ",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25937"
+    },
     {
       "id": "25936",
       "location": "תל אביב צפון - חוף הצוק ותל ברוך",
@@ -1188,21 +1203,6 @@
       "species": "פעמונית נקודה",
       "diameter": "6-10",
       "url": "https://www.meduzot.co.il/observation/25848"
-    },
-    {
-      "id": "25847",
-      "location": "חיפה דרום - חוף זמיר, דדו והסטודנטים",
-      "lat": 32.83,
-      "lon": 34.98,
-      "date": "2026-09-04T08:39+03:00",
-      "dateText": "04.09.2026",
-      "time": "08:39",
-      "activity": "הליכה על החוף",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25847"
     }
   ]
 }
