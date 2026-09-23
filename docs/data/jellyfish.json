@@ -1,9 +1,54 @@
 {
-  "updated": "2026-09-23T12:28:14.506Z",
-  "checkedAt": "2026-09-23T12:28:14.506Z",
+  "updated": "2026-09-23T20:49:23.671Z",
+  "checkedAt": "2026-09-23T20:49:23.671Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25936",
+      "location": "תל אביב צפון - חוף הצוק ותל ברוך",
+      "lat": 32.085,
+      "lon": 34.766,
+      "date": "2026-09-20T06:24+03:00",
+      "dateText": "20.09.2026",
+      "time": "06:24",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": "50",
+      "species": "מסרקנית זהרורית",
+      "diameter": "1-5",
+      "url": "https://www.meduzot.co.il/observation/25936"
+    },
+    {
+      "id": "25935",
+      "location": "פלמחים",
+      "lat": 31.93,
+      "lon": 34.697,
+      "date": "2026-09-19T07:23+03:00",
+      "dateText": "19.09.2026",
+      "time": "07:23",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": "1",
+      "species": "חוטית נודדת",
+      "diameter": "11-30",
+      "url": "https://www.meduzot.co.il/observation/25935"
+    },
+    {
+      "id": "25934",
+      "location": "פלמחים",
+      "lat": 31.93,
+      "lon": 34.697,
+      "date": "2026-09-23T07:22+03:00",
+      "dateText": "23.09.2026",
+      "time": "07:22",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": "1",
+      "species": "חוטית נודדת",
+      "diameter": "11-30",
+      "url": "https://www.meduzot.co.il/observation/25934"
+    },
     {
       "id": "25933",
       "location": "תל אביב מרכז - גורדון, בוגרשוב, פרישמן, צ'ארלס קלור",
@@ -1158,51 +1203,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25847"
-    },
-    {
-      "id": "25846",
-      "location": "הרצליה",
-      "lat": 32.166,
-      "lon": 34.796,
-      "date": "2026-09-03T07:00+03:00",
-      "dateText": "03.09.2026",
-      "time": "07:00",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": "1",
-      "species": "אין מדוזות",
-      "diameter": "1-5",
-      "url": "https://www.meduzot.co.il/observation/25846"
-    },
-    {
-      "id": "25843",
-      "location": "פלמחים",
-      "lat": 31.93,
-      "lon": 34.697,
-      "date": "2026-09-02T19:18+03:00",
-      "dateText": "02.09.2026",
-      "time": "19:18",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": "1",
-      "species": "חוטית נודדת",
-      "diameter": "6-10",
-      "url": "https://www.meduzot.co.il/observation/25843"
-    },
-    {
-      "id": "25842",
-      "location": "חיפה דרום - חוף זמיר, דדו והסטודנטים",
-      "lat": 32.83,
-      "lon": 34.98,
-      "date": "2026-09-02T07:00+03:00",
-      "dateText": "02.09.2026",
-      "time": "07:00",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25842"
     }
   ]
 }
