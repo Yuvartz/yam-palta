@@ -1,9 +1,24 @@
 {
-  "updated": "2026-09-23T23:18:53.334Z",
-  "checkedAt": "2026-09-23T23:18:53.335Z",
+  "updated": "2026-09-24T13:02:27.045Z",
+  "checkedAt": "2026-09-24T13:02:27.045Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25938",
+      "location": "בת ים וראשון לציון",
+      "lat": 32.015,
+      "lon": 34.743,
+      "date": "2026-09-24T09:30+03:00",
+      "dateText": "24.09.2026",
+      "time": "09:30",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25938"
+    },
     {
       "id": "25937",
       "location": "נמל חיפה והחוף השקט",
@@ -1188,21 +1203,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25849"
-    },
-    {
-      "id": "25848",
-      "location": "נווה ים, הבונים ודור-נחשולים",
-      "lat": null,
-      "lon": null,
-      "date": "2026-09-01T08:39+03:00",
-      "dateText": "01.09.2026",
-      "time": "08:39",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": "1-5",
-      "species": "פעמונית נקודה",
-      "diameter": "6-10",
-      "url": "https://www.meduzot.co.il/observation/25848"
     }
   ]
 }
