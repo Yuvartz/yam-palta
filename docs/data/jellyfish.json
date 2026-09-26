@@ -1,9 +1,24 @@
 {
-  "updated": "2026-09-25T15:39:14.459Z",
-  "checkedAt": "2026-09-25T15:39:14.459Z",
+  "updated": "2026-09-26T11:56:26.458Z",
+  "checkedAt": "2026-09-26T11:56:26.458Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25944",
+      "location": "אשדוד",
+      "lat": 31.79,
+      "lon": 34.63,
+      "date": "2026-09-26T10:47+03:00",
+      "dateText": "26.09.2026",
+      "time": "10:47",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25944"
+    },
     {
       "id": "25943",
       "location": "עזה",
@@ -1188,21 +1203,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25855"
-    },
-    {
-      "id": "25854",
-      "location": "בת גלים",
-      "lat": 32.827,
-      "lon": 34.987,
-      "date": "2026-09-05T08:00+03:00",
-      "dateText": "05.09.2026",
-      "time": "08:00",
-      "activity": "צלילה חופשית שנירקול",
-      "distance": "0-200",
-      "quantity": "1-5",
-      "species": "פעמונית נקודה",
-      "diameter": "11-30",
-      "url": "https://www.meduzot.co.il/observation/25854"
     }
   ]
 }
