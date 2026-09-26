@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url><loc>https://yamplata.com/</loc><xhtml:link rel="alternate" hreflang="he" href="https://yamplata.com/"/><xhtml:link rel="alternate" hreflang="en" href="https://yamplata.com/en/"/><changefreq>hourly</changefreq><priority>1.0</priority><lastmod>2026-09-26</lastmod></url>
+  <url><loc>https://yamplata.com/yam-plata/</loc><changefreq>daily</changefreq><priority>0.9</priority><lastmod>2026-09-26</lastmod></url>
+  <url><loc>https://yamplata.com/swim/</loc><changefreq>daily</changefreq><priority>0.9</priority><lastmod>2026-09-26</lastmod></url>
+  <url><loc>https://yamplata.com/app/</loc><changefreq>daily</changefreq><priority>0.9</priority><lastmod>2026-09-26</lastmod></url>
   <url><loc>https://yamplata.com/en/</loc><xhtml:link rel="alternate" hreflang="he" href="https://yamplata.com/"/><xhtml:link rel="alternate" hreflang="en" href="https://yamplata.com/en/"/><changefreq>hourly</changefreq><priority>0.9</priority><lastmod>2026-09-26</lastmod></url>
   <url><loc>https://yamplata.com/akko/</loc><xhtml:link rel="alternate" hreflang="he" href="https://yamplata.com/akko/"/><xhtml:link rel="alternate" hreflang="en" href="https://yamplata.com/en/akko/"/><changefreq>hourly</changefreq><priority>0.8</priority><lastmod>2026-09-26</lastmod></url>
   <url><loc>https://yamplata.com/en/akko/</loc><xhtml:link rel="alternate" hreflang="he" href="https://yamplata.com/akko/"/><xhtml:link rel="alternate" hreflang="en" href="https://yamplata.com/en/akko/"/><changefreq>hourly</changefreq><priority>0.7</priority><lastmod>2026-09-26</lastmod></url>

@@ -4,7 +4,7 @@
 // Runs every 3 hours from .github/workflows/beach-pages.yml and can be run locally:
 //   node scripts/build-beach-pages.mjs
 import { createRequire } from "node:module";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, writeFile, readFile } from "node:fs/promises";
 const require = createRequire(import.meta.url);
 const Palata = require("../docs/palata.js");
 
@@ -15,6 +15,11 @@ const alternates = (slug) => { const he = slug ? `${SITE}/${slug}/` : `${SITE}/`
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 // JSON-LD sits inside <script>: escape "<" so no value can end the block early.
 const ldJson = v => JSON.stringify(v).replace(/</g, "\\u003c");
+// Explicit PNG icons (multiples of 48 px): Google's favicon crawler ignores a site whose only icon is a relative .ico.
+const ICONS = `<link rel="icon" href="/favicon.ico" sizes="48x48" /><link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png" /><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" /><link rel="apple-touch-icon" href="/apple-touch-icon.png" />`;
+// Hebrew guide pages (/yam-plata/, /swim/, /app/): copy by Astra in lib/seo-copy.json, live blocks filled below.
+const COPY = JSON.parse(await readFile(new URL("./lib/seo-copy.json", import.meta.url), "utf8"));
+const GUIDE_LINKS = COPY.home.nav.map(n => `<a href="${n.href}">${esc(n.text)}</a>`).join(" · ");
 
 // Same recipe as the app and the push Worker (Palata.recipeUrls / blendHourly / scoreSeries): the static
 // page must show the number the app shows for that hour. Wave period is display-only, fetched on top.
@@ -75,7 +80,7 @@ ${alternates(b.slug)}
 <meta property="og:title" content="${esc(title)}" /><meta property="og:description" content="${esc(desc)}" /><meta property="og:url" content="${SITE}/${b.slug}/" /><meta property="og:image" content="${SITE}/og-image.png" /><meta property="og:type" content="website" /><meta property="og:locale" content="he_IL" /><meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" /><meta property="og:site_name" content="ים פלטה" />
 <meta name="twitter:card" content="summary_large_image" /><meta name="twitter:title" content="${esc(title)}" /><meta name="twitter:description" content="${esc(desc)}" /><meta name="twitter:image" content="${SITE}/og-image.png" />
 <meta name="theme-color" content="#0a0e16" />
-<link rel="icon" href="/favicon.ico" /><link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+${ICONS}
 <script type="application/ld+json">${ldJson(ld)}</script>
 <script type="application/ld+json">${ldJson({ "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "ים פלטה", item: SITE + "/" }, { "@type": "ListItem", position: 2, name: b.name, item: `${SITE}/${b.slug}/` }] })}</script>
 <style>
@@ -106,6 +111,7 @@ a{color:var(--calm)}.links{font-size:14px;color:var(--muted)}.foot{color:var(--m
 <p>הגולשים מחפשים גלים. המדד שלנו מחפש כמה שפחות: מ-0 לסוער עד 10 לים מראה. הוא משקלל גובה גל, גלי רוח, רוח עכשיו והרוח בעשר השעות האחרונות. גלים גבוהים מגבילים את הציון גם כשהרוח נחה. התחזית היא אנסמבל מודלים (Open-Meteo); בחופי המרכז מוצגת לצדה מדידה ממצוף חדרה.</p>
 <h2>עוד חופים</h2>
 <p class="links">${links}</p>
+<p class="links">מדריכים: ${GUIDE_LINKS}</p>
 <p class="foot">המידע הוא תחזית ולא תחליף לשיקול דעת, לדגלי המציל ולתנאים בשטח. מקורות: <a href="https://open-meteo.com/">Open-Meteo</a> (CC-BY 4.0) · <a href="https://isramar.ocean.org.il/">ISRAMAR</a> · <a href="https://www.meduzot.co.il/">מדוזות בים</a>. © ים פלטה · <a href="/">yamplata.com</a> · <a href="/en/${b.slug}/" hreflang="en" lang="en">English</a></p>
 </div></body></html>
 `;
@@ -134,7 +140,7 @@ ${alternates(path.replace(/^\/en\//, "").replace(/\/$/, ""))}
 <meta property="og:title" content="${esc(title)}" /><meta property="og:description" content="${esc(desc)}" /><meta property="og:url" content="${SITE}${path}" /><meta property="og:image" content="${SITE}/og-image.png" /><meta property="og:type" content="website" /><meta property="og:locale" content="en_US" /><meta property="og:locale:alternate" content="he_IL" /><meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" /><meta property="og:site_name" content="YAM PLATA" />
 <meta name="twitter:card" content="summary_large_image" /><meta name="twitter:title" content="${esc(title)}" /><meta name="twitter:description" content="${esc(desc)}" /><meta name="twitter:image" content="${SITE}/og-image.png" />
 <meta name="theme-color" content="#0a0e16" />
-<link rel="icon" href="/favicon.ico" /><link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+${ICONS}
 ${ld.map(o => `<script type="application/ld+json">${ldJson(o)}</script>`).join("\n")}
 <style>${CSS_EN}</style>
 </head>
@@ -210,6 +216,79 @@ function indexEn(results, now) {
 ` + FOOT_EN("/");
 }
 
+// ---------- Hebrew guide pages: /yam-plata/ ("מה זה ים פלטה"), /swim/ ("שחייה בים"), /app/ ("אפליקציית מזג אוויר לים") ----------
+const CSS_HE = `:root{--bg:#0a0e16;--card:#141b2a;--text:#e6edf6;--muted:#8a98ad;--calm:#2dd4bf;--gold:#ffd479}
+*{box-sizing:border-box}body{margin:0;font-family:Heebo,system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:20px 16px 40px}
+.wrap{max-width:680px;margin:0 auto}h1{font-size:28px;line-height:1.3;margin:8px 0 8px}h2{font-size:20px;margin:30px 0 10px;color:#cdd8e8}
+.lead{font-size:17px;color:#c9d3e0}.hero{background:var(--card);border:1px solid rgba(148,178,255,.1);border-radius:20px;padding:18px;margin:16px 0}
+.meta{color:var(--muted);font-size:14px}table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.06);text-align:right}th{color:var(--muted);font-weight:600}
+td b{font-family:ui-monospace,monospace;font-size:16px}ul{padding-inline-start:20px}li{margin:4px 0}
+.cta{display:inline-block;background:linear-gradient(180deg,rgba(45,212,191,.18),rgba(45,212,191,.05));border:1px solid rgba(45,212,191,.5);color:var(--calm);padding:12px 18px;border-radius:12px;text-decoration:none;font-weight:800;margin-top:12px}
+a{color:var(--calm)}.links{font-size:14px;color:var(--muted)}.foot{color:var(--muted);font-size:12px;margin-top:34px}
+dl dt{font-weight:700;margin-top:14px}dl dd{margin:2px 0 0;color:#c9d3e0}
+.shots{display:flex;gap:12px;justify-content:center;margin:14px 0}.shots img{width:46%;max-width:260px;height:auto;border-radius:22px;border:1px solid rgba(148,178,255,.15)}`;
+function liveBlock(slug, built, now) {
+  const has = cur => cur && cur.score != null;
+  if (slug === "app") return `<div class="shots"><img src="/img/app-screenshot.jpg" width="780" height="1688" alt="ים פלטה באייפון: מדד הפלטה בתל אביב ותחזית לפי שעות" /><img src="/img/app-screenshot-2.jpg" width="780" height="1688" alt="ים פלטה: טמפרטורת מים, רוח, זריחה ושקיעה ומדידת מצוף" loading="lazy" /></div>`;
+  if (slug === "swim") {
+    // the next day that still has daylight hours ahead: after sunset the table looks at tomorrow, not an empty "today"
+    const when = d => d.ds === now.dateStr ? "היום" : dayName(d.ds);
+    const rows = built.map(({ b, cur, days }) => { const d = days.find(x => x.peak); const t = has(cur) ? tierOf(cur.score) : null;
+      const cell = !d ? "—" : d.run ? `${when(d)} <span dir="ltr">${pad(d.run.s)}:00–${pad(d.run.e + 1)}:00</span>` : `${when(d)}: שיא ${(d.peak.score / 10).toFixed(1)} ב-${pad(d.peak.hour)}:00`;
+      return `<tr><td><a href="/${b.slug}/">${esc(b.name)}</a></td><td><b style="color:${t ? t.color : "inherit"}">${t ? (cur.score / 10).toFixed(1) : "—"}</b></td><td>${cell}</td><td>${d && d.water != null ? Math.round(d.water) + "°" : "—"}</td></tr>`; }).join("");
+    return `<table><thead><tr><th>חוף</th><th>מדד עכשיו</th><th>מתי הכי רגוע</th><th>מים</th></tr></thead><tbody>${rows}</tbody></table><p class="meta">עודכן ${now.text}. טווח שעות = חלון רגוע: הרצף הארוך ביותר של שעות אור עם מדד 8.0 ומעלה. כשאין חלון כזה, מוצגת השעה הרגועה ביותר.</p>`;
+  }
+  const rows = built.map(({ b, cur }) => { const t = has(cur) ? tierOf(cur.score) : null;
+    return `<tr><td><a href="/${b.slug}/">${esc(b.name)}</a></td><td><b style="color:${t ? t.color : "inherit"}">${t ? (cur.score / 10).toFixed(1) : "—"}</b></td><td style="color:${t ? t.color : "inherit"}">${t ? `${t.emoji} ${t.label}` : "אין נתונים"}</td><td>${cur && cur.waveHeight != null ? `<span dir="ltr">${cur.waveHeight.toFixed(1)}</span> מ׳` : "—"}</td></tr>`; }).join("");
+  return `<table><thead><tr><th>חוף</th><th>מדד</th><th>מצב</th><th>גל</th></tr></thead><tbody>${rows}</tbody></table><p class="meta">עודכן ${now.text}. מתעדכן כמה פעמים ביום; התחזית השעתית המלאה באפליקציה.</p>`;
+}
+function guide(g, built, now) {
+  const url = `${SITE}/${g.slug}/`;
+  const ogImg = g.slug === "app" ? `${SITE}/img/app-screenshot.jpg` : `${SITE}/og-image.png`;
+  const ld = [
+    { "@context": "https://schema.org", "@type": "WebPage", name: g.title, headline: g.h1, description: g.description, url, inLanguage: "he", dateModified: new Date().toISOString(),
+      isPartOf: { "@type": "WebSite", "@id": `${SITE}/#website`, name: "ים פלטה", url: SITE + "/" }, publisher: { "@type": "Organization", "@id": `${SITE}/#org`, name: "ים פלטה", logo: `${SITE}/icon-512.png` }, primaryImageOfPage: ogImg },
+    { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "ים פלטה", item: SITE + "/" }, { "@type": "ListItem", position: 2, name: g.h1, item: url }] },
+    g.faq && g.faq.length ? { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: g.faq.map(f => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) } : null,
+    g.slug === "app" ? { "@context": "https://schema.org", "@type": "WebApplication", name: "ים פלטה", alternateName: "YAM PLATA", url: SITE + "/", applicationCategory: "WeatherApplication", operatingSystem: "iOS, Android, Web", inLanguage: "he",
+      description: g.description, image: `${SITE}/icon-512.png`, screenshot: [`${SITE}/img/app-screenshot.jpg`, `${SITE}/img/app-screenshot-2.jpg`], offers: { "@type": "Offer", price: "0", priceCurrency: "ILS" } } : null,
+  ].filter(Boolean);
+  const section = x => `<h2>${esc(x.h2)}</h2>${(x.paragraphs || []).map(t => `<p>${esc(t)}</p>`).join("")}${x.bullets && x.bullets.length ? `<ul>${x.bullets.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}`;
+  const others = COPY.pages.filter(o => o.slug !== g.slug).map(o => `<a href="/${o.slug}/">${esc(o.h1)}</a>`).join(" · ");
+  return `<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>${esc(g.title)}</title>
+<meta name="description" content="${esc(g.description)}" />
+<link rel="canonical" href="${url}" />
+<meta property="og:title" content="${esc(g.title)}" /><meta property="og:description" content="${esc(g.description)}" /><meta property="og:url" content="${url}" /><meta property="og:image" content="${ogImg}" /><meta property="og:type" content="article" /><meta property="og:locale" content="he_IL" /><meta property="og:site_name" content="ים פלטה" />
+<meta name="twitter:card" content="summary_large_image" /><meta name="twitter:title" content="${esc(g.title)}" /><meta name="twitter:description" content="${esc(g.description)}" /><meta name="twitter:image" content="${ogImg}" />
+<meta name="theme-color" content="#0a0e16" />
+${ICONS}
+${ld.map(o => `<script type="application/ld+json">${ldJson(o)}</script>`).join("\n")}
+<style>${CSS_HE}</style>
+</head>
+<body><div class="wrap">
+<p class="meta"><a href="/">ים פלטה</a> › ${esc(g.h1)}</p>
+<h1>${esc(g.h1)}</h1>
+${g.lead ? `<p class="lead">${esc(g.lead)}</p>` : ""}
+<div class="hero">
+  ${g.live ? `<h2 style="margin-top:0">${esc(g.live.h2)}</h2>${g.live.intro ? `<p class="meta">${esc(g.live.intro)}</p>` : ""}` : ""}
+  ${liveBlock(g.slug, built, now)}
+  <a class="cta" href="/">${esc(g.cta || "לפתוח את ים פלטה")} ←</a>
+</div>
+${g.sections.map(section).join("\n")}
+${g.faq && g.faq.length ? `<h2>שאלות נפוצות</h2><dl>${g.faq.map(f => `<dt>${esc(f.q)}</dt><dd>${esc(f.a)}</dd>`).join("")}</dl>` : ""}
+<h2>עוד בים פלטה</h2>
+<p class="links">${others}</p>
+<p class="links">עמודי חופים: ${built.map(({ b }) => `<a href="/${b.slug}/">${esc(b.name)}</a>`).join(" · ")}</p>
+<p class="foot">המידע הוא תחזית ולא תחליף לשיקול דעת, לדגלי המציל ולתנאים בשטח. מקורות: <a href="https://open-meteo.com/">Open-Meteo</a> (CC-BY 4.0) · <a href="https://isramar.ocean.org.il/">ISRAMAR</a> · <a href="https://www.meduzot.co.il/">מדוזות בים</a>. © ים פלטה · <a href="/">yamplata.com</a></p>
+</div></body></html>
+`;
+}
+
 const now = israelNow();
 const built = [], failures = [];
 for (const b of BEACHES) {
@@ -221,15 +300,17 @@ for (const b of BEACHES) {
     await mkdir(`docs/en/${b.slug}`, { recursive: true });
     await writeFile(`docs/${b.slug}/index.html`, page(b, cur, days, now, BEACHES.filter(o => o !== b)), "utf8");
     await writeFile(`docs/en/${b.slug}/index.html`, pageEn(b, cur, days, now, BEACHES.filter(o => o !== b)), "utf8");
-    built.push({ b, cur }); console.log("built", b.slug, cur && cur.score != null ? (cur.score / 10).toFixed(1) : "—");
+    built.push({ b, cur, days }); console.log("built", b.slug, cur && cur.score != null ? (cur.score / 10).toFixed(1) : "—");
   } catch (e) { console.warn("failed", b.slug, e.message); failures.push(b.slug); }
 }
 if (built.length) { await mkdir("docs/en", { recursive: true }); await writeFile("docs/en/index.html", indexEn(built, now), "utf8"); }
 if (!built.length) { console.error("no beach built — refusing to rewrite the sitemap"); process.exit(1); }
+for (const g of COPY.pages) { await mkdir(`docs/${g.slug}`, { recursive: true }); await writeFile(`docs/${g.slug}/index.html`, guide(g, built, now), "utf8"); console.log("guide", g.slug); }
 const today = new Date().toISOString().slice(0, 10);
 const alt = (slug) => `<xhtml:link rel="alternate" hreflang="he" href="${SITE}/${slug ? slug + "/" : ""}"/><xhtml:link rel="alternate" hreflang="en" href="${SITE}/en/${slug ? slug + "/" : ""}"/>`;
 const u = (loc, pri, slug) => `<url><loc>${loc}</loc>${alt(slug)}<changefreq>hourly</changefreq><priority>${pri}</priority><lastmod>${today}</lastmod></url>`;
-const urls = [u(`${SITE}/`, "1.0", ""), u(`${SITE}/en/`, "0.9", ""), ...BEACHES.flatMap(b => [u(`${SITE}/${b.slug}/`, "0.8", b.slug), u(`${SITE}/en/${b.slug}/`, "0.7", b.slug)])];
+const ug = (slug) => `<url><loc>${SITE}/${slug}/</loc><changefreq>daily</changefreq><priority>0.9</priority><lastmod>${today}</lastmod></url>`;
+const urls = [u(`${SITE}/`, "1.0", ""), ...COPY.pages.map(g => ug(g.slug)), u(`${SITE}/en/`, "0.9", ""), ...BEACHES.flatMap(b => [u(`${SITE}/${b.slug}/`, "0.8", b.slug), u(`${SITE}/en/${b.slug}/`, "0.7", b.slug)])];
 await writeFile("docs/sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n  ${urls.join("\n  ")}\n</urlset>\n`, "utf8");
 console.log(`sitemap: ${urls.length} urls; built ${built.length}/${BEACHES.length} beaches (he + en) + /en/`);
 // A green job that quietly produced nothing is how a dead feed hides: make the run fail.
