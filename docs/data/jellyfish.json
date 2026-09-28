@@ -1,9 +1,39 @@
 {
-  "updated": "2026-09-28T07:55:13.319Z",
-  "checkedAt": "2026-09-28T07:55:13.319Z",
+  "updated": "2026-09-28T16:14:18.827Z",
+  "checkedAt": "2026-09-28T16:14:18.827Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25952",
+      "location": "קריית חיים",
+      "lat": null,
+      "lon": null,
+      "date": "2026-09-28T13:28+03:00",
+      "dateText": "28.09.2026",
+      "time": "13:28",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25952"
+    },
+    {
+      "id": "25951",
+      "location": "ראש הנקרה - בצת",
+      "lat": null,
+      "lon": null,
+      "date": "2026-09-28T11:10+03:00",
+      "dateText": "28.09.2026",
+      "time": "11:10",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25951"
+    },
     {
       "id": "25950",
       "location": "נווה ים, הבונים ודור-נחשולים",
@@ -1173,36 +1203,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25863"
-    },
-    {
-      "id": "25862",
-      "location": "געש, ארסוף",
-      "lat": null,
-      "lon": null,
-      "date": "2026-09-05T09:24+03:00",
-      "dateText": "05.09.2026",
-      "time": "09:24",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25862"
-    },
-    {
-      "id": "25861",
-      "location": "אולגה וגדור",
-      "lat": 32.45,
-      "lon": 34.88,
-      "date": "2026-09-05T18:04+03:00",
-      "dateText": "05.09.2026",
-      "time": "18:04",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": "1-5",
-      "species": "חוטית נודדת",
-      "diameter": "11-30",
-      "url": "https://www.meduzot.co.il/observation/25861"
     }
   ]
 }
