@@ -1,9 +1,24 @@
 {
-  "updated": "2026-10-03T07:15:49.485Z",
-  "checkedAt": "2026-10-03T07:15:49.485Z",
+  "updated": "2026-10-03T12:50:18.706Z",
+  "checkedAt": "2026-10-03T12:50:18.706Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25965",
+      "location": "מעגן מיכאל וג'אסר א זרקא",
+      "lat": null,
+      "lon": null,
+      "date": "2026-10-03T12:00+03:00",
+      "dateText": "03.10.2026",
+      "time": "12:00",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25965"
+    },
     {
       "id": "25964",
       "location": "ראש הנקרה - בצת",
@@ -1188,21 +1203,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25876"
-    },
-    {
-      "id": "25875",
-      "location": "פלמחים",
-      "lat": 31.93,
-      "lon": 34.697,
-      "date": "2026-09-10T03:34+03:00",
-      "dateText": "10.09.2026",
-      "time": "03:34",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25875"
     }
   ]
 }
