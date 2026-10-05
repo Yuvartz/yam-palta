@@ -1,9 +1,39 @@
 {
-  "updated": "2026-10-04T14:34:12.715Z",
-  "checkedAt": "2026-10-04T14:34:12.715Z",
+  "updated": "2026-10-05T16:34:42.053Z",
+  "checkedAt": "2026-10-05T16:34:42.053Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25969",
+      "location": "תל אביב מרכז - גורדון, בוגרשוב, פרישמן, צ'ארלס קלור",
+      "lat": 32.085,
+      "lon": 34.766,
+      "date": "2026-10-04T07:30+03:00",
+      "dateText": "04.10.2026",
+      "time": "07:30",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25969"
+    },
+    {
+      "id": "25968",
+      "location": "תל אביב מרכז - גורדון, בוגרשוב, פרישמן, צ'ארלס קלור",
+      "lat": 32.085,
+      "lon": 34.766,
+      "date": "2026-10-05T07:30+03:00",
+      "dateText": "05.10.2026",
+      "time": "07:30",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25968"
+    },
     {
       "id": "25967",
       "location": "חיפה דרום - חוף זמיר, דדו והסטודנטים",
@@ -1173,36 +1203,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25880"
-    },
-    {
-      "id": "25879",
-      "location": "ראש הנקרה - בצת",
-      "lat": null,
-      "lon": null,
-      "date": "2026-09-11T08:48+03:00",
-      "dateText": "11.09.2026",
-      "time": "08:48",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25879"
-    },
-    {
-      "id": "25878",
-      "location": "תל אביב צפון - חוף הצוק ותל ברוך",
-      "lat": 32.085,
-      "lon": 34.766,
-      "date": "2026-09-05T09:19+03:00",
-      "dateText": "05.09.2026",
-      "time": "09:19",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25878"
     }
   ]
 }
