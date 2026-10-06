@@ -1,9 +1,24 @@
 {
-  "updated": "2026-10-05T16:34:42.053Z",
-  "checkedAt": "2026-10-05T16:34:42.053Z",
+  "updated": "2026-10-06T16:22:27.708Z",
+  "checkedAt": "2026-10-06T16:22:27.708Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25970",
+      "location": "בת גלים",
+      "lat": 32.827,
+      "lon": 34.987,
+      "date": "2026-10-06T19:16+03:00",
+      "dateText": "06.10.2026",
+      "time": "19:16",
+      "activity": "הליכה על החוף",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25970"
+    },
     {
       "id": "25969",
       "location": "תל אביב מרכז - גורדון, בוגרשוב, פרישמן, צ'ארלס קלור",
@@ -1188,21 +1203,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25881"
-    },
-    {
-      "id": "25880",
-      "location": "חיפה דרום - חוף זמיר, דדו והסטודנטים",
-      "lat": 32.83,
-      "lon": 34.98,
-      "date": "2026-09-11T07:45+03:00",
-      "dateText": "11.09.2026",
-      "time": "07:45",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25880"
     }
   ]
 }
