@@ -82,6 +82,8 @@
     .wrap { max-width: 560px; margin: 0 auto; animation: fadeUp .5s ease both; }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
     @keyframes tlEnterNext { from { opacity: 0; transform: translateX(24px); } 60% { opacity: 1; } to { opacity: 1; transform: translateX(0); } }
+    @keyframes tlRowNext { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes tlRowPrev { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
     @keyframes tlEnterPrev { from { opacity: 0; transform: translateX(-24px); } 60% { opacity: 1; } to { opacity: 1; transform: translateX(0); } }
     .num { font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.5px; }
 
@@ -350,12 +352,21 @@
     .tl-nav:disabled { opacity: .45; cursor: default; }
     .tl-nav:not(:disabled):active { transform: scale(.9); }
     .tl-body { display: flex; flex-direction: column; gap: 2px; }
-    .tl-body.tl-next { animation: tlEnterNext .3s cubic-bezier(.2,.8,.3,1) both; }
-    .tl-body.tl-prev { animation: tlEnterPrev .3s cubic-bezier(.2,.8,.3,1) both; }
+    .timeline { touch-action: pan-y; user-select: none; -webkit-user-select: none; outline: none; }
+    .timeline:focus-visible { box-shadow: 0 0 0 2px var(--calm); }
+    /* New rows stagger in from the side the user came from (one motion with the outgoing glide) */
+    .tl-body.tl-next .tl-row { animation: tlRowNext .42s cubic-bezier(.2,.9,.3,1.12) both; animation-delay: calc(var(--i, 0) * 34ms); }
+    .tl-body.tl-prev .tl-row { animation: tlRowPrev .42s cubic-bezier(.2,.9,.3,1.12) both; animation-delay: calc(var(--i, 0) * 34ms); }
+    .tl-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 22px; padding: 5px 2px 0; }
+    .tl-note { font-size: 10.5px; color: var(--muted); }
+    .tl-today { font-family: var(--sans); font-size: 11px; font-weight: 700; color: var(--calm); background: rgba(45,212,191,.1); border: 1px solid rgba(45,212,191,.28); border-radius: 999px; padding: 2px 10px; cursor: pointer; transition: opacity .2s; }
+    .tl-today.hide { opacity: 0; pointer-events: none; }
+    .tl-dot.past { opacity: .55; }
+    .tl-dot.today { width: 7px; height: 7px; margin-top: -1px; }
     .tl-date-txt { display: inline-block; min-width: 96px; text-align: center; }
     .tl-date-txt.tl-next { animation: tlEnterNext .3s cubic-bezier(.2,.8,.3,1) both; }
     .tl-date-txt.tl-prev { animation: tlEnterPrev .3s cubic-bezier(.2,.8,.3,1) both; }
-    @media (prefers-reduced-motion: reduce) { .tl-body.tl-next, .tl-body.tl-prev, .tl-date-txt.tl-next, .tl-date-txt.tl-prev { animation: none; } }
+    @media (prefers-reduced-motion: reduce) { .tl-body.tl-next .tl-row, .tl-body.tl-prev .tl-row, .tl-date-txt.tl-next, .tl-date-txt.tl-prev { animation: none; } }
     .tl-dots { display: flex; justify-content: center; gap: 5px; padding-top: 6px; }
     .tl-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--border); transition: background .2s, transform .2s; }
     .tl-dot.on { background: var(--calm); transform: scale(1.3); }
@@ -944,7 +955,7 @@
     </div>
   </div>
 
-  <script src="palata.js?v=36"></script>  <!-- query = build: fresh HTML never runs a stale cached palata.js -->
+  <script src="palata.js?v=38"></script>  <!-- query = build: fresh HTML never runs a stale cached palata.js -->
   <script>
   const App = (() => {
     "use strict";
@@ -1129,7 +1140,10 @@
     let jelly = [], jellyOpen = false, scoreOpen = false, dailySun = {}, buoy = null, fbOpen = false, climatology = {}, heroDay = 0;
     let scoreReveal = false;  // set when fresh data lands → the next renderHero counts the score up
     const HERO_DAY_MAX = 5;   // today (0) through +5 days — matches the 6-day forecast list below
+    const HERO_DAY_MIN = -7;  // and back a week: the forecast fetch already carries past_days=7
     let heroDayAnim = null;   // one-shot "next"/"prev" slide direction, consumed by the next render
+    let heroSwapPending = null;
+    let heroNavBusy = false;  // true while the outgoing rows are sliding away (a tap during it swaps instantly)
     let waterMin = LS.water;   // informational comfort threshold only — no longer gates the Palata Index
     const dataCache = {};
     let lastUpdatedAt = null;  // Israel time of the last successful load — shown in the footer
@@ -1764,13 +1778,14 @@
       // used to glow as if it were the current hour.
       const inWindow = now.hour >= DAY_START - 1 && now.hour < DAY_END + 1;
       const nowSlot = (!afterSunset && heroDay === 0 && inWindow) ? slots.reduce((a, b) => Math.abs(b - now.hour) < Math.abs(a - now.hour) ? b : a, slots[0]) : null;
-      const rows = slots.map(hr => {
+      const isPast = baseDate < now.dateStr;   // history is model analysis, not a measurement — say so
+      const rows = slots.map((hr, ri) => {
         const h = hourly.find(x => x.dateStr === baseDate && x.hour === hr);
         const [lbl, col] = h ? hourLabel(h) : ["—", "var(--border)"];
         const height = h && h.waveHeight != null ? h.waveHeight : null;
         const chop = h ? chopHeight(h) : null;   // icon reflects chop (the verdict driver), not total height
         const idx = h ? palataIndex(h) : null;
-        return `<div class="tl-row ${hr === nowSlot ? "tl-now" : ""}">
+        return `<div class="tl-row ${hr === nowSlot ? "tl-now" : ""}" style="--i:${ri}">
           <span class="tl-h">${pad(hr)}:00</span>
           <span class="tl-wave" title="${h ? `סוול ${h.swell != null ? h.swell.toFixed(2) : "—"} מ׳ כל ${h.swellPeriod ? round(h.swellPeriod) : "—"} שנ׳ · גלי רוח ${chop != null ? chop.toFixed(2) : "—"} מ׳` : ""}">${miniWave(h, col)}</span>
           <span class="tl-height num">${height != null ? height.toFixed(2) + " מ׳" : "—"}</span>
@@ -1778,67 +1793,104 @@
           <span class="tl-status" style="color:${col}">${lbl}</span>
         </div>`;
       }).join("");
-      const dots = Array.from({ length: HERO_DAY_MAX + 1 }, (_, i) =>
-        `<span class="tl-dot${i === heroDay ? " on" : ""}"></span>`).join("");
+      const dots = Array.from({ length: HERO_DAY_MAX - HERO_DAY_MIN + 1 }, (_, i) => {
+        const d = i + HERO_DAY_MIN;
+        return `<span class="tl-dot${d === heroDay ? " on" : ""}${d < 0 ? " past" : ""}${d === 0 ? " today" : ""}"></span>`;
+      }).join("");
       const animClass = heroDayAnim ? ` tl-${heroDayAnim}` : "";   // one-shot: only the nav/swipe that just happened animates
       heroDayAnim = null;
-      return `<div class="timeline" id="heroTimeline" ontouchstart="App.heroSwipeStart(event)" ontouchmove="App.heroSwipeMove(event)" ontouchend="App.heroSwipeEnd(event)">
+      return `<div class="timeline" id="heroTimeline" tabindex="0" aria-label="שעות היום. חיצים מחליפים יום" onpointerdown="App.heroSwipeStart(event)" onpointermove="App.heroSwipeMove(event)" onpointerup="App.heroSwipeEnd(event)" onpointercancel="App.heroSwipeEnd(event)" onkeydown="App.heroKey(event)">
         <div class="tl-date">
-          <button class="tl-nav" onclick="App.heroDayNav(-1)" ${heroDay <= 0 ? "disabled" : ""} aria-label="יום קודם">${ICON.chevR}</button>
+          <button class="tl-nav" onclick="App.heroDayNav(-1)" ${heroDay <= HERO_DAY_MIN ? "disabled" : ""} aria-label="יום קודם">${ICON.chevR}</button>
           <span class="tl-date-txt${animClass}">${hebrewDay(baseDate)} · ${shortDate(baseDate)}</span>
           <button class="tl-nav" onclick="App.heroDayNav(1)" ${heroDay >= HERO_DAY_MAX ? "disabled" : ""} aria-label="יום הבא">${ICON.chevL}</button>
         </div>
         <div class="tl-cols" aria-hidden="true"><span>שעה</span><span>צורת הים</span><span>גובה גל</span><span>מדד</span><span>מצב</span></div>
         <div class="tl-body${animClass}">${rows}</div>
+        <div class="tl-foot"><span class="tl-note">${isPast ? "יום שעבר: ניתוח מודל, לא מדידה" : ""}</span><button class="tl-today${heroDay === 0 ? " hide" : ""}" onclick="App.heroDayNav(${-heroDay})"${heroDay === 0 ? ' tabindex="-1" aria-hidden="true"' : ""}>${heroDay < 0 ? "חזרה להיום" : "היום"}</button></div>
         <div class="tl-dots">${dots}</div>
       </div>`;
     }
-    function heroDayNav(dir) {
-      const next = Math.max(0, Math.min(HERO_DAY_MAX, heroDay + dir));
+    function heroDayNav(delta, fromShift = 0) {
+      const next = Math.max(HERO_DAY_MIN, Math.min(HERO_DAY_MAX, heroDay + delta));
       if (next === heroDay) return;
-      heroDay = next; heroDayAnim = dir > 0 ? "next" : "prev"; Sound.whoosh(); Track.event("day-nav", `+${next}`);
+      const dir = next > heroDay ? 1 : -1;
+      heroDay = next; Sound.whoosh(); Track.event("day-nav", next > 0 ? `+${next}` : String(next));
       // Swap ONLY the timeline: a full renderHero() rebuilds the wave layers and every drifting
       // figure, so the whole sea visibly restarts on each day flip. Precision > brute force.
-      const tl = $("heroTimeline");
-      const focusLbl = document.activeElement && document.activeElement.classList.contains("tl-nav") ? document.activeElement.getAttribute("aria-label") : null;
-      if (tl) tl.outerHTML = todayTimeline();
-      else if (hourly.length) renderHero();
-      // The nav buttons were just replaced — keep keyboard focus on the same arrow (or its twin when
-      // it became disabled at the range edge).
-      if (focusLbl) {
+      const swap = () => {
+        const tl = $("heroTimeline");
+        const active = document.activeElement;
+        const focusLbl = active && active.classList.contains("tl-nav") ? active.getAttribute("aria-label") : null;
+        const hadFocus = active === tl;
+        heroDayAnim = dir > 0 ? "next" : "prev";
+        if (tl) tl.outerHTML = todayTimeline();
+        else if (hourly.length) renderHero();
+        heroNavBusy = false;
         const nt = $("heroTimeline"); if (!nt) return;
-        const same = nt.querySelector(`.tl-nav[aria-label="${focusLbl}"]`), any = nt.querySelector(".tl-nav:not(:disabled)");
-        const target = same && !same.disabled ? same : any; if (target) target.focus({ preventScroll: true });
-      }
+        // Controls were just replaced — keep keyboard focus on the same arrow (or its twin when
+        // it became disabled at the range edge), or on the timeline itself for arrow-key use.
+        if (hadFocus) nt.focus({ preventScroll: true });
+        else if (focusLbl) {
+          const same = nt.querySelector(`.tl-nav[aria-label="${focusLbl}"]`), any = nt.querySelector(".tl-nav:not(:disabled)");
+          const target = same && !same.disabled ? same : any; if (target) target.focus({ preventScroll: true });
+        }
+      };
+      const body = document.querySelector("#heroTimeline .tl-body");
+      if (heroNavBusy && heroSwapPending) { heroSwapPending(); return; }   // rapid taps: fold into one swap that shows the final day
+      if (!body || REDUCED.matches || !body.animate) return swap();
+      // Two beats: the old rows continue from wherever the finger left them and glide out, then the
+      // new rows stagger in from the other side (CSS .tl-next/.tl-prev). Feels like one motion.
+      heroNavBusy = true;
+      let swapped = false; const once = () => { if (swapped) return; swapped = true; swap(); };
+      heroSwapPending = once;
+      const out = body.animate(
+        [{ transform: `translateX(${fromShift}px)`, opacity: fromShift ? Math.max(0.45, 1 - Math.abs(fromShift) / 220) : 1 },
+         { transform: `translateX(${-dir * 34}px)`, opacity: 0 }],
+        { duration: 130, easing: "cubic-bezier(.4,0,1,1)", fill: "forwards" });
+      out.onfinish = once; out.oncancel = once;
+      setTimeout(once, 220);   // safety net: a throttled/background tab may never fire onfinish
     }
-    // Swipe the mini-timeline to flip days. touchmove suppresses the page's vertical scroll only
-    // once the gesture is clearly horizontal, so a diagonal swipe still scrolls the page normally.
-    let heroSwipeX = null, heroSwipeY = null, heroSwipeLock = null;
-    function heroSwipeStart(e) { heroSwipeX = e.touches[0].clientX; heroSwipeY = e.touches[0].clientY; heroSwipeLock = null; }
-    // The rows follow the finger (damped) so the gesture feels physical; at the range edges the
+    // Swipe / drag the mini-timeline to flip days (touch and mouse). touch-action: pan-y lets the
+    // page keep scrolling vertically; we only capture the pointer once the gesture is clearly horizontal.
+    let heroSwipeX = null, heroSwipeY = null, heroSwipeLock = null, heroSwipeShift = 0;
+    function heroSwipeStart(e) {
+      if (heroNavBusy || (e.pointerType === "mouse" && e.button !== 0) || e.target.closest(".tl-nav, .tl-today")) return;
+      heroSwipeX = e.clientX; heroSwipeY = e.clientY; heroSwipeLock = null; heroSwipeShift = 0;
+    }
+    // The rows follow the pointer (damped) so the gesture feels physical; at the range edges the
     // resistance doubles, and on release the rows either snap back or slide into the next day.
     function heroSwipeMove(e) {
       if (heroSwipeX == null) return;
-      const dx = e.touches[0].clientX - heroSwipeX, dy = e.touches[0].clientY - heroSwipeY;
-      if (heroSwipeLock == null && Math.hypot(dx, dy) > 10) heroSwipeLock = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
-      if (heroSwipeLock !== "x") return;
-      e.preventDefault();
-      if (REDUCED.matches) return;
+      const dx = e.clientX - heroSwipeX, dy = e.clientY - heroSwipeY;
+      if (heroSwipeLock == null && Math.hypot(dx, dy) > 8) {
+        heroSwipeLock = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+        if (heroSwipeLock === "x") { try { e.currentTarget.setPointerCapture(e.pointerId); } catch (_) {} }
+      }
+      if (heroSwipeLock !== "x" || REDUCED.matches) return;
       const body = document.querySelector("#heroTimeline .tl-body"); if (!body) return;
-      const atEdge = (dx < 0 && heroDay >= HERO_DAY_MAX) || (dx > 0 && heroDay <= 0);
-      const shift = dx * (atEdge ? 0.15 : 0.4);
+      const atEdge = (dx < 0 && heroDay >= HERO_DAY_MAX) || (dx > 0 && heroDay <= HERO_DAY_MIN);
+      heroSwipeShift = dx * (atEdge ? 0.15 : 0.5);
       body.classList.add("dragging");
-      body.style.transform = `translateX(${shift.toFixed(1)}px)`;
-      body.style.opacity = String(Math.max(0.45, 1 - Math.abs(shift) / 220));
+      body.style.transform = `translateX(${heroSwipeShift.toFixed(1)}px)`;
+      body.style.opacity = String(Math.max(0.45, 1 - Math.abs(heroSwipeShift) / 220));
     }
     function heroSwipeEnd(e) {
       if (heroSwipeX == null) return;
-      const dx = e.changedTouches[0].clientX - heroSwipeX, wasHorizontal = heroSwipeLock === "x";
-      heroSwipeX = heroSwipeY = heroSwipeLock = null;
+      const dx = e.clientX - heroSwipeX, wasHorizontal = heroSwipeLock === "x", shift = heroSwipeShift;
+      heroSwipeX = heroSwipeY = heroSwipeLock = null; heroSwipeShift = 0;
       const body = document.querySelector("#heroTimeline .tl-body");
-      if (body) { body.classList.remove("dragging"); body.style.transform = ""; body.style.opacity = ""; }   // snap back (transition)
-      if (!wasHorizontal || Math.abs(dx) < 40) return;
-      heroDayNav(dx < 0 ? 1 : -1);   // swipe left -> next day, swipe right -> previous day
+      const dir = dx < 0 ? 1 : -1;   // swipe left -> next day, swipe right -> previous day
+      const atEdge = dir > 0 ? heroDay >= HERO_DAY_MAX : heroDay <= HERO_DAY_MIN;
+      const commit = e.type === "pointerup" && wasHorizontal && Math.abs(dx) >= 40 && !atEdge;
+      if (body) { body.classList.remove("dragging"); body.style.transform = ""; body.style.opacity = ""; }   // else: snaps back (CSS transition)
+      if (commit) heroDayNav(dir, shift);
+    }
+    // RTL: the "next day" arrow points left, so ArrowLeft goes forward in time.
+    function heroKey(e) {
+      if (e.key === "ArrowLeft") { e.preventDefault(); heroDayNav(1); }
+      else if (e.key === "ArrowRight") { e.preventDefault(); heroDayNav(-1); }
+      else if (e.key === "Home") { e.preventDefault(); heroDayNav(-heroDay); }
     }
     function renderGoodFor() {
       const el = $("goodFor"); const ref = nearestHourData();
@@ -2643,7 +2695,7 @@
     }
     const pad2 = pad;
     // Environment line for error reports: build, OS, file facts.
-    const BUILD = "v36";
+    const BUILD = "v38";
     function camEnv(file, extra) {
       const ua = navigator.userAgent, ios = ua.match(/OS (\d+)_(\d+)/), sfv = ua.match(/Version\/(\d+(?:\.\d+)?)/);
       const os = ios ? `iOS ${ios[1]}.${ios[2]}` : /Android/.test(ua) ? "Android" : "desktop";
@@ -3155,7 +3207,7 @@
       });
     }
 
-    return { init, setLocation, removeLocation, refresh: load, enableNotifications, openAdd, closeAdd, confirmAdd, toggleDay, toggleJelly, toggleScore, installApp, closeInstall, submitFeedback, toggleFeedback, heroDayNav, heroSwipeStart, heroSwipeMove, heroSwipeEnd, useMyLocation, toggleSound, share, openCamera, closeCamera, cameraShare, cameraPos, testNotification, disableNotifications, skipIntro, closeShare, shareLink, shareWhatsApp, trackSupport };
+    return { init, setLocation, removeLocation, refresh: load, enableNotifications, openAdd, closeAdd, confirmAdd, toggleDay, toggleJelly, toggleScore, installApp, closeInstall, submitFeedback, toggleFeedback, heroDayNav, heroSwipeStart, heroSwipeMove, heroSwipeEnd, heroKey, useMyLocation, toggleSound, share, openCamera, closeCamera, cameraShare, cameraPos, testNotification, disableNotifications, skipIntro, closeShare, shareLink, shareWhatsApp, trackSupport };
   })();
 
   document.addEventListener("DOMContentLoaded", App.init);
