@@ -260,20 +260,42 @@
       const now = new Date(), d1 = new Date(now - 864e5), d7 = new Date(now - 7 * 864e5), d30 = new Date(now - 30 * 864e5);
       const [t1, t7, t30, hits] = await Promise.all([
         gc(`stats/total?start=${day(now)}&end=${day(now)}`), gc(`stats/total?start=${day(d7)}&end=${day(now)}`), gc(`stats/total?start=${day(d30)}&end=${day(now)}`),
-        gc(`stats/hits?start=${day(d7)}&end=${day(now)}&limit=40`),
+        gc(`stats/hits?start=${day(d7)}&end=${day(now)}&limit=100`),
       ]);
+      // Audience breakdowns are best-effort: one failing endpoint must not blank the whole card.
+      const range = `start=${day(d7)}&end=${day(now)}&limit=8`;
+      const [locs, systems, browsers, refs] = await Promise.all(["locations", "systems", "browsers", "toprefs"].map(k => gc(`stats/${k}?${range}`).catch(() => null)));
       const list = (hits.hits || []);
       const pages = list.filter(h => !h.event).slice(0, 8), events = list.filter(h => h.event).slice(0, 10);
-      const evName = { launch: "פתיחות", beach: "החלפת חוף", share: "שיתופים", camera: "צילומים", notifications: "התראות הופעלו", "push-registered": "נרשמו לפוש", "maps-link": "קישור מפות", "support-click": "לחצו לתמוך", "camera-error": "שגיאות מצלמה", "camera-photo": "תמונות עם מדד" };
+      const evCount = {}; list.filter(h => h.event).forEach(h => { const k = String(h.path).replace(/^event:/, ""); evCount[k] = (evCount[k] || 0) + (h.count || 0); });
+      const spark = (() => {
+        const days = (t30.stats || []).map(d => d.daily || 0); if (days.length < 2) return "";
+        const mx = Math.max(...days, 1), w = 300, h = 46, step = w / (days.length - 1);
+        const pts = days.map((v, i) => `${(i * step).toFixed(1)},${(h - 3 - (v / mx) * (h - 8)).toFixed(1)}`).join(" ");
+        return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="none" role="img" aria-label="ביקורים ביום, 30 ימים אחרונים"><polyline points="${pts}" fill="none" stroke="var(--calm)" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>`;
+      })();
+      const top = (title, res, nameFn) => {
+        const rows = ((res && res.stats) || []).filter(r => (r.count || 0) > 0).slice(0, 8);
+        const total = rows.reduce((a, r) => a + r.count, 0) || 1;
+        return `<div><h3 style="margin:0 0 6px;color:#aab8ce;font-size:13px">${title}</h3><table>${rows.map(r => `<tr><td>${esc(nameFn ? nameFn(r) : (r.name || "ישיר / לא ידוע"))}</td><td class="num">${num(r.count)}</td><td class="sub num">${Math.round(r.count / total * 100)}%</td></tr>`).join("") || "<tr><td class='sub'>אין עדיין</td></tr>"}</table></div>`;
+      };
+      const visits7 = t7.total || 0;
+      const funnelSteps = [["ביקורים", visits7], ["פתיחות אפליקציה", evCount.launch], ["התקינו (לחיצה על התקנה)", evCount["install-tap"]], ["משתמשים מותקנים, ימים פעילים", evCount["installed-daily-active"]], ["ביקשו התראות", evCount.notifications], ["נרשמו לפוש", evCount["push-registered"]]];
+      const funnel = `<div><h3 style="margin:0 0 6px;color:#aab8ce;font-size:13px">משפך, 7 ימים</h3><table>${funnelSteps.map(([n, v], i) => `<tr><td>${n}</td><td class="num">${v == null ? "—" : num(v)}</td><td class="sub num">${i && v != null && visits7 ? (v / visits7 * 100).toFixed(1) + "%" : ""}</td></tr>`).join("")}</table><div class="sub" style="margin-top:6px">הנתונים אנונימיים: אין זיהוי אישי, ולכן אלה ספירות אירועים ולא "אנשים". מדגם קטן = לקחת בערבון מוגבל.</div></div>`;
+      const evName = { launch: "פתיחות", beach: "החלפת חוף", share: "שיתופים", camera: "צילומים", notifications: "התראות הופעלו", "push-registered": "נרשמו לפוש", "install-tap": "לחצו התקנה", "installed-daily-active": "מותקנים פעילים היום", "day-nav": "דפדוף ימים", "share-open": "פתחו שיתוף", "maps-link": "קישור מפות", "support-click": "לחצו לתמוך", "camera-error": "שגיאות מצלמה", "camera-photo": "תמונות עם מדד" };
       body.innerHTML = `
         <div class="grid" style="margin:8px 0 12px">
           <div class="card"><h3>היום</h3><div class="big num">${num(t1.total)}</div><div class="sub">ביקורים</div></div>
           <div class="card"><h3>7 ימים</h3><div class="big num">${num(t7.total)}</div><div class="sub">ביקורים · <span class="num">${num(t7.total_events)}</span> אירועים</div></div>
           <div class="card"><h3>30 ימים</h3><div class="big num">${num(t30.total)}</div><div class="sub">ביקורים</div></div>
         </div>
+        <div style="margin:0 0 14px"><h3 style="margin:0 0 4px;color:#aab8ce;font-size:13px">ביקורים ביום, 30 ימים</h3>${spark || "<div class='sub'>אין עדיין גרף</div>"}</div>
+        <div class="two" style="margin-bottom:14px">${funnel}${top("מאיפה הגיעו, 7 ימים", refs)}</div>
+        <div class="two" style="margin-bottom:14px">${top("מדינות, 7 ימים", locs)}${top("מערכות הפעלה, 7 ימים", systems)}</div>
+        <div class="two" style="margin-bottom:14px">${top("דפדפנים, 7 ימים", browsers)}<div></div></div>
         <div class="two">
           <div><h3 style="margin:0 0 6px;color:#aab8ce;font-size:13px">עמודים, 7 ימים</h3><table>${pages.map(p => `<tr><td class="path">${esc(p.path)}</td><td class="num">${num(p.count)}</td></tr>`).join("") || "<tr><td class='sub'>אין עדיין</td></tr>"}</table></div>
-          <div><h3 style="margin:0 0 6px;color:#aab8ce;font-size:13px">אירועים באפליקציה, 7 ימים</h3><table>${events.map(p => `<tr><td>${esc(evName[p.path] || p.path)}</td><td class="num">${num(p.count)}</td></tr>`).join("") || "<tr><td class='sub'>אין עדיין</td></tr>"}</table></div>
+          <div><h3 style="margin:0 0 6px;color:#aab8ce;font-size:13px">אירועים באפליקציה, 7 ימים</h3><table>${events.map(p => `<tr><td>${esc(evName[String(p.path).replace(/^event:/, "")] || p.path)}</td><td class="num">${num(p.count)}</td></tr>`).join("") || "<tr><td class='sub'>אין עדיין</td></tr>"}</table></div>
         </div>
         <div class="sub" style="margin-top:8px">מקור: GoatCounter API · <a href="${GC}" target="_blank" rel="noopener">לדשבורד המלא</a> · <a href="#" id="gcForget">שכח טוקן</a></div>`;
       $("gcForget").onclick = ev => { ev.preventDefault(); gcTokenValue = ""; $("gcToken").value = ""; loadGc(); };
