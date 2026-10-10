@@ -749,6 +749,15 @@
       .wrap { max-width: 600px; }
       .card, .hero { padding-inline: 22px; }
     }
+    /* Wide desktop: the same page flows into two balanced columns (hero + week on one side,
+       the data cards on the other). Phones and tablets keep the single column. */
+    @media (min-width: 1100px) {
+      .wrap { max-width: 1120px; }
+      #app { display: block; column-count: 2; column-gap: 22px; }
+      #app > .card, #app > section { break-inside: avoid; -webkit-column-break-inside: avoid; }
+      #app > #updated, #app > #about, #app > #support { column-span: all; }
+      .timeline { max-width: 420px; }
+    }
   </style>
 </head>
 <body>
