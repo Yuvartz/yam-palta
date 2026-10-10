@@ -110,7 +110,7 @@ self.addEventListener("fetch", e => {
         // served a 10-minute-old page right after a deploy — "I tested and it's still broken".
         const res = await fetch(req, { cache: "no-cache" });
         if (res && res.ok) {
-          // Only the app itself may become the offline shell: /panel/, /tel-aviv/ and /en/ are different
+          // Only the app itself may become the offline shell: the control panel, /tel-aviv/ and /en/ are different
           // pages, and caching them under "./" served the wrong page when the network came back down.
           const isShell = new URL(req.url).pathname === new URL("./", self.registration.scope).pathname;
           if (isShell) { const copy = res.clone(); e.waitUntil(caches.open(SHELL_CACHE).then(c => c.put("./", copy))); }
