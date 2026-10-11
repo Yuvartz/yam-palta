@@ -1,9 +1,24 @@
 {
-  "updated": "2026-10-10T19:51:55.647Z",
-  "checkedAt": "2026-10-10T19:51:55.647Z",
+  "updated": "2026-10-11T16:02:36.188Z",
+  "checkedAt": "2026-10-11T16:02:36.188Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25978",
+      "location": "תל אביב מרכז - גורדון, בוגרשוב, פרישמן, צ'ארלס קלור",
+      "lat": 32.085,
+      "lon": 34.766,
+      "date": "2026-10-11T07:30+03:00",
+      "dateText": "11.10.2026",
+      "time": "07:30",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25978"
+    },
     {
       "id": "25977",
       "location": "ראש הנקרה - בצת",
@@ -1188,21 +1203,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25891"
-    },
-    {
-      "id": "25890",
-      "location": "נווה ים, הבונים ודור-נחשולים",
-      "lat": null,
-      "lon": null,
-      "date": "2026-09-11T08:13+03:00",
-      "dateText": "11.09.2026",
-      "time": "08:13",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": "מדוזה הפוכה מטמיעה",
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25890"
     }
   ]
 }
