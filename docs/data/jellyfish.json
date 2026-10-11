@@ -1,9 +1,24 @@
 {
-  "updated": "2026-10-11T16:02:36.188Z",
-  "checkedAt": "2026-10-11T16:02:36.188Z",
+  "updated": "2026-10-11T20:41:39.015Z",
+  "checkedAt": "2026-10-11T20:41:39.015Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25979",
+      "location": "נווה ים, הבונים ודור-נחשולים",
+      "lat": null,
+      "lon": null,
+      "date": "2026-10-11T21:30+03:00",
+      "dateText": "11.10.2026",
+      "time": "21:30",
+      "activity": "צלילה חופשית שנירקול",
+      "distance": "0-200",
+      "quantity": "1-5",
+      "species": "שיטת ארגמנית",
+      "diameter": "1-5",
+      "url": "https://www.meduzot.co.il/observation/25979"
+    },
     {
       "id": "25978",
       "location": "תל אביב מרכז - גורדון, בוגרשוב, פרישמן, צ'ארלס קלור",
@@ -1188,21 +1203,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25892"
-    },
-    {
-      "id": "25891",
-      "location": "קריית חיים",
-      "lat": null,
-      "lon": null,
-      "date": "2026-09-13T13:39+03:00",
-      "dateText": "13.09.2026",
-      "time": "13:39",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25891"
     }
   ]
 }
