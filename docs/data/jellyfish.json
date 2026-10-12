@@ -1,9 +1,24 @@
 {
-  "updated": "2026-10-12T16:17:12.491Z",
-  "checkedAt": "2026-10-12T16:17:12.491Z",
+  "updated": "2026-10-12T23:20:42.349Z",
+  "checkedAt": "2026-10-12T23:20:42.349Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25981",
+      "location": "נווה ים, הבונים ודור-נחשולים",
+      "lat": null,
+      "lon": null,
+      "date": "2026-10-12T07:30+03:00",
+      "dateText": "12.10.2026",
+      "time": "07:30",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25981"
+    },
     {
       "id": "25980",
       "location": "חיפה דרום - חוף זמיר, דדו והסטודנטים",
@@ -1188,21 +1203,6 @@
       "species": "אחר, לא מזוהה",
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25894"
-    },
-    {
-      "id": "25893",
-      "location": "קריית חיים",
-      "lat": null,
-      "lon": null,
-      "date": "2026-09-13T14:20+03:00",
-      "dateText": "13.09.2026",
-      "time": "14:20",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25893"
     }
   ]
 }
