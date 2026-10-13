@@ -1,9 +1,54 @@
 {
-  "updated": "2026-10-12T23:20:42.349Z",
-  "checkedAt": "2026-10-12T23:20:42.349Z",
+  "updated": "2026-10-13T19:38:00.775Z",
+  "checkedAt": "2026-10-13T19:38:00.775Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25984",
+      "location": "נווה ים, הבונים ודור-נחשולים",
+      "lat": null,
+      "lon": null,
+      "date": "2026-10-13T21:28+03:00",
+      "dateText": "13.10.2026",
+      "time": "21:28",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": "1-5",
+      "species": "מצפנית נקודה",
+      "diameter": "6-10",
+      "url": "https://www.meduzot.co.il/observation/25984"
+    },
+    {
+      "id": "25983",
+      "location": "בת ים וראשון לציון",
+      "lat": 32.015,
+      "lon": 34.743,
+      "date": "2026-10-13T10:00+03:00",
+      "dateText": "13.10.2026",
+      "time": "10:00",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25983"
+    },
+    {
+      "id": "25982",
+      "location": "בת ים וראשון לציון",
+      "lat": 32.015,
+      "lon": 34.743,
+      "date": "2026-10-12T10:00+03:00",
+      "dateText": "12.10.2026",
+      "time": "10:00",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25982"
+    },
     {
       "id": "25981",
       "location": "נווה ים, הבונים ודור-נחשולים",
@@ -755,21 +800,6 @@
       "url": "https://www.meduzot.co.il/observation/25932"
     },
     {
-      "id": "25929",
-      "location": "תל אביב צפון - הירקון, מציצים, הילטון ומרינה תל אביב",
-      "lat": 32.085,
-      "lon": 34.766,
-      "date": "2026-09-22T20:00+03:00",
-      "dateText": "22.09.2026",
-      "time": "20:00",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": "אין מדוזות",
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25929"
-    },
-    {
       "id": "25927",
       "location": "בת ים וראשון לציון",
       "lat": 32.015,
@@ -1173,36 +1203,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25898"
-    },
-    {
-      "id": "25897",
-      "location": "חופי אשקלון והדרום",
-      "lat": 31.67,
-      "lon": 34.556,
-      "date": "2026-09-13T18:22+03:00",
-      "dateText": "13.09.2026",
-      "time": "18:22",
-      "activity": "רחצה",
-      "distance": "0-200",
-      "quantity": "1-5",
-      "species": "חוטית נודדת",
-      "diameter": "1-5",
-      "url": "https://www.meduzot.co.il/observation/25897"
-    },
-    {
-      "id": "25894",
-      "location": "תל אביב צפון - חוף הצוק ותל ברוך",
-      "lat": 32.085,
-      "lon": 34.766,
-      "date": "2026-09-13T16:19+03:00",
-      "dateText": "13.09.2026",
-      "time": "16:19",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": "אחר, לא מזוהה",
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25894"
     }
   ]
 }
