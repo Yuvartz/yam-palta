@@ -1,9 +1,54 @@
 {
-  "updated": "2026-10-14T08:09:15.551Z",
-  "checkedAt": "2026-10-14T08:09:15.551Z",
+  "updated": "2026-10-14T19:02:12.764Z",
+  "checkedAt": "2026-10-14T19:02:12.764Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25990",
+      "location": "נמל חיפה והחוף השקט",
+      "lat": 32.83,
+      "lon": 34.98,
+      "date": "2026-10-14T19:29+03:00",
+      "dateText": "14.10.2026",
+      "time": "19:29",
+      "activity": "שיט בסירה",
+      "distance": "200- 1 ק\"מ",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25990"
+    },
+    {
+      "id": "25989",
+      "location": "עכו דרום",
+      "lat": 32.922,
+      "lon": 35.068,
+      "date": "2026-10-14T19:29+03:00",
+      "dateText": "14.10.2026",
+      "time": "19:29",
+      "activity": "שיט בסירה",
+      "distance": "1-10 ק\"מ",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25989"
+    },
+    {
+      "id": "25988",
+      "location": "עכו צפון",
+      "lat": 32.922,
+      "lon": 35.068,
+      "date": "2026-10-14T19:28+03:00",
+      "dateText": "14.10.2026",
+      "time": "19:28",
+      "activity": "שיט בסירה",
+      "distance": "1-10 ק\"מ",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25988"
+    },
     {
       "id": "25987",
       "location": "קיסריה ושדות ים",
@@ -1158,51 +1203,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25904"
-    },
-    {
-      "id": "25903",
-      "location": "קיסריה ושדות ים",
-      "lat": 32.5,
-      "lon": 34.89,
-      "date": "2026-09-14T07:51+03:00",
-      "dateText": "14.09.2026",
-      "time": "07:51",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": "1-5",
-      "species": "פעמונית נקודה",
-      "diameter": "6-10",
-      "url": "https://www.meduzot.co.il/observation/25903"
-    },
-    {
-      "id": "25902",
-      "location": "תל אביב צפון - הירקון, מציצים, הילטון ומרינה תל אביב",
-      "lat": 32.085,
-      "lon": 34.766,
-      "date": "2026-09-14T07:51+03:00",
-      "dateText": "14.09.2026",
-      "time": "07:51",
-      "activity": "שחיה",
-      "distance": "200- 1 ק\"מ",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25902"
-    },
-    {
-      "id": "25901",
-      "location": "חיפה דרום - חוף זמיר, דדו והסטודנטים",
-      "lat": 32.83,
-      "lon": 34.98,
-      "date": "2026-09-14T07:49+03:00",
-      "dateText": "14.09.2026",
-      "time": "07:49",
-      "activity": "הליכה על החוף",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25901"
     }
   ]
 }
