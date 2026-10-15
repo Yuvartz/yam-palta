@@ -1,9 +1,24 @@
 {
-  "updated": "2026-10-14T19:02:12.764Z",
-  "checkedAt": "2026-10-14T19:02:12.764Z",
+  "updated": "2026-10-15T17:28:29.105Z",
+  "checkedAt": "2026-10-15T17:28:29.105Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25991",
+      "location": "מעגן מיכאל וג'אסר א זרקא",
+      "lat": null,
+      "lon": null,
+      "date": "2026-10-15T18:08+03:00",
+      "dateText": "15.10.2026",
+      "time": "18:08",
+      "activity": "צלילה חופשית שנירקול",
+      "distance": "200- 1 ק\"מ",
+      "quantity": "1-5",
+      "species": "חוטית נודדת",
+      "diameter": "1-5",
+      "url": "https://www.meduzot.co.il/observation/25991"
+    },
     {
       "id": "25990",
       "location": "נמל חיפה והחוף השקט",
@@ -1188,21 +1203,6 @@
       "species": "פעמונית נקודה",
       "diameter": "6-10",
       "url": "https://www.meduzot.co.il/observation/25905"
-    },
-    {
-      "id": "25904",
-      "location": "תל אביב מרכז - גורדון, בוגרשוב, פרישמן, צ'ארלס קלור",
-      "lat": 32.085,
-      "lon": 34.766,
-      "date": "2026-09-14T07:30+03:00",
-      "dateText": "14.09.2026",
-      "time": "07:30",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25904"
     }
   ]
 }
