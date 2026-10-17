@@ -1,9 +1,39 @@
 {
-  "updated": "2026-10-17T11:49:44.975Z",
-  "checkedAt": "2026-10-17T11:49:44.975Z",
+  "updated": "2026-10-17T19:49:11.810Z",
+  "checkedAt": "2026-10-17T19:49:11.810Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25994",
+      "location": "חופי אשקלון והדרום",
+      "lat": 31.67,
+      "lon": 34.556,
+      "date": "2026-10-14T20:50+03:00",
+      "dateText": "14.10.2026",
+      "time": "20:50",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25994"
+    },
+    {
+      "id": "25993",
+      "location": "בת גלים",
+      "lat": 32.827,
+      "lon": 34.987,
+      "date": "2026-10-17T20:49+03:00",
+      "dateText": "17.10.2026",
+      "time": "20:49",
+      "activity": "גלישת גלים",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25993"
+    },
     {
       "id": "25992",
       "location": "קריית חיים",
@@ -1173,36 +1203,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25908"
-    },
-    {
-      "id": "25907",
-      "location": "בת ים וראשון לציון",
-      "lat": 32.015,
-      "lon": 34.743,
-      "date": "2026-09-17T09:30+03:00",
-      "dateText": "17.09.2026",
-      "time": "09:30",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25907"
-    },
-    {
-      "id": "25906",
-      "location": "תל אביב מרכז - גורדון, בוגרשוב, פרישמן, צ'ארלס קלור",
-      "lat": 32.085,
-      "lon": 34.766,
-      "date": "2026-09-16T07:30+03:00",
-      "dateText": "16.09.2026",
-      "time": "07:30",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25906"
     }
   ]
 }
