@@ -1,9 +1,24 @@
 {
-  "updated": "2026-10-18T12:15:23.656Z",
-  "checkedAt": "2026-10-18T12:15:23.656Z",
+  "updated": "2026-10-18T22:01:46.986Z",
+  "checkedAt": "2026-10-18T22:01:46.986Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "25996",
+      "location": "תל אביב מרכז - גורדון, בוגרשוב, פרישמן, צ'ארלס קלור",
+      "lat": 32.085,
+      "lon": 34.766,
+      "date": "2026-10-18T07:30+03:00",
+      "dateText": "18.10.2026",
+      "time": "07:30",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/25996"
+    },
     {
       "id": "25995",
       "location": "אולגה וגדור",
@@ -1188,21 +1203,6 @@
       "species": "חוטית נודדת",
       "diameter": "1-5",
       "url": "https://www.meduzot.co.il/observation/25910"
-    },
-    {
-      "id": "25909",
-      "location": "תל אביב צפון - חוף הצוק ותל ברוך",
-      "lat": 32.085,
-      "lon": 34.766,
-      "date": "2026-09-17T07:15+03:00",
-      "dateText": "17.09.2026",
-      "time": "07:15",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25909"
     }
   ]
 }
