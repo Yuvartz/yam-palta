@@ -1,9 +1,39 @@
 {
-  "updated": "2026-10-20T15:27:00.389Z",
-  "checkedAt": "2026-10-20T15:27:00.389Z",
+  "updated": "2026-10-21T06:45:32.955Z",
+  "checkedAt": "2026-10-21T06:45:32.955Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "26002",
+      "location": "פלמחים",
+      "lat": 31.93,
+      "lon": 34.697,
+      "date": "2026-10-21T09:10+03:00",
+      "dateText": "21.10.2026",
+      "time": "09:10",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/26002"
+    },
+    {
+      "id": "26001",
+      "location": "תל אביב מרכז - גורדון, בוגרשוב, פרישמן, צ'ארלס קלור",
+      "lat": 32.085,
+      "lon": 34.766,
+      "date": "2026-10-21T07:30+03:00",
+      "dateText": "21.10.2026",
+      "time": "07:30",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/26001"
+    },
     {
       "id": "26000",
       "location": "קריית חיים",
@@ -1173,36 +1203,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25917"
-    },
-    {
-      "id": "25916",
-      "location": "געש, ארסוף",
-      "lat": null,
-      "lon": null,
-      "date": "2026-09-17T08:00+03:00",
-      "dateText": "17.09.2026",
-      "time": "08:00",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": "1",
-      "species": "חוטית נודדת",
-      "diameter": "11-30",
-      "url": "https://www.meduzot.co.il/observation/25916"
-    },
-    {
-      "id": "25915",
-      "location": "קריית חיים",
-      "lat": null,
-      "lon": null,
-      "date": "2026-09-18T13:45+03:00",
-      "dateText": "18.09.2026",
-      "time": "13:45",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25915"
     }
   ]
 }
