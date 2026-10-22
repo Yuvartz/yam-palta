@@ -1,9 +1,24 @@
 {
-  "updated": "2026-10-21T06:45:32.955Z",
-  "checkedAt": "2026-10-21T06:45:32.955Z",
+  "updated": "2026-10-22T14:13:08.795Z",
+  "checkedAt": "2026-10-22T14:13:08.795Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "26003",
+      "location": "קריית חיים",
+      "lat": null,
+      "lon": null,
+      "date": "2026-10-22T11:14+03:00",
+      "dateText": "22.10.2026",
+      "time": "11:14",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/26003"
+    },
     {
       "id": "26002",
       "location": "פלמחים",
@@ -1188,21 +1203,6 @@
       "species": "פעמונית נקודה",
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25920"
-    },
-    {
-      "id": "25917",
-      "location": "תל אביב צפון - חוף הצוק ותל ברוך",
-      "lat": 32.085,
-      "lon": 34.766,
-      "date": "2026-09-18T08:05+03:00",
-      "dateText": "18.09.2026",
-      "time": "08:05",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25917"
     }
   ]
 }
