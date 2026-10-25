@@ -1,9 +1,24 @@
 {
-  "updated": "2026-10-25T05:29:24.902Z",
-  "checkedAt": "2026-10-25T05:29:24.902Z",
+  "updated": "2026-10-25T17:57:41.537Z",
+  "checkedAt": "2026-10-25T17:57:41.537Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "26016",
+      "location": "אכזיב",
+      "lat": null,
+      "lon": null,
+      "date": "2026-10-25T19:29+02:00",
+      "dateText": "25.10.2026",
+      "time": "19:29",
+      "activity": "צלילת מכלים",
+      "distance": "1-10 ק\"מ",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/26016"
+    },
     {
       "id": "26015",
       "location": "נווה ים, הבונים ודור-נחשולים",
@@ -1188,21 +1203,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25937"
-    },
-    {
-      "id": "25936",
-      "location": "תל אביב צפון - חוף הצוק ותל ברוך",
-      "lat": 32.085,
-      "lon": 34.766,
-      "date": "2026-09-20T06:24+03:00",
-      "dateText": "20.09.2026",
-      "time": "06:24",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": "50",
-      "species": "מסרקנית זהרורית",
-      "diameter": "1-5",
-      "url": "https://www.meduzot.co.il/observation/25936"
     }
   ]
 }
