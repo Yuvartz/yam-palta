@@ -1,9 +1,24 @@
 {
-  "updated": "2026-10-25T17:57:41.537Z",
-  "checkedAt": "2026-10-25T17:57:41.537Z",
+  "updated": "2026-10-25T20:20:18.377Z",
+  "checkedAt": "2026-10-25T20:20:18.377Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "26017",
+      "location": "תל אביב מרכז - גורדון, בוגרשוב, פרישמן, צ'ארלס קלור",
+      "lat": 32.085,
+      "lon": 34.766,
+      "date": "2026-10-25T07:30+02:00",
+      "dateText": "25.10.2026",
+      "time": "07:30",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/26017"
+    },
     {
       "id": "26016",
       "location": "אכזיב",
@@ -1188,21 +1203,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25938"
-    },
-    {
-      "id": "25937",
-      "location": "נמל חיפה והחוף השקט",
-      "lat": 32.83,
-      "lon": 34.98,
-      "date": "2026-09-23T23:51+03:00",
-      "dateText": "23.09.2026",
-      "time": "23:51",
-      "activity": "דיג מסירה",
-      "distance": "200- 1 ק\"מ",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25937"
     }
   ]
 }
