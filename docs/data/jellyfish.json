@@ -1,9 +1,24 @@
 {
-  "updated": "2026-10-26T11:49:59.630Z",
-  "checkedAt": "2026-10-26T11:49:59.630Z",
+  "updated": "2026-10-26T17:51:49.817Z",
+  "checkedAt": "2026-10-26T17:51:49.817Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "26020",
+      "location": "הרצליה",
+      "lat": 32.166,
+      "lon": 34.796,
+      "date": "2026-10-26T15:05+02:00",
+      "dateText": "26.10.2026",
+      "time": "15:05",
+      "activity": "גלישת גלים",
+      "distance": "0-200",
+      "quantity": "1-5",
+      "species": "מסרקנית זהרורית",
+      "diameter": "6-10",
+      "url": "https://www.meduzot.co.il/observation/26020"
+    },
     {
       "id": "26019",
       "location": "חיפה דרום - חוף זמיר, דדו והסטודנטים",
@@ -1188,21 +1203,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25941"
-    },
-    {
-      "id": "25940",
-      "location": "בת גלים",
-      "lat": 32.827,
-      "lon": 34.987,
-      "date": "2026-09-25T12:02+03:00",
-      "dateText": "25.09.2026",
-      "time": "12:02",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25940"
     }
   ]
 }
