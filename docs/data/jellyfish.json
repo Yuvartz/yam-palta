@@ -1,9 +1,24 @@
 {
-  "updated": "2026-11-03T18:46:55.646Z",
-  "checkedAt": "2026-11-03T18:46:55.647Z",
+  "updated": "2026-11-04T11:43:27.738Z",
+  "checkedAt": "2026-11-04T11:43:27.738Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "26037",
+      "location": "נווה ים, הבונים ודור-נחשולים",
+      "lat": null,
+      "lon": null,
+      "date": "2026-11-04T06:03+02:00",
+      "dateText": "04.11.2026",
+      "time": "06:03",
+      "activity": "הליכה על החוף",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/26037"
+    },
     {
       "id": "26036",
       "location": "חיפה דרום - חוף זמיר, דדו והסטודנטים",
@@ -1188,21 +1203,6 @@
       "species": "חוטית נודדת",
       "diameter": "11-30",
       "url": "https://www.meduzot.co.il/observation/25956"
-    },
-    {
-      "id": "25955",
-      "location": "בת ים וראשון לציון",
-      "lat": 32.015,
-      "lon": 34.743,
-      "date": "2026-09-29T16:06+03:00",
-      "dateText": "29.09.2026",
-      "time": "16:06",
-      "activity": "רחצה",
-      "distance": "200- 1 ק\"מ",
-      "quantity": "1",
-      "species": "מצפנית נקודה",
-      "diameter": "6-10",
-      "url": "https://www.meduzot.co.il/observation/25955"
     }
   ]
 }
