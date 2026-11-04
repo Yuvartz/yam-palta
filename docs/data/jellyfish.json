@@ -1,9 +1,24 @@
 {
-  "updated": "2026-11-04T11:43:27.738Z",
-  "checkedAt": "2026-11-04T11:43:27.738Z",
+  "updated": "2026-11-04T19:02:03.966Z",
+  "checkedAt": "2026-11-04T19:02:03.966Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "26038",
+      "location": "בת ים וראשון לציון",
+      "lat": 32.015,
+      "lon": 34.743,
+      "date": "2026-11-04T10:00+02:00",
+      "dateText": "04.11.2026",
+      "time": "10:00",
+      "activity": "שחיה",
+      "distance": "200- 1 ק\"מ",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/26038"
+    },
     {
       "id": "26037",
       "location": "נווה ים, הבונים ודור-נחשולים",
@@ -1188,21 +1203,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25957"
-    },
-    {
-      "id": "25956",
-      "location": "מעגן מיכאל וג'אסר א זרקא",
-      "lat": null,
-      "lon": null,
-      "date": "2026-09-30T07:42+03:00",
-      "dateText": "30.09.2026",
-      "time": "07:42",
-      "activity": "הליכה על החוף",
-      "distance": "0-200",
-      "quantity": "1",
-      "species": "חוטית נודדת",
-      "diameter": "11-30",
-      "url": "https://www.meduzot.co.il/observation/25956"
     }
   ]
 }
