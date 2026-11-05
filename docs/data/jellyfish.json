@@ -1,9 +1,24 @@
 {
-  "updated": "2026-11-04T19:02:03.966Z",
-  "checkedAt": "2026-11-04T19:02:03.966Z",
+  "updated": "2026-11-05T15:54:42.481Z",
+  "checkedAt": "2026-11-05T15:54:42.482Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "26039",
+      "location": "בת ים וראשון לציון",
+      "lat": 32.015,
+      "lon": 34.743,
+      "date": "2026-11-05T10:00+02:00",
+      "dateText": "05.11.2026",
+      "time": "10:00",
+      "activity": "שחיה",
+      "distance": "200- 1 ק\"מ",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/26039"
+    },
     {
       "id": "26038",
       "location": "בת ים וראשון לציון",
@@ -1188,21 +1203,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25958"
-    },
-    {
-      "id": "25957",
-      "location": "בת גלים",
-      "lat": 32.827,
-      "lon": 34.987,
-      "date": "2026-09-30T07:42+03:00",
-      "dateText": "30.09.2026",
-      "time": "07:42",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25957"
     }
   ]
 }
