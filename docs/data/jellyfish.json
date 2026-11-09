@@ -1,9 +1,24 @@
 {
-  "updated": "2026-11-08T20:52:14.965Z",
-  "checkedAt": "2026-11-08T20:52:14.965Z",
+  "updated": "2026-11-09T17:57:15.519Z",
+  "checkedAt": "2026-11-09T17:57:15.519Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "26043",
+      "location": "נווה ים, הבונים ודור-נחשולים",
+      "lat": null,
+      "lon": null,
+      "date": "2026-11-09T07:30+02:00",
+      "dateText": "09.11.2026",
+      "time": "07:30",
+      "activity": "הליכה על החוף",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/26043"
+    },
     {
       "id": "26042",
       "location": "תל אביב מרכז - גורדון, בוגרשוב, פרישמן, צ'ארלס קלור",
@@ -1188,21 +1203,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25962"
-    },
-    {
-      "id": "25961",
-      "location": "אשדוד",
-      "lat": 31.79,
-      "lon": 34.63,
-      "date": "2026-10-03T08:12+03:00",
-      "dateText": "03.10.2026",
-      "time": "08:12",
-      "activity": "הליכה על החוף",
-      "distance": "0-200",
-      "quantity": "1",
-      "species": "חוטית נודדת",
-      "diameter": "11-30",
-      "url": "https://www.meduzot.co.il/observation/25961"
     }
   ]
 }
