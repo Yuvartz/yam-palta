@@ -1,9 +1,54 @@
 {
-  "updated": "2026-11-11T09:59:36.465Z",
-  "checkedAt": "2026-11-11T09:59:36.465Z",
+  "updated": "2026-11-11T17:44:29.272Z",
+  "checkedAt": "2026-11-11T17:44:29.272Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "26047",
+      "location": "בת ים וראשון לציון",
+      "lat": 32.015,
+      "lon": 34.743,
+      "date": "2026-11-11T15:22+02:00",
+      "dateText": "11.11.2026",
+      "time": "15:22",
+      "activity": "רחצה",
+      "distance": "200- 1 ק\"מ",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/26047"
+    },
+    {
+      "id": "26046",
+      "location": "בת ים וראשון לציון",
+      "lat": 32.015,
+      "lon": 34.743,
+      "date": "2026-11-11T10:30+02:00",
+      "dateText": "11.11.2026",
+      "time": "10:30",
+      "activity": "שחיה",
+      "distance": "200- 1 ק\"מ",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/26046"
+    },
+    {
+      "id": "26045",
+      "location": "בת ים וראשון לציון",
+      "lat": 32.015,
+      "lon": 34.743,
+      "date": "2026-11-11T15:17+02:00",
+      "dateText": "11.11.2026",
+      "time": "15:17",
+      "activity": "שחיה",
+      "distance": "200- 1 ק\"מ",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/26045"
+    },
     {
       "id": "26044",
       "location": "נווה ים, הבונים ודור-נחשולים",
@@ -1158,51 +1203,6 @@
       "species": "חוטית נודדת",
       "diameter": "11-30",
       "url": "https://www.meduzot.co.il/observation/25966"
-    },
-    {
-      "id": "25965",
-      "location": "מעגן מיכאל וג'אסר א זרקא",
-      "lat": null,
-      "lon": null,
-      "date": "2026-10-03T12:00+03:00",
-      "dateText": "03.10.2026",
-      "time": "12:00",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25965"
-    },
-    {
-      "id": "25964",
-      "location": "ראש הנקרה - בצת",
-      "lat": null,
-      "lon": null,
-      "date": "2026-10-03T09:17+03:00",
-      "dateText": "03.10.2026",
-      "time": "09:17",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25964"
-    },
-    {
-      "id": "25963",
-      "location": "נווה ים, הבונים ודור-נחשולים",
-      "lat": null,
-      "lon": null,
-      "date": "2026-10-03T07:30+03:00",
-      "dateText": "03.10.2026",
-      "time": "07:30",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25963"
     }
   ]
 }
