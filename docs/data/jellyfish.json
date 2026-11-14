@@ -1,9 +1,24 @@
 {
-  "updated": "2026-11-13T18:16:33.766Z",
-  "checkedAt": "2026-11-13T18:16:33.766Z",
+  "updated": "2026-11-14T07:09:46.541Z",
+  "checkedAt": "2026-11-14T07:09:46.541Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "26052",
+      "location": "אולגה וגדור",
+      "lat": 32.45,
+      "lon": 34.88,
+      "date": "2026-11-14T08:11+02:00",
+      "dateText": "14.11.2026",
+      "time": "08:11",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": "200",
+      "species": "מסרקנית זהרורית",
+      "diameter": "6-10",
+      "url": "https://www.meduzot.co.il/observation/26052"
+    },
     {
       "id": "26051",
       "location": "נווה ים, הבונים ודור-נחשולים",
@@ -1188,21 +1203,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25971"
-    },
-    {
-      "id": "25970",
-      "location": "בת גלים",
-      "lat": 32.827,
-      "lon": 34.987,
-      "date": "2026-10-06T19:16+03:00",
-      "dateText": "06.10.2026",
-      "time": "19:16",
-      "activity": "הליכה על החוף",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25970"
     }
   ]
 }
