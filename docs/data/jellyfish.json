@@ -1,9 +1,39 @@
 {
-  "updated": "2026-11-18T20:58:42.447Z",
-  "checkedAt": "2026-11-18T20:58:42.447Z",
+  "updated": "2026-11-19T19:14:44.219Z",
+  "checkedAt": "2026-11-19T19:14:44.219Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "26065",
+      "location": "בת ים וראשון לציון",
+      "lat": 32.015,
+      "lon": 34.743,
+      "date": "2026-11-19T10:00+02:00",
+      "dateText": "19.11.2026",
+      "time": "10:00",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/26065"
+    },
+    {
+      "id": "26064",
+      "location": "בת ים וראשון לציון",
+      "lat": 32.015,
+      "lon": 34.743,
+      "date": "2026-11-19T10:00+02:00",
+      "dateText": "19.11.2026",
+      "time": "10:00",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/26064"
+    },
     {
       "id": "26063",
       "location": "בת ים וראשון לציון",
@@ -1173,36 +1203,6 @@
       "species": "מצפנית נקודה",
       "diameter": "6-10",
       "url": "https://www.meduzot.co.il/observation/25984"
-    },
-    {
-      "id": "25983",
-      "location": "בת ים וראשון לציון",
-      "lat": 32.015,
-      "lon": 34.743,
-      "date": "2026-10-13T10:00+03:00",
-      "dateText": "13.10.2026",
-      "time": "10:00",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25983"
-    },
-    {
-      "id": "25982",
-      "location": "בת ים וראשון לציון",
-      "lat": 32.015,
-      "lon": 34.743,
-      "date": "2026-10-12T10:00+03:00",
-      "dateText": "12.10.2026",
-      "time": "10:00",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25982"
     }
   ]
 }
