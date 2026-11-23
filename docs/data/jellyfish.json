@@ -1,9 +1,39 @@
 {
-  "updated": "2026-11-22T17:28:36.843Z",
-  "checkedAt": "2026-11-22T17:28:36.843Z",
+  "updated": "2026-11-23T13:50:13.327Z",
+  "checkedAt": "2026-11-23T13:50:13.327Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "26079",
+      "location": "נווה ים, הבונים ודור-נחשולים",
+      "lat": null,
+      "lon": null,
+      "date": "2026-11-23T07:30+02:00",
+      "dateText": "23.11.2026",
+      "time": "07:30",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/26079"
+    },
+    {
+      "id": "26078",
+      "location": "אשדוד",
+      "lat": 31.79,
+      "lon": 34.63,
+      "date": "2026-11-23T13:41+02:00",
+      "dateText": "23.11.2026",
+      "time": "13:41",
+      "activity": "גלישת גלים",
+      "distance": "0-200",
+      "quantity": "5",
+      "species": "מסרקנית זהרורית",
+      "diameter": "1-5",
+      "url": "https://www.meduzot.co.il/observation/26078"
+    },
     {
       "id": "26077",
       "location": "נמל חיפה והחוף השקט",
@@ -1173,36 +1203,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25993"
-    },
-    {
-      "id": "25992",
-      "location": "קריית חיים",
-      "lat": null,
-      "lon": null,
-      "date": "2026-10-17T13:38+03:00",
-      "dateText": "17.10.2026",
-      "time": "13:38",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25992"
-    },
-    {
-      "id": "25991",
-      "location": "מעגן מיכאל וג'אסר א זרקא",
-      "lat": null,
-      "lon": null,
-      "date": "2026-10-15T18:08+03:00",
-      "dateText": "15.10.2026",
-      "time": "18:08",
-      "activity": "צלילה חופשית שנירקול",
-      "distance": "200- 1 ק\"מ",
-      "quantity": "1-5",
-      "species": "חוטית נודדת",
-      "diameter": "1-5",
-      "url": "https://www.meduzot.co.il/observation/25991"
     }
   ]
 }
