@@ -1,9 +1,54 @@
 {
-  "updated": "2026-11-23T13:50:13.327Z",
-  "checkedAt": "2026-11-23T13:50:13.327Z",
+  "updated": "2026-11-24T01:21:03.863Z",
+  "checkedAt": "2026-11-24T01:21:03.863Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "26082",
+      "location": "אכזיב",
+      "lat": null,
+      "lon": null,
+      "date": "2026-11-23T01:30+02:00",
+      "dateText": "23.11.2026",
+      "time": "01:30",
+      "activity": "צלילת מכלים",
+      "distance": "200- 1 ק\"מ",
+      "quantity": "50",
+      "species": "סיפונופורים",
+      "diameter": "11-30",
+      "url": "https://www.meduzot.co.il/observation/26082"
+    },
+    {
+      "id": "26081",
+      "location": "אכזיב",
+      "lat": null,
+      "lon": null,
+      "date": "2026-11-24T01:27+02:00",
+      "dateText": "24.11.2026",
+      "time": "01:27",
+      "activity": "צלילת מכלים",
+      "distance": "1-10 ק\"מ",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/26081"
+    },
+    {
+      "id": "26080",
+      "location": "בת גלים",
+      "lat": 32.827,
+      "lon": 34.987,
+      "date": "2026-11-24T01:27+02:00",
+      "dateText": "24.11.2026",
+      "time": "01:27",
+      "activity": "גלישת גלים",
+      "distance": "0-200",
+      "quantity": null,
+      "species": null,
+      "diameter": null,
+      "url": "https://www.meduzot.co.il/observation/26080"
+    },
     {
       "id": "26079",
       "location": "נווה ים, הבונים ודור-נחשולים",
@@ -78,21 +123,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/26075"
-    },
-    {
-      "id": "26074",
-      "location": "בת ים וראשון לציון",
-      "lat": 32.015,
-      "lon": 34.743,
-      "date": "2026-11-22T10:00+02:00",
-      "dateText": "22.11.2026",
-      "time": "10:00",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/26074"
     },
     {
       "id": "26073",
@@ -228,21 +258,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/26065"
-    },
-    {
-      "id": "26064",
-      "location": "בת ים וראשון לציון",
-      "lat": 32.015,
-      "lon": 34.743,
-      "date": "2026-11-19T10:00+02:00",
-      "dateText": "19.11.2026",
-      "time": "10:00",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/26064"
     },
     {
       "id": "26063",
@@ -1188,21 +1203,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25994"
-    },
-    {
-      "id": "25993",
-      "location": "בת גלים",
-      "lat": 32.827,
-      "lon": 34.987,
-      "date": "2026-10-17T20:49+03:00",
-      "dateText": "17.10.2026",
-      "time": "20:49",
-      "activity": "גלישת גלים",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25993"
     }
   ]
 }
