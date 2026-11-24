@@ -1,9 +1,39 @@
 {
-  "updated": "2026-11-24T01:21:03.863Z",
-  "checkedAt": "2026-11-24T01:21:03.863Z",
+  "updated": "2026-11-24T11:47:03.852Z",
+  "checkedAt": "2026-11-24T11:47:03.852Z",
   "source": "https://www.meduzot.co.il/list",
   "count": 80,
   "reports": [
+    {
+      "id": "26084",
+      "location": "אשדוד",
+      "lat": 31.79,
+      "lon": 34.63,
+      "date": "2026-11-18T08:15+02:00",
+      "dateText": "18.11.2026",
+      "time": "08:15",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": "10",
+      "species": "מסרקנית זהרורית",
+      "diameter": "1-5",
+      "url": "https://www.meduzot.co.il/observation/26084"
+    },
+    {
+      "id": "26083",
+      "location": "פלמחים",
+      "lat": 31.93,
+      "lon": 34.697,
+      "date": "2026-11-23T08:13+02:00",
+      "dateText": "23.11.2026",
+      "time": "08:13",
+      "activity": "שחיה",
+      "distance": "0-200",
+      "quantity": "30",
+      "species": "מסרקנית זהרורית",
+      "diameter": "1-5",
+      "url": "https://www.meduzot.co.il/observation/26083"
+    },
     {
       "id": "26082",
       "location": "אכזיב",
@@ -1173,36 +1203,6 @@
       "species": null,
       "diameter": null,
       "url": "https://www.meduzot.co.il/observation/25996"
-    },
-    {
-      "id": "25995",
-      "location": "אולגה וגדור",
-      "lat": 32.45,
-      "lon": 34.88,
-      "date": "2026-10-18T07:10+03:00",
-      "dateText": "18.10.2026",
-      "time": "07:10",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25995"
-    },
-    {
-      "id": "25994",
-      "location": "חופי אשקלון והדרום",
-      "lat": 31.67,
-      "lon": 34.556,
-      "date": "2026-10-14T20:50+03:00",
-      "dateText": "14.10.2026",
-      "time": "20:50",
-      "activity": "שחיה",
-      "distance": "0-200",
-      "quantity": null,
-      "species": null,
-      "diameter": null,
-      "url": "https://www.meduzot.co.il/observation/25994"
     }
   ]
 }
